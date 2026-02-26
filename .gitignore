@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Desktop.ini
+Thumbs.db
+
+# Python
+*.dist-info/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+.venv-*/
+.venv/
+__pycache__/
+venv-*/
+venv/
+
+# git worktrees
+br-*/
+branch-*/
+
+# others
+.claude/
