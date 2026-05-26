@@ -80,9 +80,10 @@ rm -rf "$STUB_TMP/test" "$STUB_TMP/test_"*
 LSP_OUT="$PROJECT_DIR/stubs/LSP"
 log "Writing stubs to $LSP_OUT/ ..."
 mkdir -p "$LSP_OUT"
+mkdir -p "$LSP_OUT"
 rm -rf "$LSP_OUT"
 
-[[ -d $STUB_TMP ]] && mv -f "$STUB_TMP" "$LSP_OUT/"
+[[ -d $STUB_TMP ]] && mv -Tf "$STUB_TMP" "$LSP_OUT/"
 
 # Marker file so consumers can tell which LSP version the stubs came from
 cat >"$LSP_OUT/.version" <<EOF
