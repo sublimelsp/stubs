@@ -1,8 +1,7 @@
 from ..plugin.core.typing import StrEnum
-from _typeshed import Incomplete
 from enum import IntEnum, IntFlag
-from typing import Any, Literal, Mapping, TypedDict
-from typing_extensions import NotRequired
+from typing import Literal, TypedDict
+from typing_extensions import NotRequired, TypeAlias
 
 URI = str
 DocumentUri = str
@@ -402,7 +401,7 @@ class CompletionTriggerKind(IntEnum):
     TriggerCharacter: int
     TriggerForIncompleteCompletions: int
 
-class ApplyKind(IntFlag):
+class ApplyKind(IntEnum):
     """
     Defines how values from a set of defaults and an individual item will be
     merged.
@@ -467,28 +466,28 @@ class PrepareSupportDefaultBehavior(IntEnum):
 class TokenFormat(StrEnum):
     Relative: str
 
-Definition: Incomplete
-DefinitionLink: str
-LSPArray: Incomplete
-LSPAny: Incomplete
-Declaration: Incomplete
-DeclarationLink: str
-InlineValue: Incomplete
-DocumentDiagnosticReport: Incomplete
-PrepareRenameResult: Incomplete
-DocumentSelector: Incomplete
-ProgressToken = int | str
-ChangeAnnotationIdentifier = str
-WorkspaceDocumentDiagnosticReport: Incomplete
-TextDocumentContentChangeEvent: Incomplete
-MarkedString: Incomplete
-DocumentFilter: Incomplete
-LSPObject = Mapping[str, Any]
-GlobPattern: Incomplete
-TextDocumentFilter: Incomplete
-NotebookDocumentFilter: Incomplete
-Pattern = str
-RegularExpressionEngineKind = str
+Definition: TypeAlias
+DefinitionLink: TypeAlias
+LSPArray: TypeAlias
+LSPAny: TypeAlias
+Declaration: TypeAlias
+DeclarationLink: TypeAlias
+InlineValue: TypeAlias
+DocumentDiagnosticReport: TypeAlias
+PrepareRenameResult: TypeAlias
+DocumentSelector: TypeAlias
+ProgressToken: TypeAlias
+ChangeAnnotationIdentifier: TypeAlias
+WorkspaceDocumentDiagnosticReport: TypeAlias
+TextDocumentContentChangeEvent: TypeAlias
+MarkedString: TypeAlias
+DocumentFilter: TypeAlias
+LSPObject: TypeAlias
+GlobPattern: TypeAlias
+TextDocumentFilter: TypeAlias
+NotebookDocumentFilter: TypeAlias
+Pattern: TypeAlias
+RegularExpressionEngineKind: TypeAlias
 
 class ImplementationParams(TypedDict):
     textDocument: TextDocumentIdentifier
@@ -581,7 +580,7 @@ class FoldingRange(TypedDict):
     startCharacter: NotRequired[Uint]
     endLine: Uint
     endCharacter: NotRequired[Uint]
-    kind: NotRequired['FoldingRangeKind']
+    kind: NotRequired[str | FoldingRangeKind]
     collapsedText: NotRequired[str]
 
 class FoldingRangeRegistrationOptions(TypedDict):
@@ -1450,7 +1449,7 @@ class CodeAction(TypedDict):
     A CodeAction must set either `edit` and/or a `command`. If both are supplied, the `edit` is applied first, then the `command` is executed.
     """
     title: str
-    kind: NotRequired['CodeActionKind']
+    kind: NotRequired[str | CodeActionKind]
     diagnostics: NotRequired[list['Diagnostic']]
     isPreferred: NotRequired[bool]
     disabled: NotRequired['CodeActionDisabled']
@@ -1462,7 +1461,7 @@ class CodeAction(TypedDict):
 class CodeActionRegistrationOptions(TypedDict):
     """Registration options for a {@link CodeActionRequest}."""
     documentSelector: DocumentSelector | None
-    codeActionKinds: NotRequired[list['CodeActionKind']]
+    codeActionKinds: NotRequired[list[str | CodeActionKind]]
     documentation: NotRequired[list['CodeActionKindDocumentation']]
     resolveProvider: NotRequired[bool]
 
@@ -1584,9 +1583,9 @@ class DocumentOnTypeFormattingRegistrationOptions(TypedDict):
 
 class RenameParams(TypedDict):
     """The parameters of a {@link RenameRequest}."""
+    newName: str
     textDocument: TextDocumentIdentifier
     position: Position
-    newName: str
     workDoneToken: NotRequired['ProgressToken']
 
 class RenameRegistrationOptions(TypedDict):
@@ -2060,7 +2059,7 @@ class TextDocumentItem(TypedDict):
     server.
     """
     uri: DocumentUri
-    languageId: LanguageKind
+    languageId: str | LanguageKind
     version: int
     text: str
 
@@ -2172,7 +2171,7 @@ class ServerCapabilities(TypedDict):
     Defines the capabilities provided by a language
     server.
     """
-    positionEncoding: NotRequired['PositionEncodingKind']
+    positionEncoding: NotRequired[str | PositionEncodingKind]
     textDocumentSync: NotRequired[TextDocumentSyncOptions | TextDocumentSyncKind]
     notebookDocumentSync: NotRequired[NotebookDocumentSyncOptions | NotebookDocumentSyncRegistrationOptions]
     completionProvider: NotRequired['CompletionOptions']
@@ -2247,7 +2246,7 @@ class Diagnostic(TypedDict):
     code: NotRequired[int | str]
     codeDescription: NotRequired['CodeDescription']
     source: NotRequired[str]
-    message: str
+    message: str | MarkupContent
     tags: NotRequired[list['DiagnosticTag']]
     relatedInformation: NotRequired[list['DiagnosticRelatedInformation']]
     data: NotRequired['LSPAny']
@@ -2400,7 +2399,7 @@ class CodeActionContext(TypedDict):
     a {@link CodeActionProvider.provideCodeActions code action} is run.
     """
     diagnostics: list['Diagnostic']
-    only: NotRequired[list['CodeActionKind']]
+    only: NotRequired[list[str | CodeActionKind]]
     triggerKind: NotRequired['CodeActionTriggerKind']
 
 class CodeActionDisabled(TypedDict):
@@ -2413,7 +2412,7 @@ class CodeActionDisabled(TypedDict):
 
 class CodeActionOptions(TypedDict):
     """Provider options for a {@link CodeActionRequest}."""
-    codeActionKinds: NotRequired[list['CodeActionKind']]
+    codeActionKinds: NotRequired[list[str | CodeActionKind]]
     documentation: NotRequired[list['CodeActionKindDocumentation']]
     resolveProvider: NotRequired[bool]
     workDoneProgress: NotRequired[bool]
@@ -2728,7 +2727,7 @@ class CodeActionKindDocumentation(TypedDict):
     @since 3.18.0
     @proposed
     """
-    kind: CodeActionKind
+    kind: str | CodeActionKind
     command: Command
 
 class NotebookCellTextDocumentFilter(TypedDict):
@@ -2852,7 +2851,7 @@ class GeneralClientCapabilities(TypedDict):
     staleRequestSupport: NotRequired['StaleRequestSupportOptions']
     regularExpressions: NotRequired['RegularExpressionsClientCapabilities']
     markdown: NotRequired['MarkdownClientCapabilities']
-    positionEncodings: NotRequired[list['PositionEncodingKind']]
+    positionEncodings: NotRequired[list[str | PositionEncodingKind]]
 
 class WorkspaceFoldersServerCapabilities(TypedDict):
     supported: NotRequired[bool]
@@ -3237,6 +3236,7 @@ class DiagnosticClientCapabilities(TypedDict):
     relatedInformation: NotRequired[bool]
     tagSupport: NotRequired['ClientDiagnosticsTagOptions']
     codeDescriptionSupport: NotRequired[bool]
+    markupMessageSupport: NotRequired[bool]
     dataSupport: NotRequired[bool]
 
 class InlineCompletionClientCapabilities(TypedDict):
@@ -3361,7 +3361,7 @@ class ClientCodeLensResolveOptions(TypedDict):
 
 class ClientFoldingRangeKindOptions(TypedDict):
     """@since 3.18.0"""
-    valueSet: NotRequired[list['FoldingRangeKind']]
+    valueSet: NotRequired[list[str | FoldingRangeKind]]
 
 class ClientFoldingRangeOptions(TypedDict):
     """@since 3.18.0"""
@@ -3405,7 +3405,7 @@ class ClientSignatureParameterInformationOptions(TypedDict):
 
 class ClientCodeActionKindOptions(TypedDict):
     """@since 3.18.0"""
-    valueSet: list['CodeActionKind']
+    valueSet: list[str | CodeActionKind]
 
 class ClientDiagnosticsTagOptions(TypedDict):
     """@since 3.18.0"""

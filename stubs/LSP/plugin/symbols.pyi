@@ -1,6 +1,6 @@
 import sublime
 import sublime_plugin
-from ..protocol import DocumentSymbol, Location, Range, SymbolInformation, SymbolKind, WorkspaceSymbol
+from ..protocol import DocumentSymbol, Location as Location, Range, SymbolInformation, SymbolKind, WorkspaceSymbol
 from .core.constants import SYMBOL_KINDS as SYMBOL_KINDS
 from .core.input_handlers import DynamicListInputHandler as DynamicListInputHandler, PreselectedListInputHandler as PreselectedListInputHandler
 from .core.promise import Promise as Promise
@@ -9,8 +9,8 @@ from .core.registry import LspTextCommand as LspTextCommand, LspWindowCommand as
 from .core.sessions import print_to_status_bar as print_to_status_bar
 from .core.views import offset_to_point as offset_to_point, range_to_region as range_to_region, text_document_identifier as text_document_identifier
 from _typeshed import Incomplete
-from typing import Any
-from typing_extensions import NotRequired, TypeGuard, TypedDict
+from typing import Any, TypedDict
+from typing_extensions import NotRequired, TypeGuard
 
 SUPPRESS_INPUT_SETTING_KEY: str
 SYMBOL_KIND_NAMES: dict[SymbolKind, str]

@@ -2,7 +2,7 @@ import sublime
 import sublime_plugin
 from .constants import ST_VERSION as ST_VERSION
 from _typeshed import Incomplete
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any, Callable
 from typing_extensions import ParamSpec
 
@@ -10,14 +10,16 @@ ListItemsReturn: Incomplete
 P = ParamSpec('P')
 
 def debounced(user_function: Callable[P, Any]) -> Callable[P, None]:
-    """ A decorator which debounces the calls to a function.
+    """
+    A decorator which debounces the calls to a function.
 
     Note that the return value of the function will be discarded, so it only makes sense to use this decorator for
     functions that return None. The function will run on Sublime's main thread.
     """
 
-class PreselectedListInputHandler(sublime_plugin.ListInputHandler, metaclass=ABCMeta):
-    """ A ListInputHandler which can preselect a value.
+class PreselectedListInputHandler(sublime_plugin.ListInputHandler, ABC):
+    """
+    A ListInputHandler which can preselect a value.
 
     Subclasses of PreselectedListInputHandler must not implement the `list_items` method, but instead `get_list_items`,
     i.e. just prepend `get_` to the regular `list_items` method.
@@ -33,8 +35,9 @@ class PreselectedListInputHandler(sublime_plugin.ListInputHandler, metaclass=ABC
     @abstractmethod
     def get_list_items(self) -> ListItemsReturn: ...
 
-class DynamicListInputHandler(sublime_plugin.ListInputHandler, metaclass=ABCMeta):
-    """ A ListInputHandler which can update its items while typing in the input field.
+class DynamicListInputHandler(sublime_plugin.ListInputHandler, ABC):
+    """
+    A ListInputHandler which can update its items while typing in the input field.
 
     Subclasses of DynamicListInputHandler must not implement the `list_items` method, but can override
     `get_list_items` for the initial list items. The `on_modified` method will be called after a small delay (debounced)
@@ -64,11 +67,11 @@ class DynamicListInputHandler(sublime_plugin.ListInputHandler, metaclass=ABCMeta
     def cancel(self) -> None: ...
     def confirm(self, text: str) -> None: ...
     def on_modified(self, text: str) -> None:
-        """ Called after changes have been made to the input, with the text of the input field passed as argument. """
+        """Called after changes have been made to the input, with the text of the input field passed as argument."""
     def get_list_items(self) -> list[sublime.ListInputItem]:
-        """ The list items which are initially shown. """
+        """The list items which are initially shown."""
     def update(self, items: list[sublime.ListInputItem]) -> None:
-        """ Call this method to update the list items. """
+        """Call this method to update the list items."""
 
 class InputListener(sublime_plugin.TextChangeListener):
     weakhandler: Incomplete

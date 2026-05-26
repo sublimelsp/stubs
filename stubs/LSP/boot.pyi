@@ -11,7 +11,7 @@ from .plugin.core.tree_view import LspCollapseTreeItemCommand as LspCollapseTree
 from .plugin.core.views import LspRunTextCommandHelperCommand as LspRunTextCommandHelperCommand
 from .plugin.document_link import LspOpenLinkCommand as LspOpenLinkCommand
 from .plugin.documents import TextChangeListener as TextChangeListener
-from .plugin.edit import LspApplyDocumentEditCommand as LspApplyDocumentEditCommand, LspApplyWorkspaceEditCommand as LspApplyWorkspaceEditCommand, LspConcludeWorkspaceEditPanelCommand as LspConcludeWorkspaceEditPanelCommand
+from .plugin.edit import LspApplyDocumentEditCommand as LspApplyDocumentEditCommand, LspApplyTextDocumentEditCommand as LspApplyTextDocumentEditCommand, LspApplyWorkspaceEditCommand as LspApplyWorkspaceEditCommand, LspConcludeWorkspaceEditPanelCommand as LspConcludeWorkspaceEditPanelCommand
 from .plugin.execute_command import LspExecuteCommand as LspExecuteCommand
 from .plugin.folding_range import LspFoldAllCommand as LspFoldAllCommand, LspFoldCommand as LspFoldCommand
 from .plugin.formatting import LspFormatCommand as LspFormatCommand, LspFormatDocumentCommand as LspFormatDocumentCommand, LspFormatDocumentRangeCommand as LspFormatDocumentRangeCommand

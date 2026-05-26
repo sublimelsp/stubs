@@ -8,7 +8,8 @@ def folding_range_to_range(folding_range: FoldingRange) -> Range: ...
 def sorted_folding_ranges(folding_ranges: list[FoldingRange]) -> list[FoldingRange]: ...
 
 class LspFoldCommand(LspTextCommand):
-    '''A command to fold at the current caret position or at a given point.
+    '''
+    A command to fold at the current caret position or at a given point.
 
     Optional command arguments:
 

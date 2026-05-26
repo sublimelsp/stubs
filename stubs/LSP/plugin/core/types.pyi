@@ -1,20 +1,22 @@
-import socket
 import sublime
 from ...protocol import DocumentSelector, DocumentUri, FileOperationFilter, ServerCapabilities, TextDocumentSyncKind, TextDocumentSyncOptions, URI
 from .collections import DottedDict as DottedDict
-from .constants import LANGUAGE_IDENTIFIERS as LANGUAGE_IDENTIFIERS
+from .constants import LANGUAGE_IDENTIFIERS as LANGUAGE_IDENTIFIERS, MarkdownLangMap as MarkdownLangMap
 from .file_watcher import FileWatcherEventType as FileWatcherEventType
 from .logging import debug as debug, set_debug_logging as set_debug_logging
+from .transports import StdioTransportConfig as StdioTransportConfig, TcpClientTransportConfig as TcpClientTransportConfig, TcpServerTransportConfig as TcpServerTransportConfig, TransportConfig as TransportConfig
 from .url import filename_to_uri as filename_to_uri, parse_uri as parse_uri
+from .workspace import WorkspaceFolder as WorkspaceFolder
 from _typeshed import Incomplete
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Any, Callable, Generator, Iterable, TypeVar, TypedDict
 from typing_extensions import NotRequired
 
-TCP_CONNECT_TIMEOUT: int
 FEATURES_TIMEOUT: int
 PANEL_FILE_REGEX: str
 PANEL_LINE_REGEX: str
+MarkdownLangMapJson = dict[str, list[list[str]]]
 
 class FileWatcherConfig(TypedDict):
     patterns: list[str]
@@ -30,11 +32,9 @@ def runtime(token: str) -> Generator[None, None, None]: ...
 T = TypeVar('T')
 
 def diff(old: Iterable[T], new: Iterable[T]) -> tuple[set[T], set[T]]:
-    """
-    Return a tuple of (added, removed) items
-    """
+    """Return a tuple of (added, removed) items."""
 def matches_pattern(path: str, patterns: Any) -> bool: ...
-def sublime_pattern_to_glob(pattern: str, is_directory_pattern: bool, root_path: str | None = None) -> str:
+def sublime_pattern_to_glob(pattern: str, *, is_directory_pattern: bool, root_path: str | None = None) -> str:
     """
     Convert a Sublime Text pattern (http://www.sublimetext.com/docs/file_patterns.html)
     to a glob pattern that utilizes globstar extension.
@@ -81,6 +81,7 @@ def read_dict_setting(settings_obj: sublime.Settings, key: str, default: dict) -
 def read_list_setting(settings_obj: sublime.Settings, key: str, default: list) -> list: ...
 
 class Settings:
+    completion_insert_mode: Incomplete
     diagnostics_additional_delay_auto_complete_ms: Incomplete
     diagnostics_delay_ms: Incomplete
     diagnostics_gutter_marker: Incomplete
@@ -88,12 +89,13 @@ class Settings:
     diagnostics_panel_include_severity_level: Incomplete
     disabled_capabilities: Incomplete
     document_highlight_style: Incomplete
+    format_on_type: Incomplete
     hover_highlight_style: Incomplete
     inhibit_snippet_completions: Incomplete
     inhibit_word_completions: Incomplete
     initially_folded: Incomplete
+    inlay_hints_max_length: Incomplete
     link_highlight_style: Incomplete
-    completion_insert_mode: Incomplete
     log_debug: Incomplete
     log_max_size: Incomplete
     log_server: Incomplete
@@ -108,43 +110,44 @@ class Settings:
     refactoring_auto_save: Incomplete
     semantic_highlighting: Incomplete
     show_code_actions: Incomplete
-    show_code_lens: Incomplete
-    show_inlay_hints: Incomplete
-    inlay_hints_max_length: Incomplete
-    show_diagnostics_in_hover: Incomplete
     show_code_actions_in_hover: Incomplete
+    show_code_lens: Incomplete
     show_diagnostics_annotations_severity_level: Incomplete
     show_diagnostics_count_in_view_status: Incomplete
-    show_multiline_diagnostics_highlights: Incomplete
-    show_multiline_document_highlights: Incomplete
+    show_diagnostics_in_hover: Incomplete
     show_diagnostics_in_view_status: Incomplete
     show_diagnostics_panel_on_save: Incomplete
     show_diagnostics_severity_level: Incomplete
+    show_inlay_hints: Incomplete
+    show_multiline_diagnostics_highlights: Incomplete
+    show_multiline_document_highlights: Incomplete
     show_references_in_quick_panel: Incomplete
+    show_signature_help: Incomplete
     show_symbol_action_links: Incomplete
     show_view_status: Incomplete
     def __init__(self, s: sublime.Settings) -> None: ...
     def update(self, s: sublime.Settings) -> None: ...
     def highlight_style_region_flags(self, style_str: str) -> tuple[sublime.RegionFlags, sublime.RegionFlags]: ...
     def diagnostics_highlight_style_flags(self) -> list[sublime.RegionFlags | None]:
-        """Returns flags for highlighting diagnostics on single lines per severity"""
+        """Returns flags for highlighting diagnostics on single lines per severity."""
 
+@dataclass
 class SemanticToken:
-    modifiers: Incomplete
-    region: Incomplete
-    type: Incomplete
-    def __init__(self, region: sublime.Region, type: str, modifiers: list[str]) -> None: ...
+    region: sublime.Region
+    type: str
+    modifiers: list[str]
 
 class ClientStates:
     STARTING: int
     READY: int
     STOPPING: int
 
-class DocumentFilter_:
+class DocumentFilterMatcher:
     '''
-    A document filter denotes a document through properties like language, scheme or pattern. An example is a filter
-    that applies to TypeScript files on disk. Another example is a filter that applies to JSON files with name
-    package.json:
+    A document filter denotes a document through properties like language, scheme or pattern.
+
+    An example is a filter that applies to TypeScript files on disk. Another example is a filter that applies to JSON
+    files with name package.json:
 
         { "language": "typescript", scheme: "file" }
         { "language": "json", "pattern": "**/package.json" }
@@ -159,7 +162,7 @@ class DocumentFilter_:
     def __call__(self, view: sublime.View) -> bool:
         """Does this filter match the view? An empty filter matches any view."""
 
-class DocumentSelector_:
+class DocumentSelectorMatcher:
     """
     A DocumentSelector is a list of DocumentFilters. A view matches a DocumentSelector if and only if any one of its
     filters matches against the view.
@@ -177,19 +180,16 @@ def method_to_capability(method: str) -> tuple[str, str]:
     Given a method, returns the corresponding capability path, and the associated path to stash the registration key.
 
     Examples:
-
         textDocument/definition --> (definitionProvider, definitionProvider.id)
         textDocument/references --> (referencesProvider, referencesProvider.id)
         textDocument/didOpen --> (textDocumentSync.didOpen, textDocumentSync.didOpen.id)
     """
 def normalize_text_sync(textsync: TextDocumentSyncOptions | TextDocumentSyncKind | None) -> dict[str, Any]:
-    """
-    Brings legacy text sync capabilities to the most modern format
-    """
+    """Brings legacy text sync capabilities to the most modern format."""
 
 class Capabilities(DottedDict):
     """
-    Maintains static and dynamic capabilities
+    Maintains static and dynamic capabilities.
 
     Static capabilities come from a response to the initialize request (from Client -> Server).
     Dynamic capabilities can be registered at any moment with client/registerCapability and client/unregisterCapability
@@ -200,6 +200,7 @@ class Capabilities(DottedDict):
     def assign(self, d: ServerCapabilities) -> None: ...
     def should_notify_did_open(self) -> bool: ...
     def text_sync_kind(self) -> TextDocumentSyncKind: ...
+    def should_notify_did_change_configuration(self) -> bool: ...
     def should_notify_did_change_workspace_folders(self) -> bool: ...
     def should_notify_will_save(self) -> bool: ...
     def should_notify_did_save(self) -> tuple[bool, bool]: ...
@@ -209,17 +210,10 @@ class PathMap:
     def __init__(self, local: str, remote: str) -> None: ...
     @classmethod
     def parse(cls, json: Any) -> list[PathMap] | None: ...
-    def __eq__(self, other: Any) -> bool: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __hash__(self) -> int: ...
     def map_from_local_to_remote(self, uri: str) -> tuple[str, bool]: ...
     def map_from_remote_to_local(self, uri: str) -> tuple[str, bool]: ...
-
-class TransportConfig:
-    name: Incomplete
-    command: Incomplete
-    tcp_port: Incomplete
-    env: Incomplete
-    listener_socket: Incomplete
-    def __init__(self, name: str, command: list[str], tcp_port: int | None, env: dict[str, str], listener_socket: socket.socket | None) -> None: ...
 
 class DefaultViewStatusHandler(ViewStatusHandler):
     def on_view_status_changed(self, config_name: str, view: sublime.View, status: str | None) -> None: ...
@@ -227,7 +221,8 @@ class DefaultViewStatusHandler(ViewStatusHandler):
 default_status_view_handler: Incomplete
 
 class ClientConfig:
-    """Represents the configuration for a language server.
+    """
+    Represents the configuration for a language server.
 
     Holds all settings needed to start and communicate with a language server, including the command to launch it, the
     file types it applies to, transport options, and LSP-level options such as initialization options and capability
@@ -252,7 +247,8 @@ class ClientConfig:
     path_maps: Incomplete
     semantic_tokens: Incomplete
     diagnostics_mode: Incomplete
-    def __init__(self, *, name: str, selector: str, priority_selector: str | None = None, schemes: list[str] | None = None, command: list[str] | None = None, tcp_port: int | None = None, auto_complete_selector: str | None = None, enabled: bool = True, initialization_options: DottedDict | None = None, settings: DottedDict | None = None, env: dict[str, str | list[str]] | None = None, experimental_capabilities: dict[str, Any] | None = None, disabled_capabilities: DottedDict | None = None, file_watcher: FileWatcherConfig | None = None, semantic_tokens: dict[str, str] | None = None, diagnostics_mode: str = 'open_files', path_maps: list[PathMap] | None = None, settings_registration: SettingsRegistration | None = None, all_settings: dict[str, Any] | None = None) -> None:
+    resolved_markdown_language_map: Incomplete
+    def __init__(self, *, name: str, selector: str, priority_selector: str | None = None, schemes: list[str] | None = None, command: list[str] | None = None, tcp_port: int | None = None, auto_complete_selector: str | None = None, enabled: bool = True, initialization_options: DottedDict | None = None, settings: DottedDict | None = None, env: dict[str, str] | None = None, experimental_capabilities: dict[str, Any] | None = None, disabled_capabilities: DottedDict | None = None, file_watcher: FileWatcherConfig | None = None, semantic_tokens: dict[str, str] | None = None, diagnostics_mode: str = 'all_files', markdown_language_map: MarkdownLangMapJson | None = None, path_maps: list[PathMap] | None = None, settings_registration: SettingsRegistration | None = None, all_settings: dict[str, Any] | None = None) -> None:
         '''
         :param name: Unique identifier for this language server.
         :param selector: Sublime Text scope selector that determines which views this server is active for (e.g.
@@ -279,8 +275,13 @@ class ClientConfig:
         :param file_watcher: Configuration for LSP file-watching (glob patterns, etc.).
         :param semantic_tokens: Mapping of semantic token types/modifiers to Sublime Text scopes for syntax
             highlighting.
-        :param diagnostics_mode: When to show diagnostics. `"open_files"` (default) shows them only for open views;
-            `"workspace"` shows them for the whole workspace.
+        :param diagnostics_mode: When to show diagnostics. `"all_files"` (default) shows them for all views;
+            `"workspace"` filters out diagnostics for files not within the workspace folders.
+        :param markdown_language_map: Optional mapping of markdown language identifiers to aliases and Sublime Text
+            syntaxes, used for syntax-highlighting fenced code blocks in popups. Each key is a fenced-code-block
+            language tag. Each value is a two-element tuple: aliases and syntax paths or `scope:BASE_SCOPE`
+            selectors. Follows the format of mdpopups\' `sublime_user_lang_map` setting. `None` (the default)
+            applies no extra mapping.
         :param path_maps: List of :class:`PathMap` entries for translating paths between the local machine and a remote
             server (e.g. inside a container).
         :param settings_registration: The `SettingsRegistration` instance holding resource path and `Settings` instance
@@ -288,17 +289,24 @@ class ClientConfig:
         :param all_settings: The complete raw settings dictionary. Used as a fallback for attribute/key access for
             settings not explicitly modelled above.
         '''
+    def __getattr__(self, name: str) -> Any:
+        """Get property through attribute access (`.foo`) for properties that don't exist natively."""
+    @property
+    def root_settings(self) -> dict[str, Any]: ...
     @property
     def init_options(self) -> DottedDict: ...
     @property
     def enabled(self) -> bool: ...
     @enabled.setter
     def enabled(self, enabled: bool) -> None: ...
-    def __getattr__(self, name: str) -> Any:
-        """Get property through attribute access (`.foo`) for properties that don't exist natively."""
+    @property
+    def markdown_language_map(self) -> MarkdownLangMapJson | None: ...
+    @markdown_language_map.setter
+    def markdown_language_map(self, lang_map: MarkdownLangMapJson | None) -> None: ...
     @classmethod
     def from_sublime_settings(cls, name: str, settings_registration: SettingsRegistration) -> ClientConfig:
-        """Create a ClientConfig from a Sublime Text `Settings` object.
+        """
+        Create a ClientConfig from a Sublime Text `Settings` object.
 
         Plugin-defined defaults are read from a resource path to the plugin's `.sublime-settings` file) and user
         overrides are layered on top from `Settings`.
@@ -308,24 +316,27 @@ class ClientConfig:
         """
     @classmethod
     def from_dict(cls, name: str, d: dict[str, Any]) -> ClientConfig:
-        """Create a ClientConfig from a plain dictionary.
+        """
+        Create a ClientConfig from a plain dictionary.
 
         :param name: Unique server name.
         :param d: Dictionary of configuration values.
         """
     @classmethod
     def from_config(cls, src_config: ClientConfig, override: dict[str, Any]) -> ClientConfig:
-        """Create a ClientConfig by applying overrides to an existing config.
+        """
+        Create a ClientConfig by applying overrides to an existing config.
 
         Values present in `override` take precedence over those in `src_config`. Structured
-        values (`initializationOptions`, `settings`) are deep-merged rather than replaced wholesale. The raw
+        values (`initialization_options`, `settings`) are deep-merged rather than replaced wholesale. The raw
         `_all_settings` dict is shallow-merged.
 
         :param src_config: The base configuration to start from.
         :param override: Dictionary of values to override.
         """
-    def resolve_transport_config(self, variables: dict[str, str]) -> TransportConfig:
-        '''Build a :class:`TransportConfig` ready for starting the language server.
+    def create_transport_config(self) -> TransportConfig:
+        '''
+        Build a :class:`TransportConfig` ready for starting the language server.
 
         Expands variables in the command arguments and environment, resolves the TCP port (including binding a listener
         socket when LSP is hosting the server), and returns the resulting transport configuration.
@@ -335,7 +346,8 @@ class ClientConfig:
         '''
     def set_view_status_handler(self, handler: ViewStatusHandler) -> None: ...
     def set_view_status(self, view: sublime.View, message: str) -> None:
-        '''Update the view status bar entry for this server.
+        '''
+        Update the view status bar entry for this server.
 
         Shows `"<name> (<message>)"` when `message` is non-empty, or just `"<name>"` otherwise. Does nothing (and erases
         any existing entry) when `show_view_status` is disabled in `LSP.sublime-settings`.
@@ -344,12 +356,14 @@ class ClientConfig:
         :param message: A short status string (e.g. `"loading"`). Pass an empty string to show only the client name.
         '''
     def erase_view_status(self, view: sublime.View) -> None:
-        """Remove this server's entry from the view's status bar.
+        """
+        Remove this server's entry from the view's status bar.
 
         :param view: The view whose status bar entry should be cleared.
         """
-    def match_view(self, view: sublime.View, scheme: str) -> bool:
-        '''Return `True` if this server should be active for the given view.
+    def match_view(self, view: sublime.View, scheme: str, window: sublime.Window, workspace_folders: list[WorkspaceFolder]) -> bool:
+        '''
+        Return `True` if this server should be active for the given view.
 
         Delegates to the registered plugin\'s `is_applicable` method when one is available; otherwise checks that
         `scheme` is in :attr:`schemes` and that the view\'s syntax scope matches :attr:`selector`.
@@ -358,7 +372,8 @@ class ClientConfig:
         :param scheme: The URI scheme of the view\'s resource (e.g. `"file"`).
         '''
     def map_client_path_to_server_uri(self, path: str) -> str:
-        """Convert a local filesystem path to the URI the language server expects.
+        """
+        Convert a local filesystem path to the URI the language server expects.
 
         Applies any configured :attr:`path_maps` to translate the path (e.g. from a local path to a container path),
         then converts the result to a `file://` URI.
@@ -367,7 +382,8 @@ class ClientConfig:
         :returns: URI suitable for sending to the language server.
         """
     def map_server_uri_to_client_path(self, uri: DocumentUri) -> str:
-        '''Convert a URI from the language server to a local filesystem path.
+        '''
+        Convert a URI from the language server to a local filesystem path.
 
         Only `file://` and `res://` URIs are supported; other schemes raise :exc:`ValueError`. Applies any
         configured :attr:`path_maps` in reverse to translate the server path back to the local path.
@@ -377,7 +393,8 @@ class ClientConfig:
         :raises ValueError: If the URI scheme is not `"file"` or `"res"`.
         '''
     def is_disabled_capability(self, capability_path: str) -> bool:
-        '''Return `True` if the given capability has been disabled in the config.
+        '''
+        Return `True` if the given capability has been disabled in the config.
 
         Walks :attr:`disabled_capabilities` along `capability_path` (a string such as `"hoverProvider"` or dotted string
         like `textDocumentSync.didOpen`). A capability is considered disabled when the value at that path is `True`, or
@@ -386,4 +403,5 @@ class ClientConfig:
         :param capability_path: Dotted capability path to check.
         '''
     def filter_out_disabled_capabilities(self, capability_path: str, options: dict[str, Any]) -> dict[str, Any]: ...
-    def __eq__(self, other: Any) -> bool: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __hash__(self) -> int: ...

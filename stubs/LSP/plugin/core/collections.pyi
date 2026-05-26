@@ -15,16 +15,15 @@ class DottedDict:
         """
     @classmethod
     def from_base_and_override(cls, base: DottedDict, override: dict[str, Any] | None) -> DottedDict: ...
-    def get(self, path: str | None = None) -> Any:
+    def get(self, path: str | None = None, default: Any = None) -> Any:
         """
         Get a value from the dictionary.
 
         :param      path:  The path, e.g. foo.bar.baz, or None.
+        :param   default:  Fallback value if path is not contained in this DottedDict.
 
-        :returns:   The value stored at the path, or None if it doesn't exist.
-                    Note that this cannot distinguish between None values and
-                    paths that don't exist. If the path is None, returns the
-                    entire dictionary.
+        :returns:   The value stored at the path, or `default` if it doesn't exist.
+                    If the path is None, returns the entire dictionary.
         """
     def walk(self, path: str) -> Generator[Any, None, None]: ...
     def set(self, path: str, value: Any) -> None:
@@ -52,14 +51,10 @@ class DottedDict:
                     entire dictionary.
         """
     def __bool__(self) -> bool:
-        """
-        If this collection has at least one key-value pair, return True, else return False.
-        """
+        """If this collection has at least one key-value pair, return True, else return False."""
     def __contains__(self, path: object) -> bool: ...
     def clear(self) -> None:
-        """
-        Remove all key-value pairs.
-        """
+        """Remove all key-value pairs."""
     def assign(self, d: dict[str, Any]) -> None:
         """
         Overwrites the old stored dictionary with a fresh new dictionary.
@@ -83,4 +78,5 @@ class DottedDict:
 
         :returns:   A copy of the underlying dictionary, but with the variables replaced
         """
-    def __eq__(self, other: Any) -> bool: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __hash__(self) -> int: ...

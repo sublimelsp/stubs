@@ -5,9 +5,7 @@ from _typeshed import Incomplete
 from typing import Any
 
 class ActiveRequest:
-    """
-    Holds state per request.
-    """
+    """Holds state per request."""
     weaksv: Incomplete
     request_id: Incomplete
     request: Incomplete

@@ -15,7 +15,8 @@ ExecutorFunc = Callable[[ResolveFunc[T]], None]
 PackagedTask: Incomplete
 
 class Promise(Generic[T]):
-    '''A simple implementation of the Promise specification.
+    '''
+    A simple implementation of the Promise specification.
 
     See: https://promisesaplus.com
 
@@ -60,7 +61,8 @@ class Promise(Generic[T]):
     '''
     @staticmethod
     def resolve(resolve_value: S) -> Promise[S]:
-        """Immediately resolves a Promise.
+        """
+        Immediately resolves a Promise.
 
         Convenience function for creating a Promise that gets immediately
         resolved with the specified value.
@@ -86,7 +88,8 @@ class Promise(Generic[T]):
     mutex: Incomplete
     callbacks: Incomplete
     def __init__(self, executor_func: ExecutorFunc[T]) -> None:
-        '''Initialize Promise object.
+        '''
+        Initialize Promise object.
 
         Arguments:
             executor_func: A function that is executed immediately by this Promise.
@@ -94,7 +97,8 @@ class Promise(Generic[T]):
             called, resolves the Promise with the value passed to it.
         '''
     def then(self, onfullfilled: FullfillFunc[T, TResult]) -> Promise[TResult]:
-        """Create a new promise and chain it with this promise.
+        """
+        Create a new promise and chain it with this promise.
 
         When this promise gets resolved, the callback will be called with the
         value that this promise resolved with.

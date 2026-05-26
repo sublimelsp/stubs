@@ -6,9 +6,7 @@ from .core.views import first_selection_region as first_selection_region, offset
 from typing import Any
 
 class LspExecuteCommand(LspTextCommand):
-    """
-    Helper command for triggering workspace/executeCommand requests.
-    """
+    """Helper command for triggering workspace/executeCommand requests."""
     def run(self, edit: sublime.Edit, command_name: str | None = None, command_args: list[Any] | None = None, session_name: str | None = None, event: dict | None = None) -> None: ...
     def handle_success_async(self, result: Any, command_name: str) -> None:
         """

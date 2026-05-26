@@ -1,6 +1,6 @@
 import asyncio
+import enum
 from _typeshed import Incomplete
-from enum import IntEnum
 from typing import Any
 
 __version__: str
@@ -8,7 +8,7 @@ StringDict = dict[str, Any]
 PayloadLike = list[StringDict] | StringDict | None
 ENCODING: str
 
-class ErrorCode(IntEnum):
+class ErrorCode(enum.IntEnum):
     ParseError: int
     InvalidRequest: int
     MethodNotFound: int
@@ -42,7 +42,7 @@ class MessageType:
     info: int
     log: int
 
-class StopLoopException(Exception): ...
+class StopLoopError(Exception): ...
 
 class Request:
     async def on_error(self, err: Error) -> None: ...
@@ -62,4 +62,9 @@ class Session:
     async def run_forever(self) -> bool: ...
 
 async def stdio() -> tuple[asyncio.StreamReader, asyncio.StreamWriter]: ...
-async def main(tcp_port: int | None = None) -> bool: ...
+
+class Mode(enum.StrEnum):
+    server: str
+    client: str
+
+async def main(tcp_port: int | None = None, mode: Mode = ...) -> bool: ...

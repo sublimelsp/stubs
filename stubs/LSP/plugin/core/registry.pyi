@@ -1,9 +1,7 @@
 import sublime
 import sublime_plugin
 from ...protocol import Diagnostic as Diagnostic, Location, LocationLink
-from .logging import debug as debug
 from .sessions import AbstractViewListener as AbstractViewListener, Session as Session
-from .url import parse_uri as parse_uri
 from .views import MissingUriError as MissingUriError, first_selection_region as first_selection_region, get_uri_and_position_from_location as get_uri_and_position_from_location, position_to_offset as position_to_offset, uri_from_view as uri_from_view
 from .windows import WindowManager as WindowManager, WindowRegistry as WindowRegistry
 from _typeshed import Incomplete
@@ -21,9 +19,10 @@ class LspWindowCommand(sublime_plugin.WindowCommand):
     """
     capability: str
     session_name: str
+    def __init__(self, window: sublime.Window) -> None: ...
     def is_enabled(self) -> bool: ...
     def session(self) -> Session | None: ...
-    def sessions(self) -> Generator[Session, None, None]: ...
+    def sessions(self) -> Generator[Session]: ...
     def session_by_name(self, session_name: str) -> Session | None: ...
 
 class LspTextCommand(sublime_plugin.TextCommand):
@@ -33,6 +32,7 @@ class LspTextCommand(sublime_plugin.TextCommand):
     """
     capability: str
     session_name: str
+    def __init__(self, view: sublime.View) -> None: ...
     def is_enabled(self, event: dict | None = None, point: int | None = None) -> bool: ...
     def want_event(self) -> bool: ...
     @staticmethod
@@ -43,9 +43,7 @@ class LspTextCommand(sublime_plugin.TextCommand):
     def sessions(self, capability_path: str | None = None) -> Generator[Session, None, None]: ...
 
 class LspOpenLocationCommand(LspWindowCommand):
-    """
-    A command to be used by third-party ST packages that need to open an URI with some abstract scheme.
-    """
+    """A command to be used by third-party ST packages that need to open an URI with some abstract scheme."""
     def run(self, location: Location | LocationLink, session_name: str | None = None, flags: sublime.NewFileFlags = ..., group: int = -1, event: dict | None = None) -> None: ...
     def want_event(self) -> bool: ...
 

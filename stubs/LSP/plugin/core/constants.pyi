@@ -1,8 +1,9 @@
 from ...protocol import CodeActionKind, CompletionItemKind, DiagnosticSeverity, DiagnosticTag, DocumentHighlightKind, MessageType, SymbolKind
 from .typing import StrEnum as StrEnum
 from _typeshed import Incomplete
-from enum import IntFlag
+from enum import IntEnum, IntFlag
 
+MarkdownLangMap = dict[str, tuple[tuple[str, ...], tuple[str, ...]]]
 SublimeKind = tuple[int, str, str]
 ST_CACHE_PATH: Incomplete
 ST_INSTALLED_PACKAGES_PATH: Incomplete
@@ -11,28 +12,43 @@ ST_PLATFORM: Incomplete
 ST_VERSION: Incomplete
 ST_STORAGE_PATH: Incomplete
 MARKO_MD_PARSER_VERSION: str | None
+AUTO_CLOSE_BRACKETS: Incomplete
 
 class RequestFlags(IntFlag):
     """
-    A bitflag that indicates how some of the requests are prioritized between the sessions.
-    This is used for multi-session configurations, where the best session is selected for each of the relevant features
-    below and the corresponding request is made only by that one session.
+    A bitflag that holds information about selecting a subset of request types.
+
+    This is used for example to prioritize certain requests between different sessions in a multi-session configuration,
+    and to mark some requests as pending for refresh in a given document.
     """
     NONE: int
     DOCUMENT_COLOR: int
     INLAY_HINT: int
     SEMANTIC_TOKENS: int
+    ON_TYPE_FORMATTING: int
+    CODE_LENS: int
+    DIAGNOSTIC: int
 
 class RegionKey(StrEnum):
-    """ Key names for use with the `View.add_regions` method. """
+    """Key names for use with the `View.add_regions` method."""
     CODE_ACTION: str
     DOCUMENT_LINK: str
     HOVER_HIGHLIGHT: str
     REFERENCE_HIGHLIGHT: str
 
+class ChangeEventAction(IntEnum):
+    CUT: Incomplete
+    INSERT_NEWLINE: Incomplete
+    OTHER: Incomplete
+    PASTE: Incomplete
+    REDO: Incomplete
+    TYPE: Incomplete
+    UNDO: Incomplete
+
 CODE_LENS_ENABLED_KEY: str
 HOVER_ENABLED_KEY: str
 SHOW_DEFINITIONS_KEY: str
+DIAGNOSTIC_ICON_FLAGS: Incomplete
 DOCUMENT_LINK_FLAGS: Incomplete
 REGIONS_INITIALIZE_FLAGS: Incomplete
 SEMANTIC_TOKEN_FLAGS: Incomplete
@@ -85,11 +101,14 @@ MESSAGE_TYPE_LEVELS: dict[MessageType, str]
 SUBLIME_KIND_SCOPES: dict[SublimeKind, str]
 DIAGNOSTIC_SEVERITY_SCOPES: dict[DiagnosticSeverity, str]
 DIAGNOSTIC_TAG_SCOPES: dict[DiagnosticTag, str]
+SUPPORTED_DIAGNOSTIC_TAGS: Incomplete
 DOCUMENT_HIGHLIGHT_KIND_SCOPES: dict[DocumentHighlightKind, str]
 CODE_ACTION_ANNOTATION_SCOPE: str
 CODE_LENS_ANNOTATION_SCOPE: str
 SIGNATURE_HELP_FUNCTION_SCOPE: str
 SIGNATURE_HELP_ACTIVE_PARAMETER_SCOPE: str
 SIGNATURE_HELP_INACTIVE_PARAMETER_SCOPE: str
+LIGHTBULB_SCOPE: str
+COMMAND_TO_CHANGE_EVENT_ACTION: dict[str, ChangeEventAction]
 LANGUAGE_IDENTIFIERS: dict[str, str]
 SEMANTIC_TOKENS_MAP: Incomplete

@@ -1,10 +1,10 @@
 import sublime
 import sublime_plugin
-from .api import get_plugin as get_plugin
+from .api import LspPlugin as LspPlugin, OnPreStartContext as OnPreStartContext, PluginStartError as PluginStartError, get_plugin as get_plugin
 from .core.css import css as css
 from .core.logging import debug as debug
 from .core.registry import windows as windows
-from .core.transports import Transport as Transport, TransportCallbacks as TransportCallbacks, create_transport as create_transport
+from .core.transports import TransportCallbacks as TransportCallbacks, TransportWrapper as TransportWrapper
 from .core.types import Capabilities as Capabilities, ClientConfig as ClientConfig
 from .core.version import __version__ as __version__
 from .core.views import extract_variables as extract_variables, make_command_link as make_command_link
@@ -40,15 +40,11 @@ class LspCopyToClipboardFromBase64Command(sublime_plugin.ApplicationCommand):
     def run(self, contents: str = '') -> None: ...
 
 class LspDumpWindowConfigs(sublime_plugin.WindowCommand):
-    """
-    Very basic command to dump all of the window's resolved configurations.
-    """
+    """Very basic command to dump all of the window's resolved configurations."""
     def run(self) -> None: ...
 
 class LspDumpBufferCapabilities(sublime_plugin.TextCommand):
-    """
-    Very basic command to dump the current view's static and dynamically registered capabilities.
-    """
+    """Very basic command to dump the current view's static and dynamically registered capabilities."""
     def run(self, edit: sublime.Edit) -> None: ...
 
 class ServerTestRunner(TransportCallbacks):

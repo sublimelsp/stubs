@@ -71,8 +71,8 @@ uvx --python="${PYTHON_VERSION}" --from=mypy stubgen \
     "$LSP_SRC" \
     -o "$STUB_TMP"
 
-# remove some useless files
-rm -rf "$STUB_TMP/test_"*
+# remove unneeded files
+rm -rf "$STUB_TMP/test" "$STUB_TMP/test_"*
 
 # ---------------------------------------------------------------------------
 # Assemble output under LSP/ to match the import namespace

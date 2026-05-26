@@ -1,6 +1,6 @@
 import sublime
-from ..protocol import CompletionItem, CompletionItemDefaults, EditRangeWithInsertReplace as EditRangeWithInsertReplace, InsertReplaceEdit, Range, TextEdit
-from .core.constants import COMPLETION_KINDS as COMPLETION_KINDS
+from ..protocol import CompletionItem, CompletionItemDefaults, CompletionParams as CompletionParams, EditRangeWithInsertReplace as EditRangeWithInsertReplace, InsertReplaceEdit, Range, TextEdit
+from .core.constants import COMPLETION_KINDS as COMPLETION_KINDS, MarkdownLangMap as MarkdownLangMap
 from .core.edit import apply_text_edits as apply_text_edits
 from .core.logging import debug as debug
 from .core.promise import Promise as Promise
@@ -8,7 +8,7 @@ from .core.protocol import Error as Error, Request as Request
 from .core.registry import LspTextCommand as LspTextCommand
 from .core.sessions import Session as Session
 from .core.settings import userprefs as userprefs
-from .core.views import FORMAT_MARKUP_CONTENT as FORMAT_MARKUP_CONTENT, FORMAT_STRING as FORMAT_STRING, MarkdownLangMap as MarkdownLangMap, minihtml as minihtml, range_to_region as range_to_region, show_lsp_popup as show_lsp_popup, text_document_position_params as text_document_position_params
+from .core.views import FORMAT_MARKUP_CONTENT as FORMAT_MARKUP_CONTENT, FORMAT_STRING as FORMAT_STRING, html_wrapper as html_wrapper, minihtml as minihtml, range_to_region as range_to_region, show_lsp_popup as show_lsp_popup, text_document_position_params as text_document_position_params
 from typing import Any, Callable
 from typing_extensions import TypeAlias, TypeGuard
 
@@ -23,7 +23,7 @@ def get_text_edit_range(text_edit: TextEdit | InsertReplaceEdit) -> Range: ...
 def is_range(val: Any) -> TypeGuard[Range]: ...
 def is_edit_range(val: Any) -> TypeGuard[EditRangeWithInsertReplace]: ...
 def completion_with_defaults(item: CompletionItem, item_defaults: CompletionItemDefaults) -> CompletionItem:
-    ''' Currently supports defaults for: ["editRange", "insertTextFormat", "data"] '''
+    '''Currently supports defaults for: ["editRange", "insertTextFormat", "data"].'''
 
 class QueryCompletionsTask:
     '''

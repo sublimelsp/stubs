@@ -1,6 +1,6 @@
 from ...protocol import FileChangeType, WatchKind
 from _typeshed import Incomplete
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import Protocol
 
 DEFAULT_WATCH_KIND: Incomplete
@@ -20,7 +20,7 @@ class FileWatcherProtocol(Protocol):
         :param events: The list of events to notify about.
         """
 
-class FileWatcher(metaclass=ABCMeta):
+class FileWatcher(ABC):
     """
     A public interface of a file watcher implementation.
 
@@ -41,9 +41,7 @@ class FileWatcher(metaclass=ABCMeta):
         """
     @abstractmethod
     def destroy(self) -> None:
-        """
-        Called before the file watcher is disabled.
-        """
+        """Called before the file watcher is disabled."""
 
 watcher_implementation: type[FileWatcher] | None
 
