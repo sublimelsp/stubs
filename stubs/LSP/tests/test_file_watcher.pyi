@@ -1,7 +1,6 @@
 from .setup import TextDocumentTestCase as TextDocumentTestCase, expand as expand
 from LSP.plugin import FileWatcher, FileWatcherEvent as FileWatcherEvent, FileWatcherEventType as FileWatcherEventType, FileWatcherProtocol
 from LSP.plugin.core.types import ClientConfig
-from _typeshed import Incomplete
 from typing import Generator
 
 def setup_workspace_folder() -> str: ...
@@ -10,11 +9,11 @@ class TestFileWatcher(FileWatcher):
     active_watchers: list[TestFileWatcher]
     @classmethod
     def create(cls, root_path: str, patterns: list[str], events: list[FileWatcherEventType], ignores: list[str], handler: FileWatcherProtocol) -> TestFileWatcher: ...
-    root_path: Incomplete
-    patterns: Incomplete
-    events: Incomplete
-    ignores: Incomplete
-    handler: Incomplete
+    root_path: str
+    patterns: list[str]
+    events: list[FileWatcherEventType]
+    ignores: list[str]
+    handler: FileWatcherProtocol
     def __init__(self, root_path: str, patterns: list[str], events: list[FileWatcherEventType], ignores: list[str], handler: FileWatcherProtocol) -> None: ...
     def destroy(self) -> None: ...
     def trigger_event(self, events: list[FileWatcherEvent]) -> None: ...
@@ -28,7 +27,7 @@ class FileWatcherDocumentTestCase(TextDocumentTestCase):
     def setUpClass(cls) -> None: ...
     @classmethod
     def tearDownClass(cls) -> None: ...
-    folder_root_path: Incomplete
+    folder_root_path: str
     def setUp(self) -> Generator: ...
     def tearDown(self) -> Generator: ...
 

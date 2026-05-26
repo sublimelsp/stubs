@@ -2,13 +2,11 @@ import sublime
 from ...protocol import WorkspaceFolder as LspWorkspaceFolder
 from .types import diff as diff, matches_pattern as matches_pattern, sublime_pattern_to_glob as sublime_pattern_to_glob
 from .url import filename_to_uri as filename_to_uri
-from _typeshed import Incomplete
-
 def is_subpath_of(file_path: str, potential_subpath: str) -> bool: ...
 
 class WorkspaceFolder:
-    name: Incomplete
-    path: Incomplete
+    name: str
+    path: str
     def __init__(self, name: str, path: str) -> None: ...
     @classmethod
     def from_path(cls, path: str) -> WorkspaceFolder: ...
@@ -19,7 +17,7 @@ class WorkspaceFolder:
     def includes_uri(self, uri: str) -> bool: ...
 
 class ProjectFolders:
-    folders: Incomplete
+    folders: list[WorkspaceFolder]
     def __init__(self, window: sublime.Window) -> None: ...
     def update(self) -> bool: ...
     def includes_path(self, file_path: str) -> bool: ...

@@ -2,10 +2,8 @@ import unittest
 from .setup import TextDocumentTestCase as TextDocumentTestCase
 from .test_protocol import LSP_RANGE as LSP_RANGE
 from LSP.protocol import TextDocumentEdit, TextEdit, WorkspaceEdit
-from _typeshed import Incomplete
-
-FILENAME: Incomplete
-URI: Incomplete
+FILENAME: str
+URI: str
 LSP_TEXT_EDIT: TextEdit
 LSP_EDIT_CHANGES: WorkspaceEdit
 LSP_TEXT_DOCUMENT_EDIT: TextDocumentEdit

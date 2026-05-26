@@ -16,15 +16,14 @@ from .types import ClientConfig as ClientConfig, ViewStatusHandler as ViewStatus
 from .url import parse_uri as parse_uri
 from .views import diagnostic_severity as diagnostic_severity, extract_variables as extract_variables, format_diagnostic_for_panel as format_diagnostic_for_panel, make_link as make_link
 from .workspace import ProjectFolders as ProjectFolders, WorkspaceFolder as WorkspaceFolder, sorted_workspace_folders as sorted_workspace_folders
-from _typeshed import Incomplete
 from typing import Any, Generator
 
 def set_diagnostics_count(view: sublime.View, errors: int, warnings: int) -> None: ...
 
 class WindowManager(Manager, WindowConfigChangeListener, ViewStatusHandler):
-    panel_manager: Incomplete
-    tree_view_sheets: Incomplete
-    formatters: Incomplete
+    panel_manager: PanelManager
+    tree_view_sheets: list[TreeViewSheet]
+    formatters: dict[str, list[AbstractPlugin]]
     suppress_sessions_restart_on_project_update: bool
     total_error_count: int
     total_warning_count: int

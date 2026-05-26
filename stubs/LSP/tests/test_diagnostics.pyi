@@ -2,10 +2,9 @@ from .setup import TextDocumentTestCase as TextDocumentTestCase
 from .test_single_document import TEST_FILE_PATH as TEST_FILE_PATH
 from LSP.plugin.core.protocol import Point
 from LSP.protocol import PublishDiagnosticsParams, Range
-from _typeshed import Incomplete
 from collections.abc import Generator
 
-TEST_FILE_URI: Incomplete
+TEST_FILE_URI: str
 
 def create_test_diagnostics(diagnostics: list[tuple[str, Point, Point]], version: int | None = None) -> PublishDiagnosticsParams: ...
 def range_from_points(start: Point, end: Point) -> Range: ...

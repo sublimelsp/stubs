@@ -1,14 +1,12 @@
-from _typeshed import Incomplete
-
 class CSS:
-    popups: Incomplete
+    popups: str
     popups_classname: str
-    notification: Incomplete
+    notification: str
     notification_classname: str
-    sheets: Incomplete
+    sheets: str
     sheets_classname: str
-    inlay_hints: Incomplete
-    annotations: Incomplete
+    inlay_hints: str
+    annotations: str
     def __init__(self) -> None: ...
 
 g_css: CSS | None

@@ -12,13 +12,13 @@ from .core.sessions import Session as Session
 from .core.types import match_file_operation_filters as match_file_operation_filters
 from .core.url import filename_to_uri as filename_to_uri
 from .edit import prompt_for_workspace_edits as prompt_for_workspace_edits
-from _typeshed import Incomplete
 from collections.abc import Generator
+from pathlib import Path
 from typing import Any, TypedDict
 from typing_extensions import NotRequired
 
 class RenamePathInputHandler(sublime_plugin.TextInputHandler):
-    path: Incomplete
+    path: Path
     def __init__(self, path: str) -> None: ...
     def name(self) -> str: ...
     def placeholder(self) -> str: ...

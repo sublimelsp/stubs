@@ -1,11 +1,12 @@
-from _typeshed import Incomplete
+import sublime
+from LSP.plugin.core.windows import WindowManager
 from unittesting import DeferrableTestCase
 
 class LspServerPanelTests(DeferrableTestCase):
-    window: Incomplete
-    wm: Incomplete
-    view: Incomplete
-    panel: Incomplete
+    window: sublime.Window
+    wm: WindowManager | None
+    view: sublime.View | None
+    panel: sublime.View | None
     def setUp(self) -> None: ...
     def assert_total_lines_equal(self, expected_total_lines: int) -> None: ...
     def update_panel(self, msg: str) -> None: ...

@@ -7,7 +7,6 @@ from .core.sessions import AbstractViewListener as AbstractViewListener, Session
 from .core.settings import userprefs as userprefs
 from .core.views import entire_content_region as entire_content_region, first_selection_region as first_selection_region, format_code_actions_for_quick_panel as format_code_actions_for_quick_panel, kind_contains_other_kind as kind_contains_other_kind, text_document_code_action_params as text_document_code_action_params
 from .lsp_task import LspTask as LspTask
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from collections.abc import Generator
 from typing_extensions import TypeGuard
@@ -24,9 +23,9 @@ def filter_quickfix_actions(only_with_diagnostics: bool, response: list[Command 
 
 class CodeActionsManager:
     """Manager for per-location caching of code action responses."""
-    menu_actions_cache_key: Incomplete
-    refactor_actions_cache: Incomplete
-    source_actions_cache: Incomplete
+    menu_actions_cache_key: str | None
+    refactor_actions_cache: list[tuple[str, CodeAction]]
+    source_actions_cache: list[tuple[str, CodeAction]]
     def __init__(self) -> None: ...
     def request_for_region_async(self, view: sublime.View, region: sublime.Region, session_buffer_diagnostics: list[tuple[SessionBufferProtocol, list[Diagnostic]]], only_kinds: list[str | CodeActionKind] | None = None, manual: bool = False) -> Promise[list[CodeActionsByConfigName]]:
         """
@@ -35,7 +34,7 @@ class CodeActionsManager:
         """
     def request_on_save_or_format_async(self, view: sublime.View, code_actions: dict[str, bool]) -> Generator[Promise[CodeActionsByConfigName]]: ...
 
-actions_manager: Incomplete
+actions_manager: CodeActionsManager
 
 def get_session_kinds(sb: SessionBufferProtocol) -> list[CodeActionKind]: ...
 def get_matching_kinds(code_actions: dict[str, bool], session_kinds: list[CodeActionKind]) -> list[CodeActionKind]:

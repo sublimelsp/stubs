@@ -9,7 +9,6 @@ from .core.registry import LspTextCommand as LspTextCommand, LspWindowCommand as
 from .core.sessions import Session as Session
 from .core.tree_view import TreeDataProvider as TreeDataProvider, TreeItem as TreeItem, new_tree_view_sheet as new_tree_view_sheet
 from .core.views import make_command_link as make_command_link, text_document_position_params as text_document_position_params
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from typing import Any, Callable, TypedDict
 
@@ -20,11 +19,11 @@ class HierarchyItemWrapper(TypedDict):
     selectionRange: Range
 
 class HierarchyDataProvider(TreeDataProvider):
-    weaksession: Incomplete
-    request: Incomplete
-    request_handler: Incomplete
-    root_elements: Incomplete
-    session_name: Incomplete
+    weaksession: weakref.ref[Session]
+    request: Callable[[Any], Request[Any, Any]]
+    request_handler: Callable[[Any], Any]
+    root_elements: list[HierarchyItemWrapper]
+    session_name: str | None
     def __init__(self, weaksession: weakref.ref[Session], request: Callable[[Any], Request[Any, Any]], request_handler: Callable[[Any], Any], root_elements: list[HierarchyItemWrapper]) -> None: ...
     def get_children(self, element: HierarchyItemWrapper | None) -> Promise[list[HierarchyItemWrapper]]: ...
     def get_tree_item(self, element: HierarchyItemWrapper) -> TreeItem: ...

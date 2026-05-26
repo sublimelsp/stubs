@@ -1,3 +1,4 @@
+import re
 import sublime
 import sublime_plugin
 from ..protocol import AnnotatedTextEdit, SnippetTextEdit, TextEdit, WorkspaceEdit
@@ -11,7 +12,6 @@ from .core.sessions import Session as Session
 from .core.url import parse_uri as parse_uri
 from .core.views import get_line as get_line
 from .core.windows import WindowManager as WindowManager
-from _typeshed import Incomplete
 from typing import Any, Callable, Generator
 
 TextEditTuple = tuple[tuple[int, int], tuple[int, int], str]
@@ -29,7 +29,7 @@ class LspApplyTextDocumentEditCommand(sublime_plugin.TextCommand):
     def run(self, edit: sublime.Edit, edits: list[TextEdit | AnnotatedTextEdit | SnippetTextEdit], label: str | None = None) -> None: ...
 
 class LspApplyDocumentEditCommand(sublime_plugin.TextCommand):
-    re_placeholder: Incomplete
+    re_placeholder: re.Pattern[str]
     def description(self, **kwargs: dict[str, Any]) -> str | None: ...
     def run(self, edit: sublime.Edit, changes: list[TextEdit], label: str | None = None, required_view_version: int | None = None, process_placeholders: bool = False) -> None: ...
     def apply_change(self, region: sublime.Region, replacement: str, edit: sublime.Edit) -> None: ...

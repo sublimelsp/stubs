@@ -1,10 +1,9 @@
 from ...protocol import FileChangeType, WatchKind
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
-from typing import Protocol
+from typing import Literal, Protocol
 
-DEFAULT_WATCH_KIND: Incomplete
-FileWatcherEventType: Incomplete
+DEFAULT_WATCH_KIND: WatchKind
+FileWatcherEventType = Literal['create', 'change', 'delete']
 FilePath = str
 FileWatcherEvent = tuple[FileWatcherEventType, FilePath]
 

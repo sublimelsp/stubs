@@ -1,11 +1,11 @@
+import sublime
 from .setup import make_stdio_test_config as make_stdio_test_config
 from LSP.protocol import ColorInformation as ColorInformation
-from _typeshed import Incomplete
 from unittesting import DeferrableTestCase
 
 class ViewsTest(DeferrableTestCase):
-    view: Incomplete
-    mock_file_name: Incomplete
+    view: sublime.View
+    mock_file_name: str
     def setUp(self) -> None: ...
     def tearDown(self) -> None: ...
     def test_missing_uri(self) -> None: ...

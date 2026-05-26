@@ -2,7 +2,6 @@ import sublime
 from .collections import DottedDict as DottedDict
 from .logging import debug as debug
 from .types import ClientConfig as ClientConfig, Settings as Settings, SettingsRegistration as SettingsRegistration, debounced as debounced, read_dict_setting as read_dict_setting
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 
 SERVER_CONFIGS_FILENAME: str
@@ -16,8 +15,8 @@ class LspSettingsChangeListener(ABC):
     def on_userprefs_updated(self) -> None: ...
 
 class ClientConfigs:
-    all: Incomplete
-    external: Incomplete
+    all: dict[str, ClientConfig]
+    external: dict[str, ClientConfig]
     def __init__(self) -> None: ...
     def add_for_testing(self, config: ClientConfig) -> None: ...
     def remove_for_testing(self, config: ClientConfig) -> None: ...
@@ -30,7 +29,7 @@ class ClientConfigs:
     def disable(self, config_name: str) -> None: ...
     def set_listener(self, listener: LspSettingsChangeListener) -> None: ...
 
-client_configs: Incomplete
+client_configs: ClientConfigs
 
 def load_settings() -> None: ...
 def unload_settings() -> None: ...

@@ -1,4 +1,3 @@
-from _typeshed import Incomplete
 from enum import IntEnum, IntFlag
 from typing import Any, Callable, Iterable, Iterator, Literal, Reversible, Sequence
 
@@ -14,9 +13,9 @@ class HoverZone(IntEnum):
     GUTTER: int
     MARGIN: int
 
-HOVER_TEXT: Incomplete
-HOVER_GUTTER: Incomplete
-HOVER_MARGIN: Incomplete
+HOVER_TEXT: int
+HOVER_GUTTER: int
+HOVER_MARGIN: int
 
 class NewFileFlags(IntFlag):
     """
@@ -36,14 +35,14 @@ class NewFileFlags(IntFlag):
     CLEAR_TO_RIGHT: int
     FORCE_CLONE: int
 
-ENCODED_POSITION: Incomplete
-TRANSIENT: Incomplete
-FORCE_GROUP: Incomplete
-SEMI_TRANSIENT: Incomplete
-ADD_TO_SELECTION: Incomplete
-REPLACE_MRU: Incomplete
-CLEAR_TO_RIGHT: Incomplete
-FORCE_CLONE: Incomplete
+ENCODED_POSITION: int
+TRANSIENT: int
+FORCE_GROUP: int
+SEMI_TRANSIENT: int
+ADD_TO_SELECTION: int
+REPLACE_MRU: int
+CLEAR_TO_RIGHT: int
+FORCE_CLONE: int
 
 class FindFlags(IntFlag):
     """
@@ -60,11 +59,11 @@ class FindFlags(IntFlag):
     REVERSE: int
     WRAP: int
 
-LITERAL: Incomplete
-IGNORECASE: Incomplete
-WHOLEWORD: Incomplete
-REVERSE: Incomplete
-WRAP: Incomplete
+LITERAL: int
+IGNORECASE: int
+WHOLEWORD: int
+REVERSE: int
+WRAP: int
 
 class QuickPanelFlags(IntFlag):
     """
@@ -79,9 +78,9 @@ class QuickPanelFlags(IntFlag):
     KEEP_OPEN_ON_FOCUS_LOST: int
     WANT_EVENT: int
 
-MONOSPACE_FONT: Incomplete
-KEEP_OPEN_ON_FOCUS_LOST: Incomplete
-WANT_EVENT: Incomplete
+MONOSPACE_FONT: int
+KEEP_OPEN_ON_FOCUS_LOST: int
+WANT_EVENT: int
 
 class PopupFlags(IntFlag):
     """
@@ -98,11 +97,11 @@ class PopupFlags(IntFlag):
     KEEP_ON_SELECTION_MODIFIED: int
     HIDE_ON_CHARACTER_EVENT: int
 
-COOPERATE_WITH_AUTO_COMPLETE: Incomplete
-HIDE_ON_MOUSE_MOVE: Incomplete
-HIDE_ON_MOUSE_MOVE_AWAY: Incomplete
-KEEP_ON_SELECTION_MODIFIED: Incomplete
-HIDE_ON_CHARACTER_EVENT: Incomplete
+COOPERATE_WITH_AUTO_COMPLETE: int
+HIDE_ON_MOUSE_MOVE: int
+HIDE_ON_MOUSE_MOVE_AWAY: int
+KEEP_ON_SELECTION_MODIFIED: int
+HIDE_ON_CHARACTER_EVENT: int
 
 class RegionFlags(IntFlag):
     """
@@ -123,17 +122,17 @@ class RegionFlags(IntFlag):
     DRAW_SQUIGGLY_UNDERLINE: int
     NO_UNDO: int
 
-DRAW_EMPTY: Incomplete
-HIDE_ON_MINIMAP: Incomplete
-DRAW_EMPTY_AS_OVERWRITE: Incomplete
-PERSISTENT: Incomplete
-DRAW_NO_FILL: Incomplete
-HIDDEN: Incomplete
-DRAW_NO_OUTLINE: Incomplete
-DRAW_SOLID_UNDERLINE: Incomplete
-DRAW_STIPPLED_UNDERLINE: Incomplete
-DRAW_SQUIGGLY_UNDERLINE: Incomplete
-NO_UNDO: Incomplete
+DRAW_EMPTY: int
+HIDE_ON_MINIMAP: int
+DRAW_EMPTY_AS_OVERWRITE: int
+PERSISTENT: int
+DRAW_NO_FILL: int
+HIDDEN: int
+DRAW_NO_OUTLINE: int
+DRAW_SOLID_UNDERLINE: int
+DRAW_STIPPLED_UNDERLINE: int
+DRAW_SQUIGGLY_UNDERLINE: int
+NO_UNDO: int
 
 class QueryOperator(IntEnum):
     """
@@ -150,12 +149,12 @@ class QueryOperator(IntEnum):
     REGEX_CONTAINS: int
     NOT_REGEX_CONTAINS: int
 
-OP_EQUAL: Incomplete
-OP_NOT_EQUAL: Incomplete
-OP_REGEX_MATCH: Incomplete
-OP_NOT_REGEX_MATCH: Incomplete
-OP_REGEX_CONTAINS: Incomplete
-OP_NOT_REGEX_CONTAINS: Incomplete
+OP_EQUAL: int
+OP_NOT_EQUAL: int
+OP_REGEX_MATCH: int
+OP_NOT_REGEX_MATCH: int
+OP_REGEX_CONTAINS: int
+OP_NOT_REGEX_CONTAINS: int
 
 class PointClassification(IntFlag):
     """
@@ -174,15 +173,15 @@ class PointClassification(IntFlag):
     LINE_END: int
     EMPTY_LINE: int
 
-CLASS_WORD_START: Incomplete
-CLASS_WORD_END: Incomplete
-CLASS_PUNCTUATION_START: Incomplete
-CLASS_PUNCTUATION_END: Incomplete
-CLASS_SUB_WORD_START: Incomplete
-CLASS_SUB_WORD_END: Incomplete
-CLASS_LINE_START: Incomplete
-CLASS_LINE_END: Incomplete
-CLASS_EMPTY_LINE: Incomplete
+CLASS_WORD_START: int
+CLASS_WORD_END: int
+CLASS_PUNCTUATION_START: int
+CLASS_PUNCTUATION_END: int
+CLASS_SUB_WORD_START: int
+CLASS_SUB_WORD_END: int
+CLASS_LINE_START: int
+CLASS_LINE_END: int
+CLASS_EMPTY_LINE: int
 
 class AutoCompleteFlags(IntFlag):
     """
@@ -196,16 +195,16 @@ class AutoCompleteFlags(IntFlag):
     DYNAMIC_COMPLETIONS: int
     INHIBIT_REORDER: int
 
-INHIBIT_WORD_COMPLETIONS: Incomplete
-INHIBIT_EXPLICIT_COMPLETIONS: Incomplete
-DYNAMIC_COMPLETIONS: Incomplete
-INHIBIT_REORDER: Incomplete
+INHIBIT_WORD_COMPLETIONS: int
+INHIBIT_EXPLICIT_COMPLETIONS: int
+DYNAMIC_COMPLETIONS: int
+INHIBIT_REORDER: int
 
 class CompletionItemFlags(IntFlag):
     NONE: int
     KEEP_PREFIX: int
 
-COMPLETION_FLAG_KEEP_PREFIX: Incomplete
+COMPLETION_FLAG_KEEP_PREFIX: int
 
 class DialogResult(IntEnum):
     """
@@ -217,9 +216,9 @@ class DialogResult(IntEnum):
     YES: int
     NO: int
 
-DIALOG_CANCEL: Incomplete
-DIALOG_YES: Incomplete
-DIALOG_NO: Incomplete
+DIALOG_CANCEL: int
+DIALOG_YES: int
+DIALOG_NO: int
 
 class PhantomLayout(IntEnum):
     """
@@ -231,9 +230,9 @@ class PhantomLayout(IntEnum):
     BELOW: int
     BLOCK: int
 
-LAYOUT_INLINE: Incomplete
-LAYOUT_BELOW: Incomplete
-LAYOUT_BLOCK: Incomplete
+LAYOUT_INLINE: int
+LAYOUT_BELOW: int
+LAYOUT_BLOCK: int
 
 class KindId(IntEnum):
     """
@@ -259,25 +258,25 @@ class KindId(IntEnum):
     COLOR_DARK: int
     COLOR_LIGHT: int
 
-KIND_ID_AMBIGUOUS: Incomplete
-KIND_ID_KEYWORD: Incomplete
-KIND_ID_TYPE: Incomplete
-KIND_ID_FUNCTION: Incomplete
-KIND_ID_NAMESPACE: Incomplete
-KIND_ID_NAVIGATION: Incomplete
-KIND_ID_MARKUP: Incomplete
-KIND_ID_VARIABLE: Incomplete
-KIND_ID_SNIPPET: Incomplete
-KIND_ID_COLOR_REDISH: Incomplete
-KIND_ID_COLOR_ORANGISH: Incomplete
-KIND_ID_COLOR_YELLOWISH: Incomplete
-KIND_ID_COLOR_GREENISH: Incomplete
-KIND_ID_COLOR_CYANISH: Incomplete
-KIND_ID_COLOR_BLUISH: Incomplete
-KIND_ID_COLOR_PURPLISH: Incomplete
-KIND_ID_COLOR_PINKISH: Incomplete
-KIND_ID_COLOR_DARK: Incomplete
-KIND_ID_COLOR_LIGHT: Incomplete
+KIND_ID_AMBIGUOUS: int
+KIND_ID_KEYWORD: int
+KIND_ID_TYPE: int
+KIND_ID_FUNCTION: int
+KIND_ID_NAMESPACE: int
+KIND_ID_NAVIGATION: int
+KIND_ID_MARKUP: int
+KIND_ID_VARIABLE: int
+KIND_ID_SNIPPET: int
+KIND_ID_COLOR_REDISH: int
+KIND_ID_COLOR_ORANGISH: int
+KIND_ID_COLOR_YELLOWISH: int
+KIND_ID_COLOR_GREENISH: int
+KIND_ID_COLOR_CYANISH: int
+KIND_ID_COLOR_BLUISH: int
+KIND_ID_COLOR_PURPLISH: int
+KIND_ID_COLOR_PINKISH: int
+KIND_ID_COLOR_DARK: int
+KIND_ID_COLOR_LIGHT: int
 KIND_AMBIGUOUS: tuple[int, str, str]
 KIND_KEYWORD: tuple[int, str, str]
 KIND_TYPE: tuple[int, str, str]
@@ -298,9 +297,9 @@ class SymbolSource(IntEnum):
     INDEX: int
     OPEN_FILES: int
 
-SYMBOL_SOURCE_ANY: Incomplete
-SYMBOL_SOURCE_INDEX: Incomplete
-SYMBOL_SOURCE_OPEN_FILES: Incomplete
+SYMBOL_SOURCE_ANY: int
+SYMBOL_SOURCE_INDEX: int
+SYMBOL_SOURCE_OPEN_FILES: int
 
 class SymbolType(IntEnum):
     """
@@ -312,9 +311,9 @@ class SymbolType(IntEnum):
     DEFINITION: int
     REFERENCE: int
 
-SYMBOL_TYPE_ANY: Incomplete
-SYMBOL_TYPE_DEFINITION: Incomplete
-SYMBOL_TYPE_REFERENCE: Incomplete
+SYMBOL_TYPE_ANY: int
+SYMBOL_TYPE_DEFINITION: int
+SYMBOL_TYPE_REFERENCE: int
 
 class CompletionFormat(IntEnum):
     """
@@ -327,9 +326,9 @@ class CompletionFormat(IntEnum):
     SNIPPET: int
     COMMAND: int
 
-COMPLETION_FORMAT_TEXT: Incomplete
-COMPLETION_FORMAT_SNIPPET: Incomplete
-COMPLETION_FORMAT_COMMAND: Incomplete
+COMPLETION_FORMAT_TEXT: int
+COMPLETION_FORMAT_SNIPPET: int
+COMPLETION_FORMAT_COMMAND: int
 
 def version() -> str:
     """

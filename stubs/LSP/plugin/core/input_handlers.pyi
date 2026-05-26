@@ -1,12 +1,12 @@
 import sublime
 import sublime_plugin
 from .constants import ST_VERSION as ST_VERSION
-from _typeshed import Incomplete
+import weakref
 from abc import ABC, abstractmethod
 from typing import Any, Callable
 from typing_extensions import ParamSpec
 
-ListItemsReturn: Incomplete
+ListItemsReturn = list[str] | tuple[list[str], int] | list[sublime.ListInputItem] | tuple[list[sublime.ListInputItem], int]
 P = ParamSpec('P')
 
 def debounced(user_function: Callable[P, Any]) -> Callable[P, None]:
@@ -54,11 +54,11 @@ class DynamicListInputHandler(sublime_plugin.ListInputHandler, ABC):
     This class will set and modify `_items` and '_text' attributes of the command, so make sure that those attribute
     names are not used in another way in the command's class.
     """
-    command: Incomplete
-    args: Incomplete
-    text: Incomplete
-    listener: Incomplete
-    input_view: Incomplete
+    command: sublime_plugin.WindowCommand
+    args: dict[str, Any]
+    text: str
+    listener: InputListener | None
+    input_view: sublime.View | None
     def __init__(self, command: sublime_plugin.WindowCommand, args: dict[str, Any]) -> None: ...
     def list_items(self) -> list[sublime.ListInputItem]: ...
     def initial_text(self) -> str: ...
@@ -74,7 +74,7 @@ class DynamicListInputHandler(sublime_plugin.ListInputHandler, ABC):
         """Call this method to update the list items."""
 
 class InputListener(sublime_plugin.TextChangeListener):
-    weakhandler: Incomplete
+    weakhandler: weakref.ref[DynamicListInputHandler]
     def __init__(self, handler: DynamicListInputHandler) -> None: ...
     @classmethod
     def is_applicable(cls, buffer: sublime.Buffer) -> bool: ...

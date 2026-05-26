@@ -1,4 +1,4 @@
-from _typeshed import Incomplete
+import threading
 from typing import Callable, Generic, Protocol, TypeVar
 
 T = TypeVar('T')
@@ -10,9 +10,9 @@ TResult = TypeVar('TResult')
 class ResolveFunc(Protocol[T_contra]):
     def __call__(self, resolve_value: T_contra) -> None: ...
 
-FullfillFunc: Incomplete
+FullfillFunc = Callable[[T], TResult | Promise[TResult]]
 ExecutorFunc = Callable[[ResolveFunc[T]], None]
-PackagedTask: Incomplete
+PackagedTask = tuple[Promise[T], ResolveFunc[T]]
 
 class Promise(Generic[T]):
     '''
@@ -70,7 +70,7 @@ class Promise(Generic[T]):
         Arguments:
             resolve_value: The value to resolve the promise with.
         """
-    resolver: Incomplete
+    resolver: ResolveFunc[T] | None
     @staticmethod
     def packaged_task() -> PackagedTask[S]: ...
     @staticmethod
@@ -85,8 +85,8 @@ class Promise(Generic[T]):
                     Gets passed a list with all resolved values.
         """
     resolved: bool
-    mutex: Incomplete
-    callbacks: Incomplete
+    mutex: threading.Lock
+    callbacks: list[ResolveFunc[T]]
     def __init__(self, executor_func: ExecutorFunc[T]) -> None:
         '''
         Initialize Promise object.

@@ -1,8 +1,6 @@
 import sublime
-from _typeshed import Incomplete
-
 class ProgressReporter:
-    title: Incomplete
+    title: str
     def __init__(self, title: str) -> None: ...
     def __del__(self) -> None: ...
     def __call__(self, message: str | None, percentage: float | None) -> None: ...

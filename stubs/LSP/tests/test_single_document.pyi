@@ -1,11 +1,10 @@
 from .setup import TIMEOUT_TIME as TIMEOUT_TIME, TextDocumentTestCase as TextDocumentTestCase, YieldPromise as YieldPromise
-from _typeshed import Incomplete
-from typing import Generator
+from typing import Any, Generator
 
-SELFDIR: Incomplete
-TEST_FILE_PATH: Incomplete
-GOTO_RESPONSE: Incomplete
-GOTO_RESPONSE_LOCATION_LINK: Incomplete
+SELFDIR: str
+TEST_FILE_PATH: str
+GOTO_RESPONSE: list[dict[str, Any]]
+GOTO_RESPONSE_LOCATION_LINK: list[dict[str, Any]]
 GOTO_CONTENT: str
 
 class SingleDocumentTestCase(TextDocumentTestCase):
@@ -33,7 +32,7 @@ class SingleDocumentTestCase(TextDocumentTestCase):
     def test_progress(self) -> Generator: ...
 
 class SingleDocumentTestCase2(TextDocumentTestCase):
-    maxDiff: Incomplete
+    maxDiff: int | None
     def test_did_change(self) -> Generator: ...
 
 class SingleDocumentTestCase3(TextDocumentTestCase):

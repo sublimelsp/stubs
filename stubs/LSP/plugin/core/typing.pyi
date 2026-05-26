@@ -1,4 +1,3 @@
-from _typeshed import Incomplete
 from enum import Enum, IntEnum as IntEnum, IntFlag as IntFlag, StrEnum as StrEnum
 
 class StrEnum(str, Enum):
@@ -7,4 +6,4 @@ class StrEnum(str, Enum):
 
         See https://docs.python.org/3.11/library/enum.html#enum.StrEnum
         """
-    __format__: Incomplete
+    def __format__(self, __format_spec: str) -> str: ...

@@ -8,7 +8,6 @@ from .core.registry import LspTextCommand as LspTextCommand, get_position as get
 from .core.sessions import Session as Session
 from .core.views import range_to_region as range_to_region, text_document_position_params as text_document_position_params
 from .edit import prompt_for_workspace_edits as prompt_for_workspace_edits
-from _typeshed import Incomplete
 from typing_extensions import TypeGuard
 
 PREPARE_RENAME_CAPABILITY: str
@@ -24,7 +23,7 @@ class LspSymbolRenameCommand(LspTextCommand):
 
 class RenameSymbolInputHandler(sublime_plugin.TextInputHandler):
     def want_event(self) -> bool: ...
-    view: Incomplete
+    view: sublime.View
     def __init__(self, view: sublime.View, placeholder: str) -> None: ...
     def name(self) -> str: ...
     def placeholder(self) -> str: ...

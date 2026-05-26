@@ -5,7 +5,6 @@ from .constants import ST_PLATFORM as ST_PLATFORM
 from .logging import debug as debug, exception_log as exception_log
 from .promise import PackagedTask as PackagedTask, Promise as Promise
 from .protocol import JSONRPCMessage as JSONRPCMessage
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from io import BufferedIOBase
 from typing import Any, Callable, IO
@@ -92,8 +91,8 @@ class TransportWrapper:
     def close(self) -> None: ...
 
 class LaunchConfig:
-    command: Incomplete
-    env: Incomplete
+    command: list[str]
+    env: dict[str, str] | None
     def __init__(self, command: list[str], env: dict[str, str] | None = None) -> None: ...
     def start(self, cwd: str | None, stdin: int, stdout: int, stderr: int) -> subprocess.Popen[bytes]: ...
 

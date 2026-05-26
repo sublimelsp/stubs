@@ -1,6 +1,5 @@
 import asyncio
 import enum
-from _typeshed import Incomplete
 from typing import Any
 
 __version__: str
@@ -22,7 +21,7 @@ class ErrorCode(enum.IntEnum):
     ContentModified: int
 
 class Error(Exception):
-    code: Incomplete
+    code: ErrorCode
     def __init__(self, code: ErrorCode, message: str) -> None: ...
     def to_lsp(self) -> StringDict: ...
     @classmethod
@@ -49,9 +48,9 @@ class Request:
     async def on_result(self, params: PayloadLike) -> None: ...
 
 class SimpleRequest(Request):
-    cv: Incomplete
-    result: Incomplete
-    error: Incomplete
+    cv: asyncio.Condition
+    result: PayloadLike
+    error: Error | None
     def __init__(self) -> None: ...
     async def on_result(self, params: PayloadLike) -> None: ...
     async def on_error(self, err: Error) -> None: ...

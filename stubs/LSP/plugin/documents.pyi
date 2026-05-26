@@ -21,10 +21,9 @@ from .core.windows import WindowManager as WindowManager
 from .folding_range import folding_range_to_range as folding_range_to_range
 from .session_buffer import SessionBuffer as SessionBuffer
 from .session_view import SessionView as SessionView
-from _typeshed import Incomplete
 from typing import Any, Callable, Literal, TypeVar, overload
 from typing_extensions import Concatenate, ParamSpec
-from weakref import WeakValueDictionary
+from weakref import WeakSet, WeakValueDictionary
 
 P = ParamSpec('P')
 R = TypeVar('R')
@@ -40,7 +39,7 @@ class TextChangeListener(sublime_plugin.TextChangeListener):
     ids_to_listeners: WeakValueDictionary[int, TextChangeListener]
     @classmethod
     def is_applicable(cls, buffer: sublime.Buffer) -> bool: ...
-    view_listeners: Incomplete
+    view_listeners: WeakSet[DocumentSyncListener]
     def __init__(self) -> None: ...
     def attach(self, buffer: sublime.Buffer) -> None: ...
     def detach(self) -> None: ...

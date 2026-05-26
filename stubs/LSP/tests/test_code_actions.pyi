@@ -4,10 +4,9 @@ from .setup import TextDocumentTestCase as TextDocumentTestCase
 from .test_single_document import TEST_FILE_PATH as TEST_FILE_PATH
 from LSP.plugin.core.protocol import Point
 from LSP.protocol import Range
-from _typeshed import Incomplete
 from typing import Any, Generator
 
-TEST_FILE_URI: Incomplete
+TEST_FILE_URI: str
 
 def edit_to_lsp(edit: tuple[str, Range]) -> dict[str, Any]: ...
 def range_from_points(start: Point, end: Point) -> Range: ...
@@ -65,7 +64,7 @@ class CodeActionMatchingTestCase(unittest.TestCase):
     def test_kind_matching(self) -> None: ...
 
 class CodeActionsListenerTestCase(TextDocumentTestCase):
-    original_debounce_time: Incomplete
+    original_debounce_time: float
     def setUp(self) -> Generator: ...
     def tearDown(self) -> None: ...
     @classmethod

@@ -2,14 +2,13 @@ import sublime
 from .test_mocks import basic_responses as basic_responses
 from LSP.plugin.core.promise import Promise
 from LSP.plugin.core.types import ClientConfig
-from _typeshed import Incomplete
 from collections.abc import Generator
 from typing import Any
 from unittesting import DeferrableTestCase
 
-CI: Incomplete
-TIMEOUT_TIME: Incomplete
-text_config: Incomplete
+CI: bool
+TIMEOUT_TIME: int
+text_config: ClientConfig
 
 class YieldPromise:
     def __init__(self) -> None: ...

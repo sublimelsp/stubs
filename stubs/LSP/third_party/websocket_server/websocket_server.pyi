@@ -1,7 +1,8 @@
-from _typeshed import Incomplete
+import logging
 from socketserver import StreamRequestHandler, TCPServer, ThreadingMixIn
+from typing import Any
 
-logger: Incomplete
+logger: logging.Logger
 FIN: int
 OPCODE: int
 MASKED: int
@@ -49,14 +50,14 @@ class WebsocketServer(ThreadingMixIn, TCPServer, API):
     """
     allow_reuse_address: bool
     daemon_threads: bool
-    clients: Incomplete
+    clients: list[Any]
     id_counter: int
-    port: Incomplete
+    port: int
     def __init__(self, port, host: str = '127.0.0.1', loglevel=...) -> None: ...
     def handler_to_client(self, handler): ...
 
 class WebSocketHandler(StreamRequestHandler):
-    server: Incomplete
+    server: WebsocketServer
     def __init__(self, socket, addr, server) -> None: ...
     keep_alive: bool
     handshake_done: bool

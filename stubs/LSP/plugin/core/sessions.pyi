@@ -21,7 +21,6 @@ from .url import filename_to_uri as filename_to_uri, normalize_uri as normalize_
 from .version import __version__ as __version__
 from .views import MissingUriError as MissingUriError, entire_content as entire_content, entire_content_region as entire_content_region, first_selection_region as first_selection_region, get_uri_and_range_from_location as get_uri_and_range_from_location, kind_contains_other_kind as kind_contains_other_kind, mutable as mutable, uri_from_view as uri_from_view
 from .workspace import WorkspaceFolder as WorkspaceFolder, is_subpath_of as is_subpath_of
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from enum import IntFlag
 from typing import Any, Callable, Generator, Literal, Protocol, TypeVar, overload
@@ -152,7 +151,7 @@ class SessionBufferProtocol(Protocol):
 
 class AbstractViewListener(ABC):
     TOTAL_ERRORS_AND_WARNINGS_STATUS_KEY: str
-    view: Incomplete
+    view: sublime.View
     hover_provider_count: int
     lightbulb_color: str
     @abstractmethod
@@ -217,29 +216,29 @@ class Logger(ABC):
 def print_to_status_bar(error: ResponseError) -> None: ...
 
 class _RegistrationData:
-    registration_id: Incomplete
-    registration_path: Incomplete
-    capability_path: Incomplete
-    selector: Incomplete
-    options: Incomplete
-    session_buffers: Incomplete
+    registration_id: str
+    registration_path: str
+    capability_path: str
+    selector: DocumentSelectorMatcher
+    options: dict[str, Any]
+    session_buffers: list[SessionBufferProtocol]
     def __init__(self, registration_id: str, capability_path: str, registration_path: str, options: dict[str, Any]) -> None: ...
     def __del__(self) -> None: ...
     def check_applicable(self, sb: SessionBufferProtocol, *, suppress_requests: bool = False) -> None: ...
 
 class Session(APIHandler, TransportCallbacks):
-    transport: Incomplete
-    working_directory: Incomplete
+    transport: TransportWrapper | None
+    working_directory: str | None
     request_id: int
-    config: Incomplete
+    config: ClientConfig
     config_status_message: str
-    manager: Incomplete
-    window: Incomplete
-    state: Incomplete
-    capabilities: Incomplete
-    diagnostics: Incomplete
-    diagnostics_result_ids: Incomplete
-    workspace_diagnostics_pending_responses: Incomplete
+    manager: Manager
+    window: sublime.Window
+    state: int
+    capabilities: Capabilities
+    diagnostics: DiagnosticsStorage
+    diagnostics_result_ids: dict[str, PreviousResultId]
+    workspace_diagnostics_pending_responses: int
     exiting: bool
     def __init__(self, manager: Manager, logger: Logger, workspace_folders: list[WorkspaceFolder], config: ClientConfig, plugin_class: type[AbstractPlugin | LspPlugin] | None) -> None: ...
     def get_workspace_folders(self) -> list[WorkspaceFolder]: ...

@@ -8,14 +8,13 @@ from .core.settings import userprefs as userprefs
 from .core.views import DIAGNOSTIC_STYLES as DIAGNOSTIC_STYLES, diagnostic_icon as diagnostic_icon, document_highlight_key as document_highlight_key, make_command_link as make_command_link, range_to_region as range_to_region
 from .diagnostics import DiagnosticsAnnotationsView as DiagnosticsAnnotationsView
 from .session_buffer import SessionBuffer as SessionBuffer
-from _typeshed import Incomplete
 from typing import Any
 from weakref import ref
 
 class TagData:
-    key: Incomplete
-    regions: Incomplete
-    scope: Incomplete
+    key: str
+    regions: list[sublime.Region]
+    scope: str
     def __init__(self, key: str, regions: list[sublime.Region] | None = None, scope: str = '') -> None: ...
 
 class SessionView:

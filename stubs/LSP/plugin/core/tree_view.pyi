@@ -3,7 +3,6 @@ from .constants import SublimeKind as SublimeKind
 from .css import css as css
 from .promise import Promise as Promise
 from .registry import LspWindowCommand as LspWindowCommand, windows as windows
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from enum import IntEnum
 from typing import TypeVar
@@ -17,21 +16,21 @@ class TreeItemCollapsibleState(IntEnum):
     EXPANDED: int
 
 class TreeItem:
-    label: Incomplete
-    kind: Incomplete
-    description: Incomplete
-    tooltip: Incomplete
-    command_url: Incomplete
-    collapsible_state: Incomplete
-    id: Incomplete
+    label: str
+    kind: SublimeKind
+    description: str
+    tooltip: str
+    command_url: str
+    collapsible_state: TreeItemCollapsibleState
+    id: str
     def __init__(self, label: str, kind: SublimeKind = ..., description: str = '', tooltip: str = '', command_url: str = '') -> None: ...
     def html(self, sheet_name: str, indent_level: int) -> str: ...
 
 class Node:
-    element: Incomplete
-    tree_item: Incomplete
-    indent_level: Incomplete
-    child_ids: Incomplete
+    element: T
+    tree_item: TreeItem
+    indent_level: int
+    child_ids: list[str]
     is_resolved: bool
     def __init__(self, element: T, tree_item: TreeItem, indent_level: int = 0) -> None: ...
 
@@ -48,11 +47,11 @@ class TreeDataProvider(ABC):
 
 class TreeViewSheet(sublime.HtmlSheet):
     """A special HtmlSheet which can render interactive tree data structures."""
-    nodes: Incomplete
-    root_nodes: Incomplete
-    name: Incomplete
-    data_provider: Incomplete
-    header: Incomplete
+    nodes: dict[str, Node]
+    root_nodes: list[Node]
+    name: str
+    data_provider: TreeDataProvider
+    header: str
     def __init__(self, sheet_id: int, name: str, data_provider: TreeDataProvider, header: str = '') -> None: ...
     def set_provider(self, data_provider: TreeDataProvider, header: str = '') -> None:
         """

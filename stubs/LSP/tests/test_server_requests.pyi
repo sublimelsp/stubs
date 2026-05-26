@@ -1,7 +1,6 @@
 from .setup import TextDocumentTestCase as TextDocumentTestCase
 from LSP.plugin.core.sessions import SessionBufferProtocol
 from LSP.plugin.core.types import ClientConfig
-from _typeshed import Incomplete
 from typing import Any, Generator
 
 def get_auto_complete_trigger(sb: SessionBufferProtocol) -> list[dict[str, str]] | None: ...
@@ -9,7 +8,7 @@ def verify(testcase: TextDocumentTestCase, method: str, input_params: Any, expec
 
 class ServerRequests(TextDocumentTestCase):
     def test_unknown_method(self) -> Generator: ...
-    maxDiff: Incomplete
+    maxDiff: int | None
     def test_m_workspace_workspaceFolders(self) -> Generator: ...
     def test_m_workspace_configuration(self) -> Generator: ...
     def test_m_workspace_applyEdit(self) -> Generator: ...

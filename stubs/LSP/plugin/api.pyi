@@ -11,7 +11,6 @@ from .core.types import ClientConfig as ClientConfig, method2attr as method2attr
 from .core.url import parse_uri as parse_uri
 from .core.views import uri_from_view as uri_from_view
 from .core.workspace import WorkspaceFolder as WorkspaceFolder
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
@@ -23,10 +22,10 @@ COMMAND_HANDLER_MARKER: str
 URI_HANDLER_MARKER: str
 P = TypeVar('P', bound=LSPAny)
 R = TypeVar('R', bound=LSPAny)
-CommandHandler: Incomplete
-CommandHandlerForDecorator: Incomplete
-UriHandler: Incomplete
-UriHandlerForDecorator: Incomplete
+CommandHandler = Callable[[list[P] | None], Promise[R]]
+CommandHandlerForDecorator = Callable[[Any, list[P] | None], Promise[R]]
+UriHandler = Callable[[DocumentUri, sublime.NewFileFlags], Promise[sublime.Sheet | None]]
+UriHandlerForDecorator = Callable[[Any, DocumentUri, sublime.NewFileFlags], Promise[sublime.Sheet | None]]
 PostResponseCallback = Callable[[], None]
 RequestHandlerResponse = Promise[R] | tuple[Promise[R], PostResponseCallback]
 g_plugins: dict[str, type[AbstractPlugin | LspPlugin]]
@@ -87,7 +86,7 @@ def get_plugin(name: str) -> type[AbstractPlugin | LspPlugin] | None: ...
 
 class APIHandler:
     """Trigger initialization of decorated API methods."""
-    handler_attr_map: Incomplete
+    handler_attr_map: dict[str, str]
     def __init__(self) -> None: ...
     def get_command_handler(self, command_name: str) -> CommandHandler[P, R] | None: ...
     def get_uri_handler(self, scheme: str) -> UriHandler | None: ...
@@ -283,7 +282,7 @@ class LspPlugin(APIHandler):
         :param      context:    The startup context. `context.configuration`, `context.variables` and
                                 `context.working_directory` can be mutated to influence how the server is launched.
         """
-    weaksession: Incomplete
+    weaksession: ref[Session]
     def __init__(self, weaksession: ref[Session]) -> None:
         """
         Constructs a new instance.
@@ -512,7 +511,7 @@ class AbstractPlugin(APIHandler, ABC):
 
         :returns:   The markdown language map, or None
         """
-    weaksession: Incomplete
+    weaksession: ref[Session]
     def __init__(self, weaksession: ref[Session]) -> None:
         """
         Constructs a new instance. Your instance is constructed after a response to the initialize request.

@@ -1,10 +1,11 @@
+import sublime
 import unittest
+from LSP.plugin.core.signature_help import SignatureHelpStyle
 from LSP.protocol import SignatureHelp
-from _typeshed import Incomplete
 
 class SignatureHelpTest(unittest.TestCase):
-    view: Incomplete
-    style: Incomplete
+    view: sublime.View
+    style: SignatureHelpStyle
     def setUp(self) -> None: ...
     def test_no_signature(self) -> None: ...
     def test_empty_signature_list(self) -> None: ...

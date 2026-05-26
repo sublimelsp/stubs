@@ -8,7 +8,7 @@ from .settings import userprefs as userprefs
 from .types import ClientConfig as ClientConfig
 from .url import encode_code_action_uri as encode_code_action_uri, parse_uri as parse_uri
 from .workspace import is_subpath_of as is_subpath_of
-from _typeshed import Incomplete
+import re
 from dataclasses import dataclass
 from typing import Any, Callable, Generator, Iterable, Sequence
 
@@ -24,9 +24,9 @@ class DiagnosticStyle:
 DIAGNOSTIC_STYLES: dict[DiagnosticSeverity, DiagnosticStyle]
 
 class DiagnosticSeverityData:
-    regions: Incomplete
-    regions_with_tag: Incomplete
-    annotations: Incomplete
+    regions: list[sublime.Region]
+    regions_with_tag: dict[DiagnosticTag, list[sublime.Region]]
+    annotations: list[str]
     def __init__(self) -> None: ...
 
 class InvalidUriSchemeError(Exception):
@@ -53,7 +53,7 @@ def location_to_encoded_filename(location: Location | LocationLink) -> str:
     """DEPRECATED."""
 
 class MissingUriError(Exception):
-    view_id: Incomplete
+    view_id: int
     def __init__(self, view_id: int) -> None: ...
 
 def uri_from_view(view: sublime.View) -> DocumentUri: ...
@@ -112,9 +112,9 @@ def minihtml(view: sublime.View, content: MarkedString | MarkupContent | list[Ma
     :returns: Formatted string
     """
 
-REPLACEMENT_MAP: Incomplete
-PATTERNS: Incomplete
-REPLACEMENT_RE: Incomplete
+REPLACEMENT_MAP: dict[str, str]
+PATTERNS: list[str]
+REPLACEMENT_RE: re.Pattern[str]
 
 def text2html(content: str) -> str: ...
 def make_link(href: str, text: Any, class_name: str | None = None, tooltip: str | None = None) -> str: ...

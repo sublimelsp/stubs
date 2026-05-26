@@ -6,8 +6,8 @@ from LSP.plugin.core.protocol import Error
 from LSP.plugin.core.sessions import Logger, Manager, Session
 from LSP.plugin.core.types import ClientConfig
 from LSP.protocol import Diagnostic as Diagnostic, DocumentUri, LogMessageParams, MessageActionItem as MessageActionItem, ShowMessageParams, ShowMessageRequestParams
-from _typeshed import Incomplete
 from typing import Any, Generator
+from weakref import WeakSet
 
 class MockManager(Manager):
     def __init__(self, window: sublime.Window) -> None: ...
@@ -35,10 +35,10 @@ class MockLogger(Logger):
     def incoming_notification(self, method: str, params: Any, unhandled: bool) -> None: ...
 
 class MockSessionBuffer:
-    session: Incomplete
-    session_views: Incomplete
-    mock_uri: Incomplete
-    mock_language_id: Incomplete
+    session: Session
+    session_views: WeakSet[Any]
+    mock_uri: str
+    mock_language_id: str
     def __init__(self, session: Session, mock_uri: str, mock_language_id: str) -> None: ...
     @property
     def last_synced_version(self) -> int: ...

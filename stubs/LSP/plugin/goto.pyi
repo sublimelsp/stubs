@@ -12,7 +12,6 @@ from .core.types import method_to_capability as method_to_capability
 from .core.url import parse_uri as parse_uri
 from .core.views import diagnostic_severity as diagnostic_severity, first_selection_region as first_selection_region, get_symbol_kind_from_scope as get_symbol_kind_from_scope, position_to_offset as position_to_offset, range_to_region as range_to_region, text_document_position_params as text_document_position_params, to_encoded_filename as to_encoded_filename, uri_from_view as uri_from_view
 from .locationpicker import LocationPicker as LocationPicker, open_location_async as open_location_async
-from _typeshed import Incomplete
 from typing import Any, TypedDict
 
 class LspGotoCommand(LspTextCommand):
@@ -25,23 +24,23 @@ class LspGotoCommand(LspTextCommand):
 
 class LspSymbolDefinitionCommand(LspGotoCommand):
     method: str
-    capability: Incomplete
+    capability: str
     placeholder_text: str
     fallback_command: str
 
 class LspSymbolTypeDefinitionCommand(LspGotoCommand):
     method: str
-    capability: Incomplete
+    capability: str
     placeholder_text: str
 
 class LspSymbolDeclarationCommand(LspGotoCommand):
     method: str
-    capability: Incomplete
+    capability: str
     placeholder_text: str
 
 class LspSymbolImplementationCommand(LspGotoCommand):
     method: str
-    capability: Incomplete
+    capability: str
     placeholder_text: str
 
 class DiagnosticData(TypedDict):
@@ -55,10 +54,10 @@ class LspGotoDiagnosticCommand(LspWindowCommand):
     def input(self, args: dict[str, Any]) -> sublime_plugin.CommandInputHandler | None: ...
 
 class DiagnosticUriInputHandler(PreselectedListInputHandler):
-    window: Incomplete
-    initial_view: Incomplete
-    sessions: Incomplete
-    uri: Incomplete
+    window: sublime.Window
+    initial_view: sublime.View
+    sessions: list[Session]
+    uri: DocumentUri | None
     def __init__(self, window: sublime.Window, initial_view: sublime.View, sessions: list[Session], max_severity: int, initial_value: DocumentUri | None = None) -> None: ...
     def name(self) -> str: ...
     def placeholder(self) -> str: ...
@@ -70,11 +69,11 @@ class DiagnosticUriInputHandler(PreselectedListInputHandler):
     def description(self, value: DocumentUri, text: str) -> str: ...
 
 class DiagnosticInputHandler(sublime_plugin.ListInputHandler):
-    window: Incomplete
-    initial_view: Incomplete
-    sessions: Incomplete
-    uri: Incomplete
-    diagnostics: Incomplete
+    window: sublime.Window
+    initial_view: sublime.View
+    sessions: list[Session]
+    uri: DocumentUri
+    diagnostics: list[DiagnosticData]
     def __init__(self, window: sublime.Window, initial_view: sublime.View, _preview: sublime.View | None, sessions: list[Session], uri: DocumentUri, diagnostics: list[DiagnosticData]) -> None: ...
     def name(self) -> str: ...
     def list_items(self) -> tuple[list[sublime.ListInputItem], int]: ...

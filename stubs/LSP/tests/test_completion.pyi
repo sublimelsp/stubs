@@ -1,9 +1,8 @@
 from .setup import TextDocumentTestCase as TextDocumentTestCase
-from _typeshed import Incomplete
 from typing import Any, Callable, Generator
 from unittest import TestCase
 
-additional_edits: Incomplete
+additional_edits: dict[str, Any]
 
 class CompletionsTestsBase(TextDocumentTestCase):
     @classmethod

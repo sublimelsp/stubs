@@ -13,7 +13,6 @@ from .core.url import normalize_uri as normalize_uri
 from .core.views import DiagnosticSeverityData as DiagnosticSeverityData, MissingUriError as MissingUriError, diagnostic_severity as diagnostic_severity, did_change as did_change, did_close as did_close, did_open as did_open, did_save as did_save, document_color_params as document_color_params, entire_content_range as entire_content_range, first_selection_region as first_selection_region, formatting_options as formatting_options, lsp_color_to_phantom as lsp_color_to_phantom, range_to_region as range_to_region, region_to_range as region_to_range, text_document_identifier as text_document_identifier, text_document_position_params as text_document_position_params, will_save as will_save
 from .diagnostics import DOCUMENT_DIAGNOSTICS_RETRIGGER_DELAY as DOCUMENT_DIAGNOSTICS_RETRIGGER_DELAY, DiagnosticsIdentifier as DiagnosticsIdentifier
 from .inlay_hint import inlay_hint_to_phantom as inlay_hint_to_phantom
-from _typeshed import Incomplete
 from dataclasses import dataclass
 from typing import Any
 from typing_extensions import ParamSpec, TypeGuard
@@ -26,8 +25,8 @@ def is_full_document_diagnostic_report(diagnostic_report: FullDocumentDiagnostic
 def is_related_full_document_diagnostic_report(diagnostic_report: DocumentDiagnosticReport) -> TypeGuard[RelatedFullDocumentDiagnosticReport]: ...
 
 class PendingChanges:
-    version: Incomplete
-    changes: Incomplete
+    version: int
+    changes: list[sublime.TextChange]
     def __init__(self, version: int, changes: list[sublime.TextChange]) -> None: ...
     def update(self, version: int, changes: list[sublime.TextChange]) -> None: ...
 
@@ -37,12 +36,12 @@ class PendingDocumentDiagnosticRequest:
     request_id: int
 
 class SemanticTokensData:
-    data: Incomplete
-    result_id: Incomplete
-    active_region_keys: Incomplete
-    tokens: Incomplete
+    data: list[int]
+    result_id: str | None
+    active_region_keys: set[int]
+    tokens: list[SemanticToken]
     view_change_count: int
-    pending_response: Incomplete
+    pending_response: int | None
     def __init__(self) -> None: ...
 
 class SessionBuffer:
@@ -54,12 +53,12 @@ class SessionBuffer:
     dynamically registered capabilities applicable to this particular buffer.
     """
     opened: bool
-    capabilities: Incomplete
-    pending_refreshes: Incomplete
-    diagnostics_data_per_severity: Incomplete
+    capabilities: Capabilities
+    pending_refreshes: RequestFlags
+    diagnostics_data_per_severity: dict[tuple[DiagnosticSeverity, bool], DiagnosticSeverityData]
     diagnostics_flags: int
-    supported_diagnostic_tags: Incomplete
-    semantic_tokens: Incomplete
+    supported_diagnostic_tags: set[DiagnosticTag]
+    semantic_tokens: SemanticTokensData
     code_lens_annotation_color: str
     def __init__(self, session_view: SessionViewProtocol, buffer_id: int, uri: DocumentUri) -> None: ...
     @property

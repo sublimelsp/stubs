@@ -1,9 +1,8 @@
 from LSP.plugin.core.types import ClientConfig
-from _typeshed import Incomplete
 from typing import Any
 from unittesting import DeferrableTestCase
 
-test_file_path: Incomplete
+test_file_path: str
 
 def read_client_config(name: str, d: dict[str, Any]) -> ClientConfig: ...
 def update_client_config(external_config: ClientConfig, user_override_config: dict[str, Any]) -> ClientConfig: ...

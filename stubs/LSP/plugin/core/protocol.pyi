@@ -1,11 +1,10 @@
 from ...protocol import *
 import sublime
-from _typeshed import Incomplete
 from plugin.api import PostResponseCallback as PostResponseCallback
 from typing import Any, Callable, Generic, Literal, TypeVar, TypedDict
 from typing_extensions import NotRequired, TypeAlias
 
-INT_MAX: Incomplete
+INT_MAX: int
 UINT_MAX = INT_MAX
 P = TypeVar('P', bound=LSPAny)
 R = TypeVar('R', bound=LSPAny)
@@ -29,11 +28,11 @@ class NotificationMessage(TypedDict):
 JSONRPCMessage = RequestMessage | ResponseMessage | NotificationMessage
 
 class Request(Generic[P, R]):
-    method: Incomplete
-    params: Incomplete
-    view: Incomplete
-    progress: Incomplete
-    on_partial_result: Incomplete
+    method: str
+    params: P
+    view: sublime.View | None
+    progress: bool
+    on_partial_result: Callable[[R], None] | None
     def __init__(self, method: str, params: P = None, view: sublime.View | None = None, progress: bool = False, on_partial_result: Callable[[R], None] | None = None) -> None: ...
     @classmethod
     def initialize(cls, params: InitializeParams) -> Request[InitializeParams, InitializeResult]: ...
@@ -114,8 +113,8 @@ class Request(Generic[P, R]):
     def to_payload(self, request_id: int) -> RequestMessage: ...
 
 class Error(Exception):
-    code: Incomplete
-    data: Incomplete
+    code: int
+    data: Any
     def __init__(self, code: int, message: str, data: Any = None) -> None: ...
     @classmethod
     def from_lsp(cls, params: ResponseError) -> Error: ...
@@ -124,15 +123,15 @@ class Error(Exception):
     def from_exception(cls, ex: Exception) -> Error: ...
 
 class Response(Generic[P]):
-    request_id: Incomplete
-    result: Incomplete
-    post_response_callback: Incomplete
+    request_id: str | int
+    result: P
+    post_response_callback: PostResponseCallback | None
     def __init__(self, request_id: str | int, result: P, post_response_callback: PostResponseCallback | None = None) -> None: ...
     def to_payload(self) -> ResponseMessage: ...
 
 class Notification(Generic[P]):
-    method: Incomplete
-    params: Incomplete
+    method: str
+    params: P
     def __init__(self, method: str, params: P = None) -> None: ...
     @classmethod
     def initialized(cls) -> Notification[InitializedParams]: ...
@@ -159,8 +158,8 @@ class Notification(Generic[P]):
     def to_payload(self) -> NotificationMessage: ...
 
 class Point:
-    row: Incomplete
-    col: Incomplete
+    row: int
+    col: int
     def __init__(self, row: int, col: int) -> None: ...
     def __eq__(self, other: object) -> bool: ...
     def __lt__(self, other: object) -> bool: ...

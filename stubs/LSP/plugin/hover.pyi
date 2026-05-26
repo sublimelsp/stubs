@@ -11,20 +11,18 @@ from .core.sessions import AbstractViewListener as AbstractViewListener, Session
 from .core.settings import userprefs as userprefs
 from .core.url import CODE_ACTION_SCHEME as CODE_ACTION_SCHEME, decode_code_action_uri as decode_code_action_uri, parse_uri as parse_uri
 from .core.views import FORMAT_MARKED_STRING as FORMAT_MARKED_STRING, FORMAT_MARKUP_CONTENT as FORMAT_MARKUP_CONTENT, format_diagnostics_for_html as format_diagnostics_for_html, html_wrapper as html_wrapper, is_location_href as is_location_href, make_command_link as make_command_link, minihtml as minihtml, range_to_region as range_to_region, show_lsp_popup as show_lsp_popup, text_document_position_params as text_document_position_params, unpack_href_location as unpack_href_location, update_lsp_popup as update_lsp_popup
-from _typeshed import Incomplete
-
 SessionName = str
 ResolvedHover = Hover | Error
 
 class LinkKind:
-    lsp_name: Incomplete
-    label: Incomplete
-    subl_cmd_name: Incomplete
-    supports_side_by_side: Incomplete
+    lsp_name: str
+    label: str
+    subl_cmd_name: str
+    supports_side_by_side: bool
     def __init__(self, lsp_name: str, label: str, subl_cmd_name: str, supports_side_by_side: bool) -> None: ...
     def link(self, point: int, view: sublime.View) -> str: ...
 
-link_kinds: Incomplete
+link_kinds: list[LinkKind]
 
 class LspHoverCommand(LspTextCommand):
     def __init__(self, view: sublime.View) -> None: ...

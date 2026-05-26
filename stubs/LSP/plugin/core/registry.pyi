@@ -4,10 +4,9 @@ from ...protocol import Diagnostic as Diagnostic, Location, LocationLink
 from .sessions import AbstractViewListener as AbstractViewListener, Session as Session
 from .views import MissingUriError as MissingUriError, first_selection_region as first_selection_region, get_uri_and_position_from_location as get_uri_and_position_from_location, position_to_offset as position_to_offset, uri_from_view as uri_from_view
 from .windows import WindowManager as WindowManager, WindowRegistry as WindowRegistry
-from _typeshed import Incomplete
 from typing import Generator, Iterable
 
-windows: Incomplete
+windows: WindowRegistry
 
 def best_session(view: sublime.View, sessions: Iterable[Session], point: int | None = None) -> Session | None: ...
 def get_position(view: sublime.View, event: dict | None = None, point: int | None = None) -> int | None: ...

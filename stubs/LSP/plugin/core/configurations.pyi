@@ -3,19 +3,19 @@ from .logging import debug as debug, exception_log as exception_log, printf as p
 from .types import ClientConfig as ClientConfig
 from .url import parse_uri as parse_uri
 from .workspace import WorkspaceFolder as WorkspaceFolder, disable_in_project as disable_in_project, enable_in_project as enable_in_project
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from typing import Generator
 
 RETRY_MAX_COUNT: int
-RETRY_COUNT_TIMEDELTA: Incomplete
+RETRY_COUNT_TIMEDELTA: timedelta
 
 class WindowConfigChangeListener(ABC):
     @abstractmethod
     def on_configs_changed(self, configs: list[ClientConfig]) -> None: ...
 
 class WindowConfigManager:
-    all: Incomplete
+    all: dict[str, ClientConfig]
     def __init__(self, window: sublime.Window, global_configs: dict[str, ClientConfig]) -> None: ...
     def add_change_listener(self, listener: WindowConfigChangeListener) -> None: ...
     def get_config(self, config_name: str) -> ClientConfig | None: ...

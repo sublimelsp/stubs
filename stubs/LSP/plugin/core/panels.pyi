@@ -1,12 +1,11 @@
 import sublime
 from .types import PANEL_FILE_REGEX as PANEL_FILE_REGEX, PANEL_LINE_REGEX as PANEL_LINE_REGEX
-from _typeshed import Incomplete
-from typing import Iterable
+from typing import Any, Iterable
 
 LOG_LINES_LIMIT_SETTING_NAME: str
 MAX_LOG_LINES_LIMIT_ON: int
 MAX_LOG_LINES_LIMIT_OFF: int
-OUTPUT_PANEL_SETTINGS: Incomplete
+OUTPUT_PANEL_SETTINGS: dict[str, Any]
 
 class PanelName:
     Diagnostics: str
