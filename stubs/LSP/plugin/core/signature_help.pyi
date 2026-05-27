@@ -3,7 +3,12 @@ from ...protocol import SignatureHelp
 from .constants import MarkdownLangMap as MarkdownLangMap
 from .logging import debug as debug
 from .registry import LspTextCommand as LspTextCommand
-from .views import FORMAT_MARKUP_CONTENT as FORMAT_MARKUP_CONTENT, FORMAT_STRING as FORMAT_STRING, html_wrapper as html_wrapper, minihtml as minihtml
+from .views import (
+    FORMAT_MARKUP_CONTENT as FORMAT_MARKUP_CONTENT,
+    FORMAT_STRING as FORMAT_STRING,
+    html_wrapper as html_wrapper,
+    minihtml as minihtml,
+)
 from typing import TypedDict
 
 class SignatureHelpStyle(TypedDict):
@@ -27,9 +32,19 @@ class SigHelp:
     A quasi state-machine object that maintains which signature (a.k.a. overload) is active. The active signature is
     determined by what the end-user is doing.
     """
-    def __init__(self, state: SignatureHelp, language_map: MarkdownLangMap | None, style: SignatureHelpStyle) -> None: ...
+    def __init__(
+        self,
+        state: SignatureHelp,
+        language_map: MarkdownLangMap | None,
+        style: SignatureHelpStyle,
+    ) -> None: ...
     @classmethod
-    def from_lsp(cls, sighelp: SignatureHelp | None, language_map: MarkdownLangMap | None, style: SignatureHelpStyle) -> SigHelp | None:
+    def from_lsp(
+        cls,
+        sighelp: SignatureHelp | None,
+        language_map: MarkdownLangMap | None,
+        style: SignatureHelpStyle,
+    ) -> SigHelp | None:
         """Create a SigHelp state object from a server's response to textDocument/signatureHelp."""
     def render(self, view: sublime.View) -> str:
         """Render the signature help content as minihtml."""

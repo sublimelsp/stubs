@@ -1,11 +1,27 @@
 import sublime
 from ..protocol import ConfigurationItem, DocumentUri, ExecuteCommandParams, LSPAny
 from .core.collections import DottedDict as DottedDict
-from .core.constants import MarkdownLangMap as MarkdownLangMap, ST_STORAGE_PATH as ST_STORAGE_PATH
+from .core.constants import (
+    MarkdownLangMap as MarkdownLangMap,
+    ST_STORAGE_PATH as ST_STORAGE_PATH,
+)
 from .core.logging import exception_log as exception_log
 from .core.promise import Promise as Promise
-from .core.protocol import ClientNotification as ClientNotification, ClientRequest as ClientRequest, ClientResponse as ClientResponse, Notification as Notification, Request as Request, Response as Response, ServerNotification as ServerNotification, ServerResponse as ServerResponse
-from .core.sessions import Session as Session, SessionBufferProtocol as SessionBufferProtocol, SessionViewProtocol as SessionViewProtocol
+from .core.protocol import (
+    ClientNotification as ClientNotification,
+    ClientRequest as ClientRequest,
+    ClientResponse as ClientResponse,
+    Notification as Notification,
+    Request as Request,
+    Response as Response,
+    ServerNotification as ServerNotification,
+    ServerResponse as ServerResponse,
+)
+from .core.sessions import (
+    Session as Session,
+    SessionBufferProtocol as SessionBufferProtocol,
+    SessionViewProtocol as SessionViewProtocol,
+)
 from .core.settings import client_configs as client_configs
 from .core.types import ClientConfig as ClientConfig, method2attr as method2attr
 from .core.url import parse_uri as parse_uri
@@ -20,12 +36,16 @@ from weakref import ref
 HANDLER_MARKER: str
 COMMAND_HANDLER_MARKER: str
 URI_HANDLER_MARKER: str
-P = TypeVar('P', bound=LSPAny)
-R = TypeVar('R', bound=LSPAny)
-CommandHandler = Callable[[list[P] | None], Promise[R]]
-CommandHandlerForDecorator = Callable[[Any, list[P] | None], Promise[R]]
-UriHandler = Callable[[DocumentUri, sublime.NewFileFlags], Promise[sublime.Sheet | None]]
-UriHandlerForDecorator = Callable[[Any, DocumentUri, sublime.NewFileFlags], Promise[sublime.Sheet | None]]
+P = TypeVar("P", bound=LSPAny)
+R = TypeVar("R", bound=LSPAny)
+CommandHandler = Callable[["list[P] | None"], "Promise[R]"]
+CommandHandlerForDecorator = Callable[[Any, "list[P] | None"], "Promise[R]"]
+UriHandler = Callable[
+    ["DocumentUri", sublime.NewFileFlags], "Promise[sublime.Sheet | None]"
+]
+UriHandlerForDecorator = Callable[
+    [Any, "DocumentUri", sublime.NewFileFlags], "Promise[sublime.Sheet | None]"
+]
 PostResponseCallback = Callable[[], None]
 RequestHandlerResponse = Promise[R] | tuple[Promise[R], PostResponseCallback]
 g_plugins: dict[str, type[AbstractPlugin | LspPlugin]]
@@ -57,10 +77,8 @@ def register_plugin(plugin: type[AbstractPlugin], notify_listener: bool = True) 
     from LSP.plugin import unregister_plugin
     from LSP.plugin import AbstractPlugin
 
-
     class MyPlugin(AbstractPlugin):
         ...
-
 
     def plugin_loaded():
         register_plugin(MyPlugin)
@@ -72,7 +90,10 @@ def register_plugin(plugin: type[AbstractPlugin], notify_listener: bool = True) 
     If you need to install supplementary files (e.g. javascript source code that implements the actual server), do so
     in `AbstractPlugin.install_or_update` in a blocking manner, without the use of Python's `threading` module.
     """
-def register_plugin_impl(plugin: type[AbstractPlugin | LspPlugin], notify_listener: bool = True) -> None: ...
+
+def register_plugin_impl(
+    plugin: type[AbstractPlugin | LspPlugin], notify_listener: bool = True
+) -> None: ...
 def unregister_plugin(plugin: type[AbstractPlugin]) -> None:
     """
     Unregister an LSP plugin in LSP.
@@ -81,17 +102,21 @@ def unregister_plugin(plugin: type[AbstractPlugin]) -> None:
     by a user, your language server is shut down for the views that it is attached to. This results in a good user
     experience.
     """
+
 def unregister_plugin_impl(plugin: type[AbstractPlugin | LspPlugin]) -> None: ...
 def get_plugin(name: str) -> type[AbstractPlugin | LspPlugin] | None: ...
 
 class APIHandler:
     """Trigger initialization of decorated API methods."""
+
     handler_attr_map: dict[str, str]
     def __init__(self) -> None: ...
     def get_command_handler(self, command_name: str) -> CommandHandler[P, R] | None: ...
     def get_uri_handler(self, scheme: str) -> UriHandler | None: ...
 
-def notification_handler(method: str) -> Callable[[Callable[[Any, P], None]], Callable[[Any, P], None]]:
+def notification_handler(
+    method: str,
+) -> Callable[[Callable[[Any, P], None]], Callable[[Any, P], None]]:
     """
     Decorator to mark a method as a handler for a specific LSP notification.
 
@@ -108,7 +133,13 @@ def notification_handler(method: str) -> Callable[[Callable[[Any, P], None]], Ca
     :param      method:             The LSP notification method name (e.g., 'eslint/status').
     :returns:   A decorator that registers the function as a notification handler.
     """
-def request_handler(method: str) -> Callable[[Callable[[Any, P], RequestHandlerResponse]], Callable[[Any, P, int], Promise[Response[R]]]]:
+
+def request_handler(
+    method: str,
+) -> Callable[
+    [Callable[[Any, P], RequestHandlerResponse]],
+    Callable[[Any, P, int], Promise[Response[R]]],
+]:
     """
     Decorator to mark a method as a handler for a specific LSP request.
 
@@ -126,7 +157,10 @@ def request_handler(method: str) -> Callable[[Callable[[Any, P], RequestHandlerR
     :param      method:             The LSP request method name (e.g., 'eslint/openDoc').
     :returns:   A decorator that registers the function as a request handler.
     """
-def command_handler(command_name: str) -> Callable[[CommandHandlerForDecorator], CommandHandlerForDecorator]:
+
+def command_handler(
+    command_name: str,
+) -> Callable[[CommandHandlerForDecorator], CommandHandlerForDecorator]:
     """
     Decorator to mark a method as a handler for a specific server command.
 
@@ -146,7 +180,10 @@ def command_handler(command_name: str) -> Callable[[CommandHandlerForDecorator],
     :param      command_name:   The command name as advertised by the server (e.g., 'rust-analyzer.showReferences').
     :returns:   A decorator that registers the function as a command handler.
     """
-def uri_handler(scheme: str) -> Callable[[UriHandlerForDecorator], UriHandlerForDecorator]:
+
+def uri_handler(
+    scheme: str,
+) -> Callable[[UriHandlerForDecorator], UriHandlerForDecorator]:
     """
     Decorator to mark a method as a handler for URIs with a specific scheme.
 
@@ -168,6 +205,7 @@ def uri_handler(scheme: str) -> Callable[[UriHandlerForDecorator], UriHandlerFor
 @dataclass
 class IsApplicableContext:
     """Context passed to `LspPlugin.is_applicable_async`."""
+
     configuration: ClientConfig
     view: sublime.View
     workspace_folders: list[WorkspaceFolder]
@@ -175,6 +213,7 @@ class IsApplicableContext:
 @dataclass
 class OnPreStartContext:
     """Context passed to `LspPlugin.on_pre_start_async`."""
+
     configuration: ClientConfig
     variables: dict[str, str]
     view: sublime.View
@@ -194,14 +233,11 @@ class LspPlugin(APIHandler):
     ```py
     from LSP.plugin import LspPlugin
 
-
     class LspFooPlugin(LspPlugin):
         pass
 
-
     def plugin_loaded() -> None:
         LspFooPlugin.register()
-
 
     def plugin_unloaded() -> None:
         LspFooPlugin.unregister()
@@ -219,6 +255,7 @@ class LspPlugin(APIHandler):
 
     Use `@command_handler` to handle server-specific commands.
     """
+
     name: Final[str]
     plugin_storage_path: Final[Path]
     @classmethod
@@ -302,7 +339,9 @@ class LspPlugin(APIHandler):
         Override to perform any post-initialization work, such as sending custom notifications or requests
         that depend on the server's capabilities reported in the `initialize` response.
         """
-    def on_pre_send_request_async(self, request: ClientRequest, view: sublime.View | None) -> None:
+    def on_pre_send_request_async(
+        self, request: ClientRequest, view: sublime.View | None
+    ) -> None:
         """
         Notifies about a request that is about to be sent to the language server.
 
@@ -343,7 +382,9 @@ class LspPlugin(APIHandler):
         """Called when the content of the session buffer has changed or a new buffer was opened (debounced)."""
     def on_selection_modified_async(self, session_view: SessionViewProtocol) -> None:
         """Called after the selection has been modified in a view (debounced)."""
-    def on_session_end_async(self, exit_code: int | None, exception: Exception | None) -> None:
+    def on_session_end_async(
+        self, exit_code: int | None, exception: Exception | None
+    ) -> None:
         """
         Notifies about the session ending (also if the session has crashed). Provides an opportunity to clean up
         any stored state or delete references to the session or plugin instance that would otherwise prevent the
@@ -360,14 +401,14 @@ class AbstractPlugin(APIHandler, ABC):
     @classmethod
     @abstractmethod
     def name(cls) -> str:
-        '''
+        """
         A human-friendly name. If your plugin is called "LSP-foobar", then this should return "foobar". If you also
         have your settings file called "LSP-foobar.sublime-settings", then you don\'t even need to re-implement the
         configuration method (see below).
-        '''
+        """
     @classmethod
     def configuration(cls) -> tuple[sublime.Settings, str]:
-        '''
+        """
         Return the Settings object that defines the "command", "selector", and optionally the "initialization_options",
         "env" and "tcp_port" as the first element in the tuple, and the path to the base settings
         filename as the second element in the tuple.
@@ -404,7 +445,7 @@ class AbstractPlugin(APIHandler, ABC):
 
         When you\'re managing your own server binary, you would typically place it in sublime.cache_path(). So your
         "command" should look like this: "command": ["$cache_path/LSP-foobar/server_binary", "--stdio"]
-        '''
+        """
     @classmethod
     def is_applicable(cls, view: sublime.View, config: ClientConfig) -> bool:
         """
@@ -427,7 +468,7 @@ class AbstractPlugin(APIHandler, ABC):
         """In addition to the above variables, add more variables here to be expanded."""
     @classmethod
     def storage_path(cls) -> str:
-        '''
+        """
         The storage path. Use this as your base directory to install server files. Its path is \'$DATA/Package Storage\'.
 
         You should have an additional subdirectory preferably the same name as your plugin. For instance:
@@ -435,7 +476,6 @@ class AbstractPlugin(APIHandler, ABC):
         ```python
         from LSP.plugin import AbstractPlugin
         import os
-
 
         class MyPlugin(AbstractPlugin):
 
@@ -448,7 +488,7 @@ class AbstractPlugin(APIHandler, ABC):
                 # Do everything relative to this directory
                 return os.path.join(cls.storage_path(), cls.name())
         ```
-        '''
+        """
     @classmethod
     def needs_update_or_installation(cls) -> bool:
         """
@@ -462,7 +502,13 @@ class AbstractPlugin(APIHandler, ABC):
         yourself here.
         """
     @classmethod
-    def can_start(cls, window: sublime.Window, initiating_view: sublime.View, workspace_folders: list[WorkspaceFolder], configuration: ClientConfig) -> str | None:
+    def can_start(
+        cls,
+        window: sublime.Window,
+        initiating_view: sublime.View,
+        workspace_folders: list[WorkspaceFolder],
+        configuration: ClientConfig,
+    ) -> str | None:
         """
         Determines ability to start. This is called after needs_update_or_installation and after install_or_update.
         So you may assume that if you're managing your server binary, then it is already installed when this
@@ -477,8 +523,14 @@ class AbstractPlugin(APIHandler, ABC):
                     should go ahead and start a session.
         """
     @classmethod
-    def on_pre_start(cls, window: sublime.Window, initiating_view: sublime.View, workspace_folders: list[WorkspaceFolder], configuration: ClientConfig) -> str | None:
-        '''
+    def on_pre_start(
+        cls,
+        window: sublime.Window,
+        initiating_view: sublime.View,
+        workspace_folders: list[WorkspaceFolder],
+        configuration: ClientConfig,
+    ) -> str | None:
+        """
         Callback invoked just before the language server subprocess is started. This is the place to do last-minute
         adjustments to your "command" or "initialization_options" in the passed-in "configuration" argument, or change
         the order of the workspace folders. You can also choose to return a custom working directory, but consider that
@@ -490,9 +542,15 @@ class AbstractPlugin(APIHandler, ABC):
         :param      configuration:      The configuration, you can modify this one
 
         :returns:   A desired working directory, or None if you don\'t care
-        '''
+        """
     @classmethod
-    def on_post_start(cls, window: sublime.Window, initiating_view: sublime.View, workspace_folders: list[WorkspaceFolder], configuration: ClientConfig) -> None:
+    def on_post_start(
+        cls,
+        window: sublime.Window,
+        initiating_view: sublime.View,
+        workspace_folders: list[WorkspaceFolder],
+        configuration: ClientConfig,
+    ) -> None:
         """
         Callback invoked when the subprocess was just started.
 
@@ -526,7 +584,9 @@ class AbstractPlugin(APIHandler, ABC):
 
         :param      settings:      The settings that the server should receive.
         """
-    def on_workspace_configuration(self, params: ConfigurationItem, configuration: Any) -> Any:
+    def on_workspace_configuration(
+        self, params: ConfigurationItem, configuration: Any
+    ) -> Any:
         """
         Override to augment configuration returned for the workspace/configuration request.
 
@@ -535,8 +595,10 @@ class AbstractPlugin(APIHandler, ABC):
 
         :returns: The resolved configuration for given params.
         """
-    def on_pre_server_command(self, command: ExecuteCommandParams, done_callback: Callable[[], None]) -> bool:
-        '''
+    def on_pre_server_command(
+        self, command: ExecuteCommandParams, done_callback: Callable[[], None]
+    ) -> bool:
+        """
         Intercept a command that is about to be sent to the language server.
 
         :param    command:        The payload containing a "command" and optionally "arguments".
@@ -544,8 +606,10 @@ class AbstractPlugin(APIHandler, ABC):
 
         :returns: True if *YOU* will handle this command plugin-side, false otherwise. You must invoke the
                   passed `done_callback` when you\'re done.
-        '''
-    def on_pre_send_request_async(self, request_id: int, request: Request[Any, Any]) -> None:
+        """
+    def on_pre_send_request_async(
+        self, request_id: int, request: Request[Any, Any]
+    ) -> None:
         """
         Notifies about a request that is about to be sent to the language server.
         This API is triggered on async thread.
@@ -575,7 +639,9 @@ class AbstractPlugin(APIHandler, ABC):
 
         :param    notification:  The notification object.
         """
-    def on_open_uri_async(self, uri: DocumentUri, callback: Callable[[str | None, str, str], None]) -> bool:
+    def on_open_uri_async(
+        self, uri: DocumentUri, callback: Callable[[str | None, str, str], None]
+    ) -> bool:
         """
         Called when a language server reports to open an URI. If you know how to handle this URI, then return True and
         invoke the passed-in callback some time.
@@ -587,11 +653,15 @@ class AbstractPlugin(APIHandler, ABC):
         - The second argument is the content of the view.
         - The third argument is the syntax to apply for the new view.
         """
-    def on_session_buffer_changed_async(self, session_buffer: SessionBufferProtocol) -> None:
+    def on_session_buffer_changed_async(
+        self, session_buffer: SessionBufferProtocol
+    ) -> None:
         """Called when the content of the session buffer has changed or a new buffer was opened."""
     def on_selection_modified_async(self, session_view: SessionViewProtocol) -> None:
         """Called after the selection has been modified in a view (debounced)."""
-    def on_session_end_async(self, exit_code: int | None, exception: Exception | None) -> None:
+    def on_session_end_async(
+        self, exit_code: int | None, exception: Exception | None
+    ) -> None:
         """
         Notifies about the session ending (also if the session has crashed). Provides an opportunity to clean up
         any stored state or delete references to the session or plugin instance that would otherwise prevent the

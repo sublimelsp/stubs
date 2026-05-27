@@ -1,7 +1,16 @@
 import sublime_plugin
-from .code_actions import CodeActionsOnFormatOnSaveTask as CodeActionsOnFormatOnSaveTask, CodeActionsOnSaveTask as CodeActionsOnSaveTask
-from .formatting import FormatOnSaveTask as FormatOnSaveTask, WillSaveWaitTask as WillSaveWaitTask
-from .lsp_task import LspTask as LspTask, LspTextCommandWithTasks as LspTextCommandWithTasks
+from .code_actions import (
+    CodeActionsOnFormatOnSaveTask as CodeActionsOnFormatOnSaveTask,
+    CodeActionsOnSaveTask as CodeActionsOnSaveTask,
+)
+from .formatting import (
+    FormatOnSaveTask as FormatOnSaveTask,
+    WillSaveWaitTask as WillSaveWaitTask,
+)
+from .lsp_task import (
+    LspTask as LspTask,
+    LspTextCommandWithTasks as LspTextCommandWithTasks,
+)
 from typing import Any
 
 class LspSaveCommand(LspTextCommandWithTasks):

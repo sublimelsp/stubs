@@ -1,14 +1,19 @@
 from ...protocol import FileChangeType, WatchKind
 from abc import ABC, abstractmethod
-from typing import Literal, Protocol
+from typing import Protocol
+from typing import Literal
 
 DEFAULT_WATCH_KIND: WatchKind
-FileWatcherEventType = Literal['create', 'change', 'delete']
+FileWatcherEventType = Literal["create", "change", "delete"]
 FilePath = str
 FileWatcherEvent = tuple[FileWatcherEventType, FilePath]
 
-def lsp_watch_kind_to_file_watcher_event_types(kind: WatchKind) -> list[FileWatcherEventType]: ...
-def file_watcher_event_type_to_lsp_file_change_type(kind: FileWatcherEventType) -> FileChangeType: ...
+def lsp_watch_kind_to_file_watcher_event_types(
+    kind: WatchKind,
+) -> list[FileWatcherEventType]: ...
+def file_watcher_event_type_to_lsp_file_change_type(
+    kind: FileWatcherEventType,
+) -> FileChangeType: ...
 
 class FileWatcherProtocol(Protocol):
     def on_file_event_async(self, events: list[FileWatcherEvent]) -> None:
@@ -28,7 +33,14 @@ class FileWatcher(ABC):
     """
     @classmethod
     @abstractmethod
-    def create(cls, root_path: str, patterns: list[str], events: list[FileWatcherEventType], ignores: list[str], handler: FileWatcherProtocol) -> FileWatcher:
+    def create(
+        cls,
+        root_path: str,
+        patterns: list[str],
+        events: list[FileWatcherEventType],
+        ignores: list[str],
+        handler: FileWatcherProtocol,
+    ) -> FileWatcher:
         """
         Creates a new instance of the file watcher.
 

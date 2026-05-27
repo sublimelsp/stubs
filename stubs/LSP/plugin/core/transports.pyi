@@ -16,46 +16,82 @@ class StopLoopError(Exception): ...
 class TransportConfig(ABC):
     """The object that does the actual RPC communication."""
     @staticmethod
-    def resolve_launch_config(command: list[str], env: dict[str, str] | None, variables: dict[str, str]) -> LaunchConfig: ...
+    def resolve_launch_config(
+        command: list[str], env: dict[str, str] | None, variables: dict[str, str]
+    ) -> LaunchConfig: ...
     @abstractmethod
-    def start(self, command: list[str] | None, env: dict[str, str] | None, cwd: str | None, variables: dict[str, str], callbacks: TransportCallbacks) -> TransportWrapper: ...
+    def start(
+        self,
+        command: list[str] | None,
+        env: dict[str, str] | None,
+        cwd: str | None,
+        variables: dict[str, str],
+        callbacks: TransportCallbacks,
+    ) -> TransportWrapper: ...
 
 class StdioTransportConfig(TransportConfig):
-    '''
+    """
     The simplest of transport configs: launch the subprocess and communicate with it over standard I/O. This transport
     config requires a "command". This is the default transport config when only a "command" is specified in the
     ClientConfig.
-    '''
-    def start(self, command: list[str] | None, env: dict[str, str] | None, cwd: str | None, variables: dict[str, str], callbacks: TransportCallbacks) -> TransportWrapper: ...
+    """
+    def start(
+        self,
+        command: list[str] | None,
+        env: dict[str, str] | None,
+        cwd: str | None,
+        variables: dict[str, str],
+        callbacks: TransportCallbacks,
+    ) -> TransportWrapper: ...
 
 class TcpClientTransportConfig(TransportConfig):
-    '''
+    """
     Transport for communicating to a language server that expects incoming client connections. The language server acts
     as the TCP server, this text editor acts as the TCP client. One can have a "command" with this transport
     configuration. In that case the subprocess is launched, and then the TCP connection is attempted. If no "command" is
     given, a TCP connection is still made. This can be used for cases where the language server is already running as
     part of some larger application, like Godot Editor.
-    '''
+    """
     def __init__(self, port: int | None) -> None: ...
-    def start(self, command: list[str] | None, env: dict[str, str] | None, cwd: str | None, variables: dict[str, str], callbacks: TransportCallbacks) -> TransportWrapper: ...
+    def start(
+        self,
+        command: list[str] | None,
+        env: dict[str, str] | None,
+        cwd: str | None,
+        variables: dict[str, str],
+        callbacks: TransportCallbacks,
+    ) -> TransportWrapper: ...
 
 class TcpServerTransportConfig(TransportConfig):
-    '''
+    """
     Transport for communicating to a language server over TCP. The difference, however, is that this transport will
     start a TCP listener socket accepting new TCP cliet connections. Once a client connects to this text editor acting
     as the TCP server, we\'ll assume it\'s the language server we just launched. As such, this tranport requires a
     "command" for starting the language server subprocess.
-    '''
+    """
     def __init__(self, port: int | None) -> None: ...
-    def start(self, command: list[str] | None, env: dict[str, str] | None, cwd: str | None, variables: dict[str, str], callbacks: TransportCallbacks) -> TransportWrapper: ...
+    def start(
+        self,
+        command: list[str] | None,
+        env: dict[str, str] | None,
+        cwd: str | None,
+        variables: dict[str, str],
+        callbacks: TransportCallbacks,
+    ) -> TransportWrapper: ...
 
 class TransportCallbacks:
-    def on_transport_close(self, exit_code: int, exception: Exception | None) -> None: ...
+    def on_transport_close(
+        self, exit_code: int, exception: Exception | None
+    ) -> None: ...
     def on_payload(self, payload: JSONRPCMessage) -> None: ...
     def on_stderr_message(self, message: str) -> None: ...
 
 class Transport(ABC):
-    def __init__(self, encoder: Callable[[JSONRPCMessage], bytes], decoder: Callable[[bytes], JSONRPCMessage]) -> None: ...
+    def __init__(
+        self,
+        encoder: Callable[[JSONRPCMessage], bytes],
+        decoder: Callable[[bytes], JSONRPCMessage],
+    ) -> None: ...
     @abstractmethod
     def read(self) -> JSONRPCMessage | None: ...
     @abstractmethod
@@ -66,14 +102,25 @@ class Transport(ABC):
     def close(self) -> None: ...
 
 class FileObjectTransport(Transport):
-    def __init__(self, encoder: Callable[[JSONRPCMessage], bytes], decoder: Callable[[bytes], JSONRPCMessage], reader: IO[bytes] | BufferedIOBase, writer: IO[bytes] | BufferedIOBase) -> None: ...
+    def __init__(
+        self,
+        encoder: Callable[[JSONRPCMessage], bytes],
+        decoder: Callable[[bytes], JSONRPCMessage],
+        reader: IO[bytes] | BufferedIOBase,
+        writer: IO[bytes] | BufferedIOBase,
+    ) -> None: ...
     def read(self) -> JSONRPCMessage: ...
     def write(self, payload: JSONRPCMessage) -> None: ...
     def write_bytes(self, payload: bytes) -> None: ...
     def close(self) -> None: ...
 
 class SocketTransport(FileObjectTransport):
-    def __init__(self, encoder: Callable[[JSONRPCMessage], bytes], decoder: Callable[[bytes], JSONRPCMessage], sock: socket.socket) -> None: ...
+    def __init__(
+        self,
+        encoder: Callable[[JSONRPCMessage], bytes],
+        decoder: Callable[[bytes], JSONRPCMessage],
+        sock: socket.socket,
+    ) -> None: ...
     def close(self) -> None: ...
 
 class TransportWrapper:
@@ -83,7 +130,13 @@ class TransportWrapper:
     process around (if any), and also keeps track of the ErrorReader. It can be the case that there is no ErrorReader,
     for instance when talking to a remote TCP language server. So it can be None.
     """
-    def __init__(self, callback_object: TransportCallbacks, transport: Transport, process: subprocess.Popen[bytes] | None, error_reader: ErrorReader | None) -> None: ...
+    def __init__(
+        self,
+        callback_object: TransportCallbacks,
+        transport: Transport,
+        process: subprocess.Popen[bytes] | None,
+        error_reader: ErrorReader | None,
+    ) -> None: ...
     @property
     def process_args(self) -> Any: ...
     def send(self, payload: JSONRPCMessage) -> None: ...
@@ -92,9 +145,13 @@ class TransportWrapper:
 
 class LaunchConfig:
     command: list[str]
-    env: dict[str, str] | None
-    def __init__(self, command: list[str], env: dict[str, str] | None = None) -> None: ...
-    def start(self, cwd: str | None, stdin: int, stdout: int, stderr: int) -> subprocess.Popen[bytes]: ...
+    env: dict[str, str]
+    def __init__(
+        self, command: list[str], env: dict[str, str] | None = None
+    ) -> None: ...
+    def start(
+        self, cwd: str | None, stdin: int, stdout: int, stderr: int
+    ) -> subprocess.Popen[bytes]: ...
 
 class ErrorReader:
     """
@@ -104,7 +161,9 @@ class ErrorReader:
     the regular RPC transport, this is wrapped in a different class. For instance, a TCP client transport communicating
     via a socket, while it listens for log messages on the stdout/stderr streams of a spawned child process.
     """
-    def __init__(self, callback_object: TransportCallbacks, reader: IO[bytes]) -> None: ...
+    def __init__(
+        self, callback_object: TransportCallbacks, reader: IO[bytes]
+    ) -> None: ...
     def on_transport_close(self) -> None: ...
 
 def encode_json(data: JSONRPCMessage) -> bytes: ...

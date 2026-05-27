@@ -1,30 +1,54 @@
 import sublime
 from ..protocol import Command as Command, DiagnosticSeverity, DocumentUri
 from .core.active_request import ActiveRequest as ActiveRequest
-from .core.constants import ChangeEventAction as ChangeEventAction, DIAGNOSTIC_ICON_FLAGS as DIAGNOSTIC_ICON_FLAGS, DIAGNOSTIC_TAG_SCOPES as DIAGNOSTIC_TAG_SCOPES, HOVER_ENABLED_KEY as HOVER_ENABLED_KEY, REGIONS_INITIALIZE_FLAGS as REGIONS_INITIALIZE_FLAGS, RegionKey as RegionKey, RequestFlags as RequestFlags, SHOW_DEFINITIONS_KEY as SHOW_DEFINITIONS_KEY
+from .core.constants import (
+    ChangeEventAction as ChangeEventAction,
+    DIAGNOSTIC_ICON_FLAGS as DIAGNOSTIC_ICON_FLAGS,
+    DIAGNOSTIC_TAG_SCOPES as DIAGNOSTIC_TAG_SCOPES,
+    HOVER_ENABLED_KEY as HOVER_ENABLED_KEY,
+    REGIONS_INITIALIZE_FLAGS as REGIONS_INITIALIZE_FLAGS,
+    RegionKey as RegionKey,
+    RequestFlags as RequestFlags,
+    SHOW_DEFINITIONS_KEY as SHOW_DEFINITIONS_KEY,
+)
 from .core.protocol import Request as Request, ResolvedCodeLens as ResolvedCodeLens
-from .core.sessions import AbstractViewListener as AbstractViewListener, Session as Session
+from .core.sessions import (
+    AbstractViewListener as AbstractViewListener,
+    Session as Session,
+)
 from .core.settings import userprefs as userprefs
-from .core.views import DIAGNOSTIC_STYLES as DIAGNOSTIC_STYLES, diagnostic_icon as diagnostic_icon, document_highlight_key as document_highlight_key, make_command_link as make_command_link, range_to_region as range_to_region
+from .core.views import (
+    DIAGNOSTIC_STYLES as DIAGNOSTIC_STYLES,
+    diagnostic_icon as diagnostic_icon,
+    document_highlight_key as document_highlight_key,
+    make_command_link as make_command_link,
+    range_to_region as range_to_region,
+)
 from .diagnostics import DiagnosticsAnnotationsView as DiagnosticsAnnotationsView
 from .session_buffer import SessionBuffer as SessionBuffer
+from _typeshed import Incomplete
 from typing import Any
 from weakref import ref
 
 class TagData:
     key: str
-    regions: list[sublime.Region]
+    regions: Incomplete
     scope: str
-    def __init__(self, key: str, regions: list[sublime.Region] | None = None, scope: str = '') -> None: ...
+    def __init__(
+        self, key: str, regions: list[sublime.Region] | None = None, scope: str = ""
+    ) -> None: ...
 
 class SessionView:
     """Holds state per session per view."""
+
     HOVER_PROVIDER_KEY: str
     AC_TRIGGERS_KEY: str
     COMPLETION_PROVIDER_KEY: str
     TRIGGER_CHARACTERS_KEY: str
     code_lenses_needs_refresh: bool
-    def __init__(self, listener: AbstractViewListener, session: Session, uri: DocumentUri) -> None: ...
+    def __init__(
+        self, listener: AbstractViewListener, session: Session, uri: DocumentUri
+    ) -> None: ...
     def on_before_remove(self) -> None: ...
     def on_initialized(self) -> None: ...
     @property
@@ -43,17 +67,28 @@ class SessionView:
     def get_view_for_group(self, group: int) -> sublime.View | None: ...
     def get_capability_async(self, capability_path: str) -> Any | None: ...
     def get_request_flags(self) -> RequestFlags: ...
-    def on_capability_added_async(self, registration_id: str, capability_path: str, options: dict[str, Any]) -> None: ...
-    def on_capability_removed_async(self, registration_id: str, discarded_capabilities: dict[str, Any]) -> None: ...
+    def on_capability_added_async(
+        self, registration_id: str, capability_path: str, options: dict[str, Any]
+    ) -> None: ...
+    def on_capability_removed_async(
+        self, registration_id: str, discarded_capabilities: dict[str, Any]
+    ) -> None: ...
     def has_capability_async(self, capability_path: str) -> bool: ...
     def shutdown_async(self) -> None: ...
     def diagnostics_key(self, severity: DiagnosticSeverity, multiline: bool) -> str: ...
     def present_diagnostics_async(self, is_view_visible: bool) -> None: ...
-    def on_request_started_async(self, request_id: int, request: Request[Any, Any]) -> None: ...
+    def on_request_started_async(
+        self, request_id: int, request: Request[Any, Any]
+    ) -> None: ...
     def on_request_finished_async(self, request_id: int) -> None: ...
     def on_request_canceled_async(self, request_id: int) -> None: ...
     def on_request_progress(self, request_id: int, params: dict[str, Any]) -> None: ...
-    def on_text_changed_async(self, change_count: int, changes: list[sublime.TextChange], action: ChangeEventAction) -> None: ...
+    def on_text_changed_async(
+        self,
+        change_count: int,
+        changes: list[sublime.TextChange],
+        action: ChangeEventAction,
+    ) -> None: ...
     def on_revert_async(self) -> None: ...
     def on_reload_async(self) -> None: ...
     def purge_changes_async(self) -> None: ...

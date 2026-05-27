@@ -2,13 +2,16 @@ import sublime
 from ..protocol import FoldingRange, Range
 from .core.protocol import Request as Request, UINT_MAX as UINT_MAX
 from .core.registry import LspTextCommand as LspTextCommand
-from .core.views import range_to_region as range_to_region, text_document_identifier as text_document_identifier
+from .core.views import (
+    range_to_region as range_to_region,
+    text_document_identifier as text_document_identifier,
+)
 
 def folding_range_to_range(folding_range: FoldingRange) -> Range: ...
 def sorted_folding_ranges(folding_ranges: list[FoldingRange]) -> list[FoldingRange]: ...
 
 class LspFoldCommand(LspTextCommand):
-    '''
+    """
     A command to fold at the current caret position or at a given point.
 
     Optional command arguments:
@@ -20,15 +23,40 @@ class LspFoldCommand(LspTextCommand):
                     within the folded region (like ST built-in `fold` command), and `false` will fold a region even if
                     the caret is anywhere else on the starting line.
     - `point`:      Can be used instead of the caret position, measured as character offset in the document.
-    '''
+    """
+
     capability: str
     folding_ranges: list[FoldingRange]
     change_count: int
     folding_region: sublime.Region | None
-    def is_visible(self, prefetch: bool = False, hidden: bool = False, strict: bool = True, event: dict | None = None, point: int | None = None) -> bool: ...
-    def description(self, prefetch: bool = False, hidden: bool = False, strict: bool = True, event: dict | None = None, point: int | None = None) -> str: ...
-    def run(self, edit: sublime.Edit, prefetch: bool = False, hidden: bool = False, strict: bool = True, event: dict | None = None, point: int | None = None) -> None: ...
+    def is_visible(
+        self,
+        prefetch: bool = False,
+        hidden: bool = False,
+        strict: bool = True,
+        event: dict | None = None,
+        point: int | None = None,
+    ) -> bool: ...
+    def description(
+        self,
+        prefetch: bool = False,
+        hidden: bool = False,
+        strict: bool = True,
+        event: dict | None = None,
+        point: int | None = None,
+    ) -> str: ...
+    def run(
+        self,
+        edit: sublime.Edit,
+        prefetch: bool = False,
+        hidden: bool = False,
+        strict: bool = True,
+        event: dict | None = None,
+        point: int | None = None,
+    ) -> None: ...
 
 class LspFoldAllCommand(LspTextCommand):
     capability: str
-    def run(self, edit: sublime.Edit, kind: str | None = None, event: dict | None = None) -> None: ...
+    def run(
+        self, edit: sublime.Edit, kind: str | None = None, event: dict | None = None
+    ) -> None: ...

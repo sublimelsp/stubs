@@ -1,6 +1,9 @@
 import sublime
 import sublime_plugin
-from .core.panels import LOG_LINES_LIMIT_SETTING_NAME as LOG_LINES_LIMIT_SETTING_NAME, PanelName as PanelName
+from .core.panels import (
+    LOG_LINES_LIMIT_SETTING_NAME as LOG_LINES_LIMIT_SETTING_NAME,
+    PanelName as PanelName,
+)
 from .core.registry import windows as windows
 from .core.views import mutable as mutable
 from sublime_plugin import WindowCommand
@@ -27,7 +30,7 @@ class LspClearPanelCommand(sublime_plugin.TextCommand):
 
 class LspUpdatePanelCommand(sublime_plugin.TextCommand):
     """A update_panel command to update the error panel with new text."""
-    def run(self, edit: sublime.Edit, characters: str | None = '') -> None: ...
+    def run(self, edit: sublime.Edit, characters: str | None = "") -> None: ...
 
 class LspUpdateLogPanelCommand(sublime_plugin.TextCommand):
     def run(self, edit: sublime.Edit) -> None: ...

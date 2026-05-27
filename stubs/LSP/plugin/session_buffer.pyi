@@ -1,32 +1,105 @@
 import sublime
-from ..protocol import CodeAction as CodeAction, CodeActionKind as CodeActionKind, CodeActionTriggerKind, CodeLens as CodeLens, ColorInformation as ColorInformation, Command as Command, Diagnostic as Diagnostic, DiagnosticSeverity as DiagnosticSeverity, DiagnosticTag as DiagnosticTag, DocumentDiagnosticReport, DocumentLink, DocumentUri, FullDocumentDiagnosticReport, InlayHint as InlayHint, RelatedFullDocumentDiagnosticReport as RelatedFullDocumentDiagnosticReport, TextDocumentSyncKind, TextEdit as TextEdit, UnchangedDocumentDiagnosticReport
+from ..protocol import (
+    CodeAction as CodeAction,
+    CodeActionKind as CodeActionKind,
+    CodeActionTriggerKind,
+    CodeLens as CodeLens,
+    ColorInformation as ColorInformation,
+    Command as Command,
+    Diagnostic as Diagnostic,
+    DiagnosticSeverity as DiagnosticSeverity,
+    DiagnosticTag as DiagnosticTag,
+    DocumentDiagnosticReport,
+    DocumentLink,
+    DocumentUri,
+    FullDocumentDiagnosticReport,
+    InlayHint as InlayHint,
+    RelatedFullDocumentDiagnosticReport as RelatedFullDocumentDiagnosticReport,
+    TextDocumentSyncKind,
+    TextEdit as TextEdit,
+    UnchangedDocumentDiagnosticReport,
+)
 from .api import AbstractPlugin as AbstractPlugin, LspPlugin as LspPlugin
-from .code_lens import CodeLensCache as CodeLensCache, LspToggleCodeLensesCommand as LspToggleCodeLensesCommand
-from .core.constants import AUTO_CLOSE_BRACKETS as AUTO_CLOSE_BRACKETS, CODE_LENS_ANNOTATION_SCOPE as CODE_LENS_ANNOTATION_SCOPE, ChangeEventAction as ChangeEventAction, DIAGNOSTIC_TAG_SCOPES as DIAGNOSTIC_TAG_SCOPES, DOCUMENT_LINK_FLAGS as DOCUMENT_LINK_FLAGS, RegionKey as RegionKey, RequestFlags as RequestFlags, SEMANTIC_TOKENS_MAP as SEMANTIC_TOKENS_MAP, SEMANTIC_TOKEN_FLAGS as SEMANTIC_TOKEN_FLAGS, SUPPORTED_DIAGNOSTIC_TAGS as SUPPORTED_DIAGNOSTIC_TAGS
+from .code_lens import (
+    CodeLensCache as CodeLensCache,
+    LspToggleCodeLensesCommand as LspToggleCodeLensesCommand,
+)
+from .core.constants import (
+    AUTO_CLOSE_BRACKETS as AUTO_CLOSE_BRACKETS,
+    CODE_LENS_ANNOTATION_SCOPE as CODE_LENS_ANNOTATION_SCOPE,
+    ChangeEventAction as ChangeEventAction,
+    DIAGNOSTIC_TAG_SCOPES as DIAGNOSTIC_TAG_SCOPES,
+    DOCUMENT_LINK_FLAGS as DOCUMENT_LINK_FLAGS,
+    RegionKey as RegionKey,
+    RequestFlags as RequestFlags,
+    SEMANTIC_TOKENS_MAP as SEMANTIC_TOKENS_MAP,
+    SEMANTIC_TOKEN_FLAGS as SEMANTIC_TOKEN_FLAGS,
+    SUPPORTED_DIAGNOSTIC_TAGS as SUPPORTED_DIAGNOSTIC_TAGS,
+)
 from .core.edit import apply_text_edits as apply_text_edits
 from .core.promise import Promise as Promise
-from .core.protocol import Error as Error, Request as Request, ResolvedCodeLens as ResolvedCodeLens, ResponseError as ResponseError
-from .core.sessions import Session as Session, SessionViewProtocol as SessionViewProtocol, is_diagnostic_server_cancellation_data as is_diagnostic_server_cancellation_data
+from .core.protocol import (
+    Error as Error,
+    Request as Request,
+    ResolvedCodeLens as ResolvedCodeLens,
+    ResponseError as ResponseError,
+)
+from .core.sessions import (
+    Session as Session,
+    SessionViewProtocol as SessionViewProtocol,
+    is_diagnostic_server_cancellation_data as is_diagnostic_server_cancellation_data,
+)
 from .core.settings import userprefs as userprefs
-from .core.types import Capabilities as Capabilities, DebouncerNonThreadSafe as DebouncerNonThreadSafe, FEATURES_TIMEOUT as FEATURES_TIMEOUT, SemanticToken as SemanticToken, debounced as debounced
+from .core.types import (
+    Capabilities as Capabilities,
+    DebouncerNonThreadSafe as DebouncerNonThreadSafe,
+    FEATURES_TIMEOUT as FEATURES_TIMEOUT,
+    SemanticToken as SemanticToken,
+    debounced as debounced,
+)
 from .core.url import normalize_uri as normalize_uri
-from .core.views import DiagnosticSeverityData as DiagnosticSeverityData, MissingUriError as MissingUriError, diagnostic_severity as diagnostic_severity, did_change as did_change, did_close as did_close, did_open as did_open, did_save as did_save, document_color_params as document_color_params, entire_content_range as entire_content_range, first_selection_region as first_selection_region, formatting_options as formatting_options, lsp_color_to_phantom as lsp_color_to_phantom, range_to_region as range_to_region, region_to_range as region_to_range, text_document_identifier as text_document_identifier, text_document_position_params as text_document_position_params, will_save as will_save
-from .diagnostics import DOCUMENT_DIAGNOSTICS_RETRIGGER_DELAY as DOCUMENT_DIAGNOSTICS_RETRIGGER_DELAY, DiagnosticsIdentifier as DiagnosticsIdentifier
+from .core.views import (
+    DiagnosticSeverityData as DiagnosticSeverityData,
+    MissingUriError as MissingUriError,
+    diagnostic_severity as diagnostic_severity,
+    did_change as did_change,
+    did_close as did_close,
+    did_open as did_open,
+    did_save as did_save,
+    document_color_params as document_color_params,
+    entire_content_range as entire_content_range,
+    first_selection_region as first_selection_region,
+    formatting_options as formatting_options,
+    lsp_color_to_phantom as lsp_color_to_phantom,
+    range_to_region as range_to_region,
+    region_to_range as region_to_range,
+    text_document_identifier as text_document_identifier,
+    text_document_position_params as text_document_position_params,
+    will_save as will_save,
+)
+from .diagnostics import (
+    DOCUMENT_DIAGNOSTICS_RETRIGGER_DELAY as DOCUMENT_DIAGNOSTICS_RETRIGGER_DELAY,
+    DiagnosticsIdentifier as DiagnosticsIdentifier,
+)
 from .inlay_hint import inlay_hint_to_phantom as inlay_hint_to_phantom
 from dataclasses import dataclass
 from typing import Any
 from typing_extensions import ParamSpec, TypeGuard
 from weakref import WeakSet
 
-P = ParamSpec('P')
+P = ParamSpec("P")
 HUGE_FILE_SIZE: int
 
-def is_full_document_diagnostic_report(diagnostic_report: FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport) -> TypeGuard[FullDocumentDiagnosticReport]: ...
-def is_related_full_document_diagnostic_report(diagnostic_report: DocumentDiagnosticReport) -> TypeGuard[RelatedFullDocumentDiagnosticReport]: ...
+def is_full_document_diagnostic_report(
+    diagnostic_report: FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport,
+) -> TypeGuard[FullDocumentDiagnosticReport]: ...
+def is_related_full_document_diagnostic_report(
+    diagnostic_report: DocumentDiagnosticReport,
+) -> TypeGuard[RelatedFullDocumentDiagnosticReport]: ...
 
 class PendingChanges:
     version: int
-    changes: list[sublime.TextChange]
+    changes: list[list[sublime.TextChange]]
     def __init__(self, version: int, changes: list[sublime.TextChange]) -> None: ...
     def update(self, version: int, changes: list[sublime.TextChange]) -> None: ...
 
@@ -52,15 +125,20 @@ class SessionBuffer:
     buffer. The diagnostics are then published further to the views attached to this buffer. It also maintains the
     dynamically registered capabilities applicable to this particular buffer.
     """
+
     opened: bool
     capabilities: Capabilities
     pending_refreshes: RequestFlags
-    diagnostics_data_per_severity: dict[tuple[DiagnosticSeverity, bool], DiagnosticSeverityData]
+    diagnostics_data_per_severity: dict[
+        tuple[DiagnosticSeverity, bool], DiagnosticSeverityData
+    ]
     diagnostics_flags: int
     supported_diagnostic_tags: set[DiagnosticTag]
     semantic_tokens: SemanticTokensData
     code_lens_annotation_color: str
-    def __init__(self, session_view: SessionViewProtocol, buffer_id: int, uri: DocumentUri) -> None: ...
+    def __init__(
+        self, session_view: SessionViewProtocol, buffer_id: int, uri: DocumentUri
+    ) -> None: ...
     @property
     def session(self) -> Session: ...
     @property
@@ -78,8 +156,17 @@ class SessionBuffer:
         """Deprecated: use get_language_id."""
     def add_session_view(self, sv: SessionViewProtocol) -> None: ...
     def remove_session_view(self, sv: SessionViewProtocol) -> None: ...
-    def register_capability_async(self, registration_id: str, capability_path: str, registration_path: str, options: dict[str, Any], suppress_requests: bool) -> None: ...
-    def unregister_capability_async(self, registration_id: str, capability_path: str, registration_path: str) -> None: ...
+    def register_capability_async(
+        self,
+        registration_id: str,
+        capability_path: str,
+        registration_path: str,
+        options: dict[str, Any],
+        suppress_requests: bool,
+    ) -> None: ...
+    def unregister_capability_async(
+        self, registration_id: str, capability_path: str, registration_path: str
+    ) -> None: ...
     def get_capability(self, capability_path: str) -> Any | None: ...
     def has_capability(self, capability_path: str) -> bool: ...
     def text_sync_kind(self) -> TextDocumentSyncKind: ...
@@ -87,10 +174,18 @@ class SessionBuffer:
     def should_notify_will_save(self) -> bool: ...
     def should_notify_did_save(self) -> tuple[bool, bool]: ...
     def should_notify_did_close(self) -> bool: ...
-    def on_text_changed_async(self, view: sublime.View, change_count: int, changes: list[sublime.TextChange], action: ChangeEventAction) -> None: ...
+    def on_text_changed_async(
+        self,
+        view: sublime.View,
+        change_count: int,
+        changes: list[sublime.TextChange],
+        action: ChangeEventAction,
+    ) -> None: ...
     def on_revert_async(self, view: sublime.View) -> None: ...
     on_reload_async = on_revert_async
-    def purge_changes_async(self, view: sublime.View, suppress_requests: bool = False) -> None: ...
+    def purge_changes_async(
+        self, view: sublime.View, suppress_requests: bool = False
+    ) -> None: ...
     def on_pre_save_async(self, view: sublime.View) -> None: ...
     def on_post_save_async(self, view: sublime.View, new_uri: DocumentUri) -> None: ...
     def on_userprefs_changed_async(self) -> None: ...
@@ -102,18 +197,36 @@ class SessionBuffer:
         will be sent the next time when a view of this SessionBuffer gets activated.
         """
     def clear_color_boxes_async(self) -> None: ...
-    def get_document_link_at_point(self, view: sublime.View, point: int) -> DocumentLink | None: ...
+    def get_document_link_at_point(
+        self, view: sublime.View, point: int
+    ) -> DocumentLink | None: ...
     def update_document_link(self, new_link: DocumentLink) -> None: ...
-    def do_document_diagnostic_async(self, view: sublime.View, version: int, *, forced_update: bool = False) -> None: ...
-    def on_diagnostics_async(self, raw_diagnostics: list[Diagnostic], version: int | None, visible_session_views: set[SessionViewProtocol]) -> None: ...
+    def do_document_diagnostic_async(
+        self, view: sublime.View, version: int, *, forced_update: bool = False
+    ) -> None: ...
+    def on_diagnostics_async(
+        self,
+        raw_diagnostics: list[Diagnostic],
+        version: int | None,
+        visible_session_views: set[SessionViewProtocol],
+    ) -> None: ...
     def has_latest_diagnostics(self) -> bool: ...
-    def do_semantic_tokens_async(self, view: sublime.View, only_viewport: bool = False) -> None: ...
+    def do_semantic_tokens_async(
+        self, view: sublime.View, only_viewport: bool = False
+    ) -> None: ...
     def get_semantic_tokens(self) -> list[SemanticToken]: ...
     def clear_semantic_tokens_async(self) -> None: ...
     def do_inlay_hints_async(self, view: sublime.View) -> None: ...
     def present_inlay_hints(self, phantoms: list[sublime.Phantom]) -> None: ...
     def remove_inlay_hint_phantom(self, phantom_uuid: str) -> None: ...
     def remove_all_inlay_hints(self) -> None: ...
-    def request_code_actions_async(self, view: sublime.View, region: sublime.Region, diagnostics: list[Diagnostic], kinds: list[str | CodeActionKind] | None = None, trigger_kind: CodeActionTriggerKind = ...) -> Promise[list[Command | CodeAction] | Error | None]: ...
+    def request_code_actions_async(
+        self,
+        view: sublime.View,
+        region: sublime.Region,
+        diagnostics: list[Diagnostic],
+        kinds: list[str | CodeActionKind] | None = None,
+        trigger_kind: CodeActionTriggerKind = ...,
+    ) -> Promise[list[Command | CodeAction] | Error | None]: ...
     def do_code_lenses_async(self, view: sublime.View) -> None: ...
     def resolve_visible_code_lenses_async(self, view: sublime.View) -> None: ...

@@ -14,7 +14,9 @@ class DottedDict:
         :param      d:    An existing dictionary.
         """
     @classmethod
-    def from_base_and_override(cls, base: DottedDict, override: dict[str, Any] | None) -> DottedDict: ...
+    def from_base_and_override(
+        cls, base: DottedDict, override: dict[str, Any] | None
+    ) -> DottedDict: ...
     def get(self, path: str | None = None, default: Any = None) -> Any:
         """
         Get a value from the dictionary.

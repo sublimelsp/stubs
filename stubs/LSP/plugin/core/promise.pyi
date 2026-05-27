@@ -1,21 +1,23 @@
-import threading
+from _typeshed import Incomplete
 from typing import Callable, Generic, Protocol, TypeVar
+from typing import Tuple
+from typing import Union
 
-T = TypeVar('T')
-S = TypeVar('S')
-TExecutor = TypeVar('TExecutor')
-T_contra = TypeVar('T_contra', contravariant=True)
-TResult = TypeVar('TResult')
+T = TypeVar("T")
+S = TypeVar("S")
+TExecutor = TypeVar("TExecutor")
+T_contra = TypeVar("T_contra", contravariant=True)
+TResult = TypeVar("TResult")
 
 class ResolveFunc(Protocol[T_contra]):
     def __call__(self, resolve_value: T_contra) -> None: ...
 
-FullfillFunc = Callable[[T], TResult | Promise[TResult]]
+FullfillFunc = Callable[[T], Union[TResult, "Promise[TResult]"]]
 ExecutorFunc = Callable[[ResolveFunc[T]], None]
-PackagedTask = tuple[Promise[T], ResolveFunc[T]]
+PackagedTask = Tuple["Promise[T]", ResolveFunc[T]]
 
 class Promise(Generic[T]):
-    '''
+    """
     A simple implementation of the Promise specification.
 
     See: https://promisesaplus.com
@@ -58,7 +60,7 @@ class Promise(Generic[T]):
             assert value === 222
 
         Promise(do_work_async_1).then(do_more_work_async).then(process_value)
-    '''
+    """
     @staticmethod
     def resolve(resolve_value: S) -> Promise[S]:
         """
@@ -70,7 +72,7 @@ class Promise(Generic[T]):
         Arguments:
             resolve_value: The value to resolve the promise with.
         """
-    resolver: ResolveFunc[T] | None
+    resolver: Incomplete
     @staticmethod
     def packaged_task() -> PackagedTask[S]: ...
     @staticmethod
@@ -85,17 +87,17 @@ class Promise(Generic[T]):
                     Gets passed a list with all resolved values.
         """
     resolved: bool
-    mutex: threading.Lock
+    mutex: Incomplete
     callbacks: list[ResolveFunc[T]]
     def __init__(self, executor_func: ExecutorFunc[T]) -> None:
-        '''
+        """
         Initialize Promise object.
 
         Arguments:
             executor_func: A function that is executed immediately by this Promise.
             It gets passed a "resolve" function. The "resolve" function, when
             called, resolves the Promise with the value passed to it.
-        '''
+        """
     def then(self, onfullfilled: FullfillFunc[T, TResult]) -> Promise[TResult]:
         """
         Create a new promise and chain it with this promise.

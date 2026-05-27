@@ -1,13 +1,23 @@
 import sublime
 import sublime_plugin
 from .constants import ST_VERSION as ST_VERSION
-import weakref
+from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from typing import Any, Callable
 from typing_extensions import ParamSpec
+from typing import List
+from typing import Tuple
+from typing import Union
 
-ListItemsReturn = list[str] | tuple[list[str], int] | list[sublime.ListInputItem] | tuple[list[sublime.ListInputItem], int]
-P = ParamSpec('P')
+ListItemsReturn = Union[
+    List[str],
+    Tuple[List[str], int],
+    List[Tuple[str, Any]],
+    Tuple[List[Tuple[str, Any]], int],
+    List[sublime.ListInputItem],
+    Tuple[List[sublime.ListInputItem], int],
+]
+P = ParamSpec("P")
 
 def debounced(user_function: Callable[P, Any]) -> Callable[P, None]:
     """
@@ -30,7 +40,11 @@ class PreselectedListInputHandler(sublime_plugin.ListInputHandler, ABC):
 
     Inspired by https://github.com/sublimehq/sublime_text/issues/5507.
     """
-    def __init__(self, window: sublime.Window, initial_value: str | sublime.ListInputItem | None = None) -> None: ...
+    def __init__(
+        self,
+        window: sublime.Window,
+        initial_value: str | sublime.ListInputItem | None = None,
+    ) -> None: ...
     def list_items(self) -> ListItemsReturn: ...
     @abstractmethod
     def get_list_items(self) -> ListItemsReturn: ...
@@ -54,12 +68,15 @@ class DynamicListInputHandler(sublime_plugin.ListInputHandler, ABC):
     This class will set and modify `_items` and '_text' attributes of the command, so make sure that those attribute
     names are not used in another way in the command's class.
     """
+
     command: sublime_plugin.WindowCommand
     args: dict[str, Any]
-    text: str
-    listener: InputListener | None
+    text: Incomplete
+    listener: sublime_plugin.TextChangeListener | None
     input_view: sublime.View | None
-    def __init__(self, command: sublime_plugin.WindowCommand, args: dict[str, Any]) -> None: ...
+    def __init__(
+        self, command: sublime_plugin.WindowCommand, args: dict[str, Any]
+    ) -> None: ...
     def list_items(self) -> list[sublime.ListInputItem]: ...
     def initial_text(self) -> str: ...
     def initial_selection(self) -> list[tuple[int, int]]: ...
@@ -74,7 +91,7 @@ class DynamicListInputHandler(sublime_plugin.ListInputHandler, ABC):
         """Call this method to update the list items."""
 
 class InputListener(sublime_plugin.TextChangeListener):
-    weakhandler: weakref.ref[DynamicListInputHandler]
+    weakhandler: ref[DynamicListInputHandler]
     def __init__(self, handler: DynamicListInputHandler) -> None: ...
     @classmethod
     def is_applicable(cls, buffer: sublime.Buffer) -> bool: ...
