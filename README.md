@@ -1,5 +1,5 @@
 This repository contains Python library stubs of [LSP](https://github.com/sublimelsp/LSP).
 
-## Todo
+## To Generate LSP Stubs
 
-- How to deal with many "Incomplete" types in the stubs?
+Just run `script/generate-stubs.sh`.
