@@ -31,7 +31,7 @@ from weakref import ref
 
 class TagData:
     key: str
-    regions: list[sublime.Region] | None
+    regions: list[sublime.Region]
     scope: str
     def __init__(
         self, key: str, regions: list[sublime.Region] | None = None, scope: str = ""

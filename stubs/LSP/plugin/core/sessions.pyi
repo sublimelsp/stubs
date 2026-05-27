@@ -160,7 +160,6 @@ from enum import IntFlag
 from typing import Any, Callable, Generator, Literal, Protocol, TypeVar, overload
 from typing_extensions import TypeAlias, TypeGuard
 from weakref import WeakSet
-from ...protocol import WorkspaceFolder as LspWorkspaceFolder
 
 InitCallback: TypeAlias = Callable[["Session", bool], None]
 P = TypeVar("P", bound=LSPAny)

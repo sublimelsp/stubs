@@ -303,17 +303,17 @@ class ClientConfig:
 
     name: str
     selector: str
-    priority_selector: str | None
+    priority_selector: str
     schemes: list[str]
-    command: list[str] | None
+    command: list[str]
     tcp_port: int | None
     auto_complete_selector: str | None
-    initialization_options: DottedDict | None
-    settings: DottedDict | None
-    env: dict[str, str] | None
+    initialization_options: DottedDict
+    settings: DottedDict
+    env: dict[str, str]
     experimental_capabilities: dict[str, Any] | None
-    disabled_capabilities: DottedDict | None
-    file_watcher: FileWatcherConfig | None
+    disabled_capabilities: DottedDict
+    file_watcher: FileWatcherConfig
     path_maps: list[PathMap] | None
     semantic_tokens: dict[str, str] | None
     diagnostics_mode: str

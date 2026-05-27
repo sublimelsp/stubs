@@ -411,6 +411,7 @@ def collect_source_info(src_path):
         "class_attrs": {},  # class -> {attr: type_str} (from AnnAssign + __init__)
         "class_methods": {},  # class -> {method: stub_sig}
         "enum_member_names": {},  # class -> {member: True}
+        "narrowed_class_attrs": {},  # class -> {attr: type_str} narrowed from T | None -> T
         "import_nodes": [],
     }
 
@@ -431,7 +432,7 @@ def collect_source_info(src_path):
 
     # Helper to process a single class body (works for top-level and nested classes)
     def _collect_class_body(class_node, is_enum, info):
-        ca, cm, ce = {}, {}, set()
+        ca, cm, ce, narrowed = {}, {}, set(), {}
         for item in ast.iter_child_nodes(class_node):
             if isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
                 ca[item.target.id] = unparse(item.annotation)
@@ -496,6 +497,8 @@ def collect_source_info(src_path):
                             ):
                                 ca[attr] = f"ref[{init_params[val.args[0].id]}]"
                             # Pattern E: self.attr = param or default
+                            # The `or default` guarantees the result is non-None, so
+                            # strip any trailing `| None` from the param type.
                             elif (
                                 isinstance(val, ast.BoolOp)
                                 and isinstance(val.op, ast.Or)
@@ -503,7 +506,17 @@ def collect_source_info(src_path):
                                 and isinstance(val.values[0], ast.Name)
                                 and val.values[0].id in init_params
                             ):
-                                ca[attr] = init_params[val.values[0].id]
+                                param_type = init_params[val.values[0].id]
+                                if param_type.endswith(" | None"):
+                                    stripped = param_type[: -len(" | None")]
+                                    ca[attr] = stripped
+                                    narrowed[attr] = stripped
+                                elif param_type.startswith("None | "):
+                                    stripped = param_type[len("None | "):]
+                                    ca[attr] = stripped
+                                    narrowed[attr] = stripped
+                                else:
+                                    ca[attr] = param_type
                             # Pattern F: self.attr = param.some_attr (attribute of typed param)
                             elif (
                                 isinstance(val, ast.Attribute)
@@ -571,6 +584,8 @@ def collect_source_info(src_path):
             info["class_methods"][class_node.name] = cm
         if ce:
             info["enum_member_names"][class_node.name] = ce
+        if narrowed:
+            info["narrowed_class_attrs"][class_node.name] = narrowed
 
     # Phase 3: collect info from class definitions (all depths via ast.walk)
     for node in ast.walk(tree):
@@ -735,6 +750,21 @@ def apply_fixes(txt, info):
             else:
                 new_lines.append(raw)
             continue
+
+        # Check for narrowed T | None -> T (must come before Incomplete check)
+        na = re.match(r"^(\s*)([A-Za-z_]\w*): (.+) \| None\s*$", raw)
+        if na:
+            na_indent, na_name, na_base = na.group(1), na.group(2), na.group(3)
+            current_class_for_na = None
+            for ci in sorted(class_at_indent.keys(), key=len, reverse=True):
+                if len(na_indent) > len(ci):
+                    current_class_for_na = class_at_indent[ci]
+                    break
+            if current_class_for_na:
+                narrowed_dict = info.get("narrowed_class_attrs", {}).get(current_class_for_na, {})
+                if na_name in narrowed_dict and narrowed_dict[na_name] == na_base:
+                    new_lines.append(f"{na_indent}{na_name}: {na_base}")
+                    continue
 
         # Check for Incomplete pattern
         m = re.match(r"^(\s*)([A-Za-z_]\w*): Incomplete\s*$", raw)
@@ -928,14 +958,6 @@ lsp_src = pathlib.Path(os.environ["LSP_SRC"])
 for pyi in sorted(out.rglob("*.pyi")):
     txt = pyi.read_bytes().decode("utf-8").replace("\r\n", "\n")
 
-    needs_fix = (
-        ": Incomplete" in txt
-        or bool(re.search(r"\w+: TypeAlias\s*$", txt, re.MULTILINE))
-        or bool(re.search(r"^\w+: (?:dict|list|set|tuple)\s*$", txt, re.MULTILINE))
-    )
-    if not needs_fix:
-        continue
-
     # Locate source using relative path first, then fallbacks
     rel = pyi.relative_to(out)
     src = None
@@ -957,12 +979,21 @@ for pyi in sorted(out.rglob("*.pyi")):
                 src = found
                 break
 
-    if src:
-        info = collect_source_info(src)
-        if info:
-            txt = apply_fixes(txt, info)
-            txt = add_missing_imports(txt, info)
-            txt = ensure_any_import(txt)
-            txt = cleanup_incomplete_import(txt)
+    info = collect_source_info(src) if src else None
+
+    needs_fix = (
+        ": Incomplete" in txt
+        or bool(re.search(r"\w+: TypeAlias\s*$", txt, re.MULTILINE))
+        or bool(re.search(r"^\w+: (?:dict|list|set|tuple)\s*$", txt, re.MULTILINE))
+        or bool(info and info.get("narrowed_class_attrs"))
+    )
+    if not needs_fix:
+        continue
+
+    if info:
+        txt = apply_fixes(txt, info)
+        txt = add_missing_imports(txt, info)
+        txt = ensure_any_import(txt)
+        txt = cleanup_incomplete_import(txt)
 
     pyi.write_bytes(txt.encode("utf-8"))
