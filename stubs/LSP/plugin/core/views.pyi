@@ -1,93 +1,217 @@
 import sublime
 import sublime_plugin
-from ...protocol import CodeAction as CodeAction, CodeActionKind, CodeActionParams, Color, ColorInformation, Command as Command, Diagnostic, DiagnosticSeverity, DiagnosticTag as DiagnosticTag, DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams, DidSaveTextDocumentParams, DocumentColorParams, DocumentFormattingParams as DocumentFormattingParams, DocumentHighlightKind, DocumentRangeFormattingParams as DocumentRangeFormattingParams, DocumentRangesFormattingParams as DocumentRangesFormattingParams, DocumentUri, FormattingOptions, Location, LocationLink, MarkedString, MarkupContent, Position, Range, SelectionRangeParams, TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, TextDocumentPositionParams, TextDocumentSaveReason, TextEdit as TextEdit, VersionedTextDocumentIdentifier, WillSaveTextDocumentParams
-from .constants import CODE_ACTION_KINDS as CODE_ACTION_KINDS, MARKO_MD_PARSER_VERSION as MARKO_MD_PARSER_VERSION, ST_CACHE_PATH as ST_CACHE_PATH, ST_STORAGE_PATH as ST_STORAGE_PATH, SUBLIME_KIND_SCOPES as SUBLIME_KIND_SCOPES, SublimeKind as SublimeKind
+from ...protocol import (
+    CodeAction as CodeAction,
+    CodeActionKind as CodeActionKind,
+    CodeActionParams,
+    Color,
+    ColorInformation,
+    Command as Command,
+    Diagnostic,
+    DiagnosticSeverity,
+    DiagnosticTag as DiagnosticTag,
+    DidChangeTextDocumentParams,
+    DidCloseTextDocumentParams,
+    DidOpenTextDocumentParams,
+    DidSaveTextDocumentParams,
+    DocumentColorParams,
+    DocumentFormattingParams as DocumentFormattingParams,
+    DocumentHighlightKind,
+    DocumentRangeFormattingParams as DocumentRangeFormattingParams,
+    DocumentRangesFormattingParams as DocumentRangesFormattingParams,
+    DocumentUri,
+    FormattingOptions,
+    LanguageKind as LanguageKind,
+    Location,
+    LocationLink,
+    MarkedString,
+    MarkupContent,
+    Position,
+    Range,
+    SelectionRangeParams,
+    TextDocumentContentChangeEvent,
+    TextDocumentIdentifier,
+    TextDocumentItem,
+    TextDocumentPositionParams,
+    TextDocumentSaveReason,
+    TextEdit as TextEdit,
+    VersionedTextDocumentIdentifier,
+    WillSaveTextDocumentParams,
+)
+from .constants import (
+    CODE_ACTION_KINDS as CODE_ACTION_KINDS,
+    MARKO_MD_PARSER_VERSION as MARKO_MD_PARSER_VERSION,
+    MarkdownLangMap as MarkdownLangMap,
+    ST_CACHE_PATH as ST_CACHE_PATH,
+    ST_PLATFORM as ST_PLATFORM,
+    ST_STORAGE_PATH as ST_STORAGE_PATH,
+    SUBLIME_KIND_SCOPES as SUBLIME_KIND_SCOPES,
+    SublimeKind as SublimeKind,
+)
 from .protocol import Notification as Notification, Point as Point, Request as Request
+from .sessions import SessionBufferProtocol as SessionBufferProtocol
 from .settings import userprefs as userprefs
 from .types import ClientConfig as ClientConfig
-from .url import parse_uri as parse_uri
+from .url import (
+    encode_code_action_uri as encode_code_action_uri,
+    parse_uri as parse_uri,
+)
 from .workspace import is_subpath_of as is_subpath_of
-from _typeshed import Incomplete
-from typing import Any, Callable, Iterable
+from dataclasses import dataclass
+from typing import Any, Callable, Generator, Iterable, Sequence
+import linecache
+import re
 
-MarkdownLangMap = dict[str, tuple[tuple[str, ...], tuple[str, ...]]]
-DIAGNOSTIC_SEVERITY: list[tuple[str, str, str, str, sublime.RegionFlags, sublime.RegionFlags]]
+@dataclass
+class DiagnosticStyle:
+    kind: str
+    css_class: str
+    region_scope: str
+    icon_resource: str
+    single_line_region_flags: sublime.RegionFlags
+    multi_line_region_flags: sublime.RegionFlags
+
+DIAGNOSTIC_STYLES: dict[DiagnosticSeverity, DiagnosticStyle]
 
 class DiagnosticSeverityData:
-    regions: Incomplete
-    regions_with_tag: Incomplete
-    annotations: Incomplete
-    icon: Incomplete
-    def __init__(self, severity: int) -> None: ...
+    regions: list[sublime.Region]
+    regions_with_tag: dict[DiagnosticTag, list[sublime.Region]]
+    annotations: list[str]
+    def __init__(self) -> None: ...
 
-class InvalidUriSchemeException(Exception):
-    uri: Incomplete
+class InvalidUriSchemeError(Exception):
     def __init__(self, uri: str) -> None: ...
 
-def get_line(window: sublime.Window, file_name: str, row: int, strip: bool = True) -> str:
+def mutable(view: sublime.View) -> Generator: ...
+def get_line(
+    window: sublime.Window, file_name: str, row: int, strip: bool = True
+) -> str:
     """
     Get the line from the buffer if the view is open, else get line from linecache.
     row - is 0 based. If you want to get the first line, you should pass 0.
     """
+
 def extract_variables(window: sublime.Window) -> dict[str, str]: ...
 def point_to_offset(point: Point, view: sublime.View) -> int: ...
 def offset_to_point(view: sublime.View, offset: int) -> Point: ...
 def position(view: sublime.View, offset: int) -> Position: ...
 def position_to_offset(position: Position, view: sublime.View) -> int: ...
 def get_symbol_kind_from_scope(scope_name: str) -> SublimeKind: ...
-def range_to_region(range: Range, view: sublime.View) -> sublime.Region: ...
+def range_to_region(lsp_range: Range, view: sublime.View) -> sublime.Region: ...
 def region_to_range(view: sublime.View, region: sublime.Region) -> Range: ...
 def to_encoded_filename(path: str, position: Position) -> str: ...
-def get_uri_and_range_from_location(location: Location | LocationLink) -> tuple[DocumentUri, Range]: ...
-def get_uri_and_position_from_location(location: Location | LocationLink) -> tuple[DocumentUri, Position]: ...
+def get_uri_and_range_from_location(
+    location: Location | LocationLink,
+) -> tuple[DocumentUri, Range]: ...
+def get_uri_and_position_from_location(
+    location: Location | LocationLink,
+) -> tuple[DocumentUri, Position]: ...
 def location_to_encoded_filename(location: Location | LocationLink) -> str:
-    """
-    DEPRECATED
-    """
+    """DEPRECATED."""
 
 class MissingUriError(Exception):
-    view_id: Incomplete
+    view_id: int
     def __init__(self, view_id: int) -> None: ...
 
 def uri_from_view(view: sublime.View) -> DocumentUri: ...
-def text_document_identifier(view_or_uri: DocumentUri | sublime.View) -> TextDocumentIdentifier: ...
+def text_document_identifier(
+    view_or_uri: DocumentUri | sublime.View,
+) -> TextDocumentIdentifier: ...
 def first_selection_region(view: sublime.View) -> sublime.Region | None: ...
 def has_single_nonempty_selection(view: sublime.View) -> bool: ...
 def entire_content_region(view: sublime.View) -> sublime.Region: ...
 def entire_content(view: sublime.View) -> str: ...
 def entire_content_range(view: sublime.View) -> Range: ...
 def text_document_item(view: sublime.View, language_id: str) -> TextDocumentItem: ...
-def versioned_text_document_identifier(view: sublime.View, version: int) -> VersionedTextDocumentIdentifier: ...
-def text_document_position_params(view: sublime.View, location: int) -> TextDocumentPositionParams: ...
-def did_open_text_document_params(view: sublime.View, language_id: str) -> DidOpenTextDocumentParams: ...
-def render_text_change(change: sublime.TextChange) -> TextDocumentContentChangeEvent: ...
-def did_change_text_document_params(view: sublime.View, version: int, changes: Iterable[sublime.TextChange] | None = None) -> DidChangeTextDocumentParams: ...
-def will_save_text_document_params(view_or_uri: DocumentUri | sublime.View, reason: TextDocumentSaveReason) -> WillSaveTextDocumentParams: ...
-def did_save_text_document_params(view: sublime.View, include_text: bool, uri: DocumentUri | None = None) -> DidSaveTextDocumentParams: ...
+def versioned_text_document_identifier(
+    view: sublime.View, version: int
+) -> VersionedTextDocumentIdentifier: ...
+def text_document_position_params(
+    view: sublime.View, location: int
+) -> TextDocumentPositionParams: ...
+def did_open_text_document_params(
+    view: sublime.View, language_id: str
+) -> DidOpenTextDocumentParams: ...
+def render_text_change(
+    change: sublime.TextChange,
+) -> TextDocumentContentChangeEvent: ...
+def did_change_text_document_params(
+    view: sublime.View, version: int, changes: list[sublime.TextChange] | None = None
+) -> DidChangeTextDocumentParams: ...
+def will_save_text_document_params(
+    view_or_uri: DocumentUri | sublime.View, reason: TextDocumentSaveReason
+) -> WillSaveTextDocumentParams: ...
+def did_save_text_document_params(
+    view: sublime.View, include_text: bool, uri: DocumentUri | None = None
+) -> DidSaveTextDocumentParams: ...
 def did_close_text_document_params(uri: DocumentUri) -> DidCloseTextDocumentParams: ...
-def did_open(view: sublime.View, language_id: str) -> Notification[DidOpenTextDocumentParams]: ...
-def did_change(view: sublime.View, version: int, changes: Iterable[sublime.TextChange] | None = None) -> Notification[DidChangeTextDocumentParams]: ...
-def will_save(uri: DocumentUri, reason: TextDocumentSaveReason) -> Notification[WillSaveTextDocumentParams]: ...
-def will_save_wait_until(view: sublime.View, reason: TextDocumentSaveReason) -> Request[WillSaveTextDocumentParams, list[TextEdit] | None]: ...
-def did_save(view: sublime.View, include_text: bool, uri: DocumentUri | None = None) -> Notification[DidSaveTextDocumentParams]: ...
+def did_open(
+    view: sublime.View, language_id: str
+) -> Notification[DidOpenTextDocumentParams]: ...
+def did_change(
+    view: sublime.View, version: int, changes: list[sublime.TextChange] | None = None
+) -> Notification[DidChangeTextDocumentParams]: ...
+def will_save(
+    uri: DocumentUri, reason: TextDocumentSaveReason
+) -> Notification[WillSaveTextDocumentParams]: ...
+def will_save_wait_until(
+    view: sublime.View, reason: TextDocumentSaveReason
+) -> Request[WillSaveTextDocumentParams, list[TextEdit] | None]: ...
+def did_save(
+    view: sublime.View, include_text: bool, uri: DocumentUri | None = None
+) -> Notification[DidSaveTextDocumentParams]: ...
 def did_close(uri: DocumentUri) -> Notification[DidCloseTextDocumentParams]: ...
 def formatting_options(settings: sublime.Settings) -> FormattingOptions: ...
-def text_document_formatting(view: sublime.View) -> Request[DocumentFormattingParams, list[TextEdit] | None]: ...
-def text_document_range_formatting(view: sublime.View, region: sublime.Region) -> Request[DocumentRangeFormattingParams, list[TextEdit] | None]: ...
-def text_document_ranges_formatting(view: sublime.View) -> Request[DocumentRangesFormattingParams, list[TextEdit] | None]: ...
+def text_document_formatting(
+    view: sublime.View,
+) -> Request[DocumentFormattingParams, list[TextEdit] | None]: ...
+def text_document_range_formatting(
+    view: sublime.View, region: sublime.Region
+) -> Request[DocumentRangeFormattingParams, list[TextEdit] | None]: ...
+def text_document_ranges_formatting(
+    view: sublime.View,
+) -> Request[DocumentRangesFormattingParams, list[TextEdit] | None]: ...
 def selection_range_params(view: sublime.View) -> SelectionRangeParams: ...
-def text_document_code_action_params(view: sublime.View, region: sublime.Region, diagnostics: list[Diagnostic], only_kinds: list[CodeActionKind] | None = None, manual: bool = False) -> CodeActionParams: ...
-
-LSP_POPUP_SPACER_HTML: str
-
-def show_lsp_popup(view: sublime.View, contents: str, *, location: int = -1, md: bool = False, flags: sublime.PopupFlags = ..., css: str | None = None, wrapper_class: str | None = None, body_id: str | None = None, on_navigate: Callable[..., None] | None = None, on_hide: Callable[..., None] | None = None) -> None: ...
-def update_lsp_popup(view: sublime.View, contents: str, *, md: bool = False, css: str | None = None, wrapper_class: str | None = None, body_id: str | None = None) -> None: ...
+def text_document_code_action_params(
+    view: sublime.View,
+    region: sublime.Region,
+    diagnostics: list[Diagnostic],
+    only_kinds: list[str | CodeActionKind] | None = None,
+    manual: bool = False,
+) -> CodeActionParams: ...
+def show_lsp_popup(
+    view: sublime.View,
+    contents: str,
+    *,
+    location: int = -1,
+    md: bool = False,
+    flags: sublime.PopupFlags = ...,
+    css: str | None = None,
+    wrapper_class: str | None = None,
+    body_id: str | None = None,
+    on_navigate: Callable[..., None] | None = None,
+    on_hide: Callable[..., None] | None = None,
+) -> None: ...
+def update_lsp_popup(
+    view: sublime.View,
+    contents: str,
+    *,
+    md: bool = False,
+    css: str | None = None,
+    wrapper_class: str | None = None,
+    body_id: str | None = None,
+) -> None: ...
 
 FORMAT_STRING: int
 FORMAT_MARKED_STRING: int
 FORMAT_MARKUP_CONTENT: int
 
-def minihtml(view: sublime.View, content: MarkedString | MarkupContent | list[MarkedString], allowed_formats: int, language_id_map: MarkdownLangMap | None = None) -> str:
+def minihtml(
+    view: sublime.View,
+    content: MarkedString | MarkupContent | list[MarkedString],
+    allowed_formats: int,
+    language_id_map: MarkdownLangMap | None = None,
+) -> str:
     """
     Formats provided input content into markup accepted by minihtml.
 
@@ -108,27 +232,44 @@ def minihtml(view: sublime.View, content: MarkedString | MarkupContent | list[Ma
     :returns: Formatted string
     """
 
-REPLACEMENT_MAP: Incomplete
-PATTERNS: Incomplete
-REPLACEMENT_RE: Incomplete
+REPLACEMENT_MAP: dict[str, str]
+PATTERNS: list[str]
+REPLACEMENT_RE: re.Pattern[str]
 
 def text2html(content: str) -> str: ...
-def make_link(href: str, text: Any, class_name: str | None = None, tooltip: str | None = None) -> str: ...
-def make_command_link(command: str, text: str, command_args: dict[str, Any] | None = None, class_name: str | None = None, tooltip: str | None = None, view_id: int | None = None) -> str: ...
+def make_link(
+    href: str, text: Any, class_name: str | None = None, tooltip: str | None = None
+) -> str: ...
+def make_command_link(
+    command: str,
+    text: str,
+    command_args: dict[str, Any] | None = None,
+    class_name: str | None = None,
+    tooltip: str | None = None,
+    view_id: int | None = None,
+) -> str: ...
 
 class LspRunTextCommandHelperCommand(sublime_plugin.WindowCommand):
-    def run(self, view_id: int, command: str, args: dict[str, Any] | None = None) -> None: ...
+    def run(
+        self, view_id: int, command: str, args: dict[str, Any] | None = None
+    ) -> None: ...
 
 COLOR_BOX_HTML: str
 
 def color_to_hex(color: Color) -> str: ...
 def lsp_color_to_html(color_info: ColorInformation) -> str: ...
-def lsp_color_to_phantom(view: sublime.View, color_info: ColorInformation) -> sublime.Phantom: ...
+def lsp_color_to_phantom(
+    view: sublime.View, color_info: ColorInformation
+) -> sublime.Phantom: ...
 def document_color_params(view: sublime.View) -> DocumentColorParams: ...
-def format_severity(severity: int) -> str: ...
 def diagnostic_severity(diagnostic: Diagnostic) -> DiagnosticSeverity: ...
-def format_diagnostics_for_annotation(diagnostics: list[Diagnostic], css_class: str) -> list[str]: ...
-def format_diagnostic_for_panel(diagnostic: Diagnostic) -> tuple[str, int | None, str | None, str | None]:
+def diagnostic_icon(severity: DiagnosticSeverity) -> str: ...
+def format_diagnostics_for_annotation(
+    view: sublime.View, diagnostics: list[Diagnostic], css_class: str
+) -> list[str]: ...
+def format_diagnostic_for_panel(
+    diagnostic: Diagnostic,
+) -> tuple[str, int | None, str | None, str | None]:
     """
     Turn an LSP diagnostic into a string suitable for an output panel.
 
@@ -138,30 +279,58 @@ def format_diagnostic_for_panel(diagnostic: Diagnostic) -> tuple[str, int | None
                 When the last three elements are not optional, show an inline phantom
                 using the information given.
     """
-def diagnostic_source_and_code(diagnostic: Diagnostic) -> tuple[str, str | None, str | None]: ...
-def location_to_human_readable(config: ClientConfig, base_dir: str | None, location: Location | LocationLink) -> str:
-    """
-    Format an LSP Location (or LocationLink) into a string suitable for a human to read
-    """
+
+def diagnostic_source_and_code(
+    diagnostic: Diagnostic,
+) -> tuple[str, str | None, str | None]: ...
+def location_to_human_readable(
+    config: ClientConfig, base_dir: str | None, location: Location | LocationLink
+) -> str:
+    """Format an LSP Location (or LocationLink) into a string suitable for a human to read."""
+
 def location_to_href(config: ClientConfig, location: Location | LocationLink) -> str:
-    """
-    Encode an LSP Location (or LocationLink) into a string suitable as a hyperlink in minihtml
-    """
+    """Encode an LSP Location (or LocationLink) into a string suitable as a hyperlink in minihtml."""
+
 def unpack_href_location(href: str) -> tuple[str, str, int, int]:
-    """
-    Return the session name, URI, row, and col_utf16 from an encoded href.
-    """
+    """Return the session name, URI, row, and col_utf16 from an encoded href."""
+
 def is_location_href(href: str) -> bool:
+    """Check whether this href is an encoded location."""
+
+def html_wrapper(content: str, *, class_name: str | None = None) -> str:
     """
-    Check whether this href is an encoded location.
+    Wrap content in a container with default pading applied.
+
+    Automatically inserted spacer element acts as a bottom padding to workaround minihtml's margin collapsing bug.
+    Otherwise if the last element had bottom margin (for example a paragraph), it would render a double margin.
+    The `content` is NOT escaped.
     """
-def format_diagnostic_for_html(config: ClientConfig, diagnostic: Diagnostic, base_dir: str | None = None) -> str: ...
-def format_code_actions_for_quick_panel(session_actions: Iterable[tuple[str, CodeAction | Command]]) -> tuple[list[sublime.QuickPanelItem], int]: ...
+
+def lightbulb_html(color: str, star: bool) -> str: ...
+def format_diagnostics_for_html(
+    view: sublime.View,
+    diagnostics_by_config: Sequence[tuple[SessionBufferProtocol, Sequence[Diagnostic]]],
+    code_actions_by_config: dict[str, list[Command | CodeAction]],
+    lightbulb_color: str,
+    base_dir: str | None = None,
+) -> str: ...
+def format_diagnostic_for_html(
+    view: sublime.View,
+    config: ClientConfig,
+    diagnostic: Diagnostic,
+    code_actions: list[Command | CodeAction],
+    lightbulb_color: str,
+    base_dir: str | None = None,
+) -> str: ...
+def format_code_actions_for_quick_panel(
+    session_actions: Iterable[tuple[str, CodeAction | Command]],
+) -> tuple[list[sublime.QuickPanelItem], int]: ...
 def kind_contains_other_kind(kind: str, other_kind: str) -> bool:
-    '''
+    """
     Check if `other_kind` is a sub-kind of `kind`.
 
-    The kind `"refactor.extract"` for example contains `"refactor.extract"` and ``"refactor.extract.function"`,
-    but not `"unicorn.refactor.extract"`, or `"refactor.extractAll"` or `refactor`.
-    '''
+    The kind `"refactor.extract"` for example contains `"refactor.extract"` and `"refactor.extract.function"`,
+    but not `"unicorn.refactor.extract"`, or `"refactor.extractAll"` or `"refactor"`.
+    """
+
 def document_highlight_key(kind: DocumentHighlightKind, *, multiline: bool) -> str: ...

@@ -71,25 +71,32 @@ uvx --python="${PYTHON_VERSION}" --from=mypy stubgen \
     "$LSP_SRC" \
     -o "$STUB_TMP"
 
-# remove some useless files
-rm -rf "$STUB_TMP/test_"*
+# remove unneeded files
+rm -rf "$STUB_TMP/tests" "$STUB_TMP/tests_"*
 
 # ---------------------------------------------------------------------------
 # Assemble output under LSP/ to match the import namespace
 # ---------------------------------------------------------------------------
 LSP_OUT="$PROJECT_DIR/stubs/LSP"
 log "Writing stubs to $LSP_OUT/ ..."
-mkdir -p "$LSP_OUT"
 rm -rf "$LSP_OUT"
 
-[[ -d $STUB_TMP ]] && mv -f "$STUB_TMP" "$LSP_OUT/"
+mkdir -p "$LSP_OUT"
+[[ -d $STUB_TMP ]] && mv -Tf "$STUB_TMP" "$LSP_OUT/"
+
+# Fix Incomplete placeholder types, class attribute types, and normalize to LF.
+# Uses Python's AST module to infer types from source without executing code.
+log "Post-processing stubs..."
+LSP_OUT="$LSP_OUT" LSP_SRC="$LSP_SRC" uv run python "${SCRIPT_DIR}/fix-stubs.py"
+
+# Format stubs with ruff
+uvx --from ruff ruff format "${LSP_OUT}"
 
 # Marker file so consumers can tell which LSP version the stubs came from
 cat >"$LSP_OUT/.version" <<EOF
 ref: $LSP_REF
 tag: $LSP_TAG
 commit: $LSP_COMMIT
-generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
 EOF
 
 log "Done."

@@ -1,29 +1,38 @@
 import sublime
 import sublime_plugin
 from ...protocol import Diagnostic as Diagnostic, Location, LocationLink
-from .logging import debug as debug
 from .sessions import AbstractViewListener as AbstractViewListener, Session as Session
-from .url import parse_uri as parse_uri
-from .views import MissingUriError as MissingUriError, first_selection_region as first_selection_region, get_uri_and_position_from_location as get_uri_and_position_from_location, position_to_offset as position_to_offset, uri_from_view as uri_from_view
+from .views import (
+    MissingUriError as MissingUriError,
+    first_selection_region as first_selection_region,
+    get_uri_and_position_from_location as get_uri_and_position_from_location,
+    position_to_offset as position_to_offset,
+    uri_from_view as uri_from_view,
+)
 from .windows import WindowManager as WindowManager, WindowRegistry as WindowRegistry
-from _typeshed import Incomplete
 from typing import Generator, Iterable
 
-windows: Incomplete
+windows: WindowRegistry
 
-def best_session(view: sublime.View, sessions: Iterable[Session], point: int | None = None) -> Session | None: ...
-def get_position(view: sublime.View, event: dict | None = None, point: int | None = None) -> int | None: ...
+def best_session(
+    view: sublime.View, sessions: Iterable[Session], point: int | None = None
+) -> Session | None: ...
+def get_position(
+    view: sublime.View, event: dict | None = None, point: int | None = None
+) -> int | None: ...
 
 class LspWindowCommand(sublime_plugin.WindowCommand):
     """
     Inherit from this class to define requests which are not bound to a particular view. This allows to run requests
     for example from links in HtmlSheets or when an unrelated file has focus.
     """
+
     capability: str
     session_name: str
+    def __init__(self, window: sublime.Window) -> None: ...
     def is_enabled(self) -> bool: ...
     def session(self) -> Session | None: ...
-    def sessions(self) -> Generator[Session, None, None]: ...
+    def sessions(self) -> Generator[Session]: ...
     def session_by_name(self, session_name: str) -> Session | None: ...
 
 class LspTextCommand(sublime_plugin.TextCommand):
@@ -31,22 +40,37 @@ class LspTextCommand(sublime_plugin.TextCommand):
     Inherit from this class to define your requests that should be triggered via the command palette and/or a
     keybinding.
     """
+
     capability: str
     session_name: str
-    def is_enabled(self, event: dict | None = None, point: int | None = None) -> bool: ...
+    def __init__(self, view: sublime.View) -> None: ...
+    def is_enabled(
+        self, event: dict | None = None, point: int | None = None
+    ) -> bool: ...
     def want_event(self) -> bool: ...
     @staticmethod
     def applies_to_context_menu(event: dict | None) -> bool: ...
     def get_listener(self) -> AbstractViewListener | None: ...
-    def best_session(self, capability: str, point: int | None = None) -> Session | None: ...
-    def session_by_name(self, name: str | None = None, capability_path: str | None = None) -> Session | None: ...
-    def sessions(self, capability_path: str | None = None) -> Generator[Session, None, None]: ...
+    def best_session(
+        self, capability: str, point: int | None = None
+    ) -> Session | None: ...
+    def session_by_name(
+        self, name: str | None = None, capability_path: str | None = None
+    ) -> Session | None: ...
+    def sessions(
+        self, capability_path: str | None = None
+    ) -> Generator[Session, None, None]: ...
 
 class LspOpenLocationCommand(LspWindowCommand):
-    """
-    A command to be used by third-party ST packages that need to open an URI with some abstract scheme.
-    """
-    def run(self, location: Location | LocationLink, session_name: str | None = None, flags: sublime.NewFileFlags = ..., group: int = -1, event: dict | None = None) -> None: ...
+    """A command to be used by third-party ST packages that need to open an URI with some abstract scheme."""
+    def run(
+        self,
+        location: Location | LocationLink,
+        session_name: str | None = None,
+        flags: sublime.NewFileFlags = ...,
+        group: int = -1,
+        event: dict | None = None,
+    ) -> None: ...
     def want_event(self) -> bool: ...
 
 class LspRestartServerCommand(LspTextCommand):
@@ -57,7 +81,9 @@ class LspRestartServerCommand(LspTextCommand):
 class LspCheckApplicableCommand(sublime_plugin.TextCommand):
     def run(self, edit: sublime.Edit, session_name: str) -> None: ...
 
-def navigate_diagnostics(view: sublime.View, point: int | None, forward: bool = True) -> None: ...
+def navigate_diagnostics(
+    view: sublime.View, point: int | None, forward: bool = True
+) -> None: ...
 
 class LspNextDiagnosticCommand(LspTextCommand):
     def run(self, edit: sublime.Edit, point: int | None = None) -> None: ...

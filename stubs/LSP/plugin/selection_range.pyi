@@ -1,15 +1,33 @@
 import sublime
 from ..protocol import SelectionRange
 from .core.protocol import Request as Request
-from .core.registry import LspTextCommand as LspTextCommand, get_position as get_position
-from .core.views import range_to_region as range_to_region, selection_range_params as selection_range_params
+from .core.registry import (
+    LspTextCommand as LspTextCommand,
+    get_position as get_position,
+)
+from .core.views import (
+    range_to_region as range_to_region,
+    selection_range_params as selection_range_params,
+)
 from typing import Any
 
 class LspExpandSelectionCommand(LspTextCommand):
     capability: str
     def __init__(self, view: sublime.View) -> None: ...
-    def is_enabled(self, event: dict | None = None, point: int | None = None, fallback: bool = False) -> bool: ...
-    def is_visible(self, event: dict | None = None, point: int | None = None, fallback: bool = False) -> bool: ...
-    def run(self, edit: sublime.Edit, event: dict | None = None, fallback: bool = False) -> None: ...
+    def is_enabled(
+        self,
+        event: dict | None = None,
+        point: int | None = None,
+        fallback: bool = False,
+    ) -> bool: ...
+    def is_visible(
+        self,
+        event: dict | None = None,
+        point: int | None = None,
+        fallback: bool = False,
+    ) -> bool: ...
+    def run(
+        self, edit: sublime.Edit, event: dict | None = None, fallback: bool = False
+    ) -> None: ...
     def on_result(self, params: list[SelectionRange] | None) -> None: ...
     def on_error(self, params: Any) -> None: ...

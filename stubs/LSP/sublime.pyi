@@ -1,6 +1,6 @@
-from _typeshed import Incomplete
 from enum import IntEnum, IntFlag
 from typing import Any, Callable, Iterable, Iterator, Literal, Reversible, Sequence
+from typing import Optional
 
 class HoverZone(IntEnum):
     """
@@ -10,13 +10,14 @@ class HoverZone(IntEnum):
 
     For backwards compatibility these values are also available outside this enumeration with a `HOVER_` prefix.
     """
+
     TEXT: int
     GUTTER: int
     MARGIN: int
 
-HOVER_TEXT: Incomplete
-HOVER_GUTTER: Incomplete
-HOVER_MARGIN: Incomplete
+HOVER_TEXT: int
+HOVER_GUTTER: int
+HOVER_MARGIN: int
 
 class NewFileFlags(IntFlag):
     """
@@ -26,6 +27,7 @@ class NewFileFlags(IntFlag):
 
     For backwards compatibility these values are also available outside this enumeration (without a prefix).
     """
+
     NONE: int
     ENCODED_POSITION: int
     TRANSIENT: int
@@ -36,14 +38,14 @@ class NewFileFlags(IntFlag):
     CLEAR_TO_RIGHT: int
     FORCE_CLONE: int
 
-ENCODED_POSITION: Incomplete
-TRANSIENT: Incomplete
-FORCE_GROUP: Incomplete
-SEMI_TRANSIENT: Incomplete
-ADD_TO_SELECTION: Incomplete
-REPLACE_MRU: Incomplete
-CLEAR_TO_RIGHT: Incomplete
-FORCE_CLONE: Incomplete
+ENCODED_POSITION: int
+TRANSIENT: int
+FORCE_GROUP: int
+SEMI_TRANSIENT: int
+ADD_TO_SELECTION: int
+REPLACE_MRU: int
+CLEAR_TO_RIGHT: int
+FORCE_CLONE: int
 
 class FindFlags(IntFlag):
     """
@@ -53,6 +55,7 @@ class FindFlags(IntFlag):
 
     For backwards compatibility these values are also available outside this enumeration (without a prefix).
     """
+
     NONE: int
     LITERAL: int
     IGNORECASE: int
@@ -60,11 +63,11 @@ class FindFlags(IntFlag):
     REVERSE: int
     WRAP: int
 
-LITERAL: Incomplete
-IGNORECASE: Incomplete
-WHOLEWORD: Incomplete
-REVERSE: Incomplete
-WRAP: Incomplete
+LITERAL: int
+IGNORECASE: int
+WHOLEWORD: int
+REVERSE: int
+WRAP: int
 
 class QuickPanelFlags(IntFlag):
     """
@@ -74,14 +77,15 @@ class QuickPanelFlags(IntFlag):
 
     For backwards compatibility these values are also available outside this enumeration (without a prefix).
     """
+
     NONE: int
     MONOSPACE_FONT: int
     KEEP_OPEN_ON_FOCUS_LOST: int
     WANT_EVENT: int
 
-MONOSPACE_FONT: Incomplete
-KEEP_OPEN_ON_FOCUS_LOST: Incomplete
-WANT_EVENT: Incomplete
+MONOSPACE_FONT: int
+KEEP_OPEN_ON_FOCUS_LOST: int
+WANT_EVENT: int
 
 class PopupFlags(IntFlag):
     """
@@ -91,6 +95,7 @@ class PopupFlags(IntFlag):
 
     For backwards compatibility these values are also available outside this enumeration (without a prefix).
     """
+
     NONE: int
     COOPERATE_WITH_AUTO_COMPLETE: int
     HIDE_ON_MOUSE_MOVE: int
@@ -98,11 +103,11 @@ class PopupFlags(IntFlag):
     KEEP_ON_SELECTION_MODIFIED: int
     HIDE_ON_CHARACTER_EVENT: int
 
-COOPERATE_WITH_AUTO_COMPLETE: Incomplete
-HIDE_ON_MOUSE_MOVE: Incomplete
-HIDE_ON_MOUSE_MOVE_AWAY: Incomplete
-KEEP_ON_SELECTION_MODIFIED: Incomplete
-HIDE_ON_CHARACTER_EVENT: Incomplete
+COOPERATE_WITH_AUTO_COMPLETE: int
+HIDE_ON_MOUSE_MOVE: int
+HIDE_ON_MOUSE_MOVE_AWAY: int
+KEEP_ON_SELECTION_MODIFIED: int
+HIDE_ON_CHARACTER_EVENT: int
 
 class RegionFlags(IntFlag):
     """
@@ -110,6 +115,7 @@ class RegionFlags(IntFlag):
 
     For backwards compatibility these values are also available outside this enumeration (without a prefix).
     """
+
     NONE: int
     DRAW_EMPTY: int
     HIDE_ON_MINIMAP: int
@@ -123,17 +129,17 @@ class RegionFlags(IntFlag):
     DRAW_SQUIGGLY_UNDERLINE: int
     NO_UNDO: int
 
-DRAW_EMPTY: Incomplete
-HIDE_ON_MINIMAP: Incomplete
-DRAW_EMPTY_AS_OVERWRITE: Incomplete
-PERSISTENT: Incomplete
-DRAW_NO_FILL: Incomplete
-HIDDEN: Incomplete
-DRAW_NO_OUTLINE: Incomplete
-DRAW_SOLID_UNDERLINE: Incomplete
-DRAW_STIPPLED_UNDERLINE: Incomplete
-DRAW_SQUIGGLY_UNDERLINE: Incomplete
-NO_UNDO: Incomplete
+DRAW_EMPTY: int
+HIDE_ON_MINIMAP: int
+DRAW_EMPTY_AS_OVERWRITE: int
+PERSISTENT: int
+DRAW_NO_FILL: int
+HIDDEN: int
+DRAW_NO_OUTLINE: int
+DRAW_SOLID_UNDERLINE: int
+DRAW_STIPPLED_UNDERLINE: int
+DRAW_SQUIGGLY_UNDERLINE: int
+NO_UNDO: int
 
 class QueryOperator(IntEnum):
     """
@@ -143,6 +149,7 @@ class QueryOperator(IntEnum):
 
     For backwards compatibility these values are also available outside this enumeration with a `OP_` prefix.
     """
+
     EQUAL: int
     NOT_EQUAL: int
     REGEX_MATCH: int
@@ -150,12 +157,12 @@ class QueryOperator(IntEnum):
     REGEX_CONTAINS: int
     NOT_REGEX_CONTAINS: int
 
-OP_EQUAL: Incomplete
-OP_NOT_EQUAL: Incomplete
-OP_REGEX_MATCH: Incomplete
-OP_NOT_REGEX_MATCH: Incomplete
-OP_REGEX_CONTAINS: Incomplete
-OP_NOT_REGEX_CONTAINS: Incomplete
+OP_EQUAL: int
+OP_NOT_EQUAL: int
+OP_REGEX_MATCH: int
+OP_NOT_REGEX_MATCH: int
+OP_REGEX_CONTAINS: int
+OP_NOT_REGEX_CONTAINS: int
 
 class PointClassification(IntFlag):
     """
@@ -163,6 +170,7 @@ class PointClassification(IntFlag):
 
     For backwards compatibility these values are also available outside this enumeration with a `CLASS_` prefix.
     """
+
     NONE: int
     WORD_START: int
     WORD_END: int
@@ -174,15 +182,15 @@ class PointClassification(IntFlag):
     LINE_END: int
     EMPTY_LINE: int
 
-CLASS_WORD_START: Incomplete
-CLASS_WORD_END: Incomplete
-CLASS_PUNCTUATION_START: Incomplete
-CLASS_PUNCTUATION_END: Incomplete
-CLASS_SUB_WORD_START: Incomplete
-CLASS_SUB_WORD_END: Incomplete
-CLASS_LINE_START: Incomplete
-CLASS_LINE_END: Incomplete
-CLASS_EMPTY_LINE: Incomplete
+CLASS_WORD_START: int
+CLASS_WORD_END: int
+CLASS_PUNCTUATION_START: int
+CLASS_PUNCTUATION_END: int
+CLASS_SUB_WORD_START: int
+CLASS_SUB_WORD_END: int
+CLASS_LINE_START: int
+CLASS_LINE_END: int
+CLASS_EMPTY_LINE: int
 
 class AutoCompleteFlags(IntFlag):
     """
@@ -190,22 +198,23 @@ class AutoCompleteFlags(IntFlag):
 
     For backwards compatibility these values are also available outside this enumeration (without a prefix).
     """
+
     NONE: int
     INHIBIT_WORD_COMPLETIONS: int
     INHIBIT_EXPLICIT_COMPLETIONS: int
     DYNAMIC_COMPLETIONS: int
     INHIBIT_REORDER: int
 
-INHIBIT_WORD_COMPLETIONS: Incomplete
-INHIBIT_EXPLICIT_COMPLETIONS: Incomplete
-DYNAMIC_COMPLETIONS: Incomplete
-INHIBIT_REORDER: Incomplete
+INHIBIT_WORD_COMPLETIONS: int
+INHIBIT_EXPLICIT_COMPLETIONS: int
+DYNAMIC_COMPLETIONS: int
+INHIBIT_REORDER: int
 
 class CompletionItemFlags(IntFlag):
     NONE: int
     KEEP_PREFIX: int
 
-COMPLETION_FLAG_KEEP_PREFIX: Incomplete
+COMPLETION_FLAG_KEEP_PREFIX: int
 
 class DialogResult(IntEnum):
     """
@@ -213,13 +222,14 @@ class DialogResult(IntEnum):
 
     For backwards compatibility these values are also available outside this enumeration with a `DIALOG_` prefix.
     """
+
     CANCEL: int
     YES: int
     NO: int
 
-DIALOG_CANCEL: Incomplete
-DIALOG_YES: Incomplete
-DIALOG_NO: Incomplete
+DIALOG_CANCEL: int
+DIALOG_YES: int
+DIALOG_NO: int
 
 class PhantomLayout(IntEnum):
     """
@@ -227,18 +237,20 @@ class PhantomLayout(IntEnum):
 
     For backwards compatibility these values are also available outside this enumeration with a `LAYOUT_` prefix.
     """
+
     INLINE: int
     BELOW: int
     BLOCK: int
 
-LAYOUT_INLINE: Incomplete
-LAYOUT_BELOW: Incomplete
-LAYOUT_BLOCK: Incomplete
+LAYOUT_INLINE: int
+LAYOUT_BELOW: int
+LAYOUT_BLOCK: int
 
 class KindId(IntEnum):
     """
     For backwards compatibility these values are also available outside this enumeration with a `KIND_ID_` prefix.
     """
+
     AMBIGUOUS: int
     KEYWORD: int
     TYPE: int
@@ -259,25 +271,25 @@ class KindId(IntEnum):
     COLOR_DARK: int
     COLOR_LIGHT: int
 
-KIND_ID_AMBIGUOUS: Incomplete
-KIND_ID_KEYWORD: Incomplete
-KIND_ID_TYPE: Incomplete
-KIND_ID_FUNCTION: Incomplete
-KIND_ID_NAMESPACE: Incomplete
-KIND_ID_NAVIGATION: Incomplete
-KIND_ID_MARKUP: Incomplete
-KIND_ID_VARIABLE: Incomplete
-KIND_ID_SNIPPET: Incomplete
-KIND_ID_COLOR_REDISH: Incomplete
-KIND_ID_COLOR_ORANGISH: Incomplete
-KIND_ID_COLOR_YELLOWISH: Incomplete
-KIND_ID_COLOR_GREENISH: Incomplete
-KIND_ID_COLOR_CYANISH: Incomplete
-KIND_ID_COLOR_BLUISH: Incomplete
-KIND_ID_COLOR_PURPLISH: Incomplete
-KIND_ID_COLOR_PINKISH: Incomplete
-KIND_ID_COLOR_DARK: Incomplete
-KIND_ID_COLOR_LIGHT: Incomplete
+KIND_ID_AMBIGUOUS: int
+KIND_ID_KEYWORD: int
+KIND_ID_TYPE: int
+KIND_ID_FUNCTION: int
+KIND_ID_NAMESPACE: int
+KIND_ID_NAVIGATION: int
+KIND_ID_MARKUP: int
+KIND_ID_VARIABLE: int
+KIND_ID_SNIPPET: int
+KIND_ID_COLOR_REDISH: int
+KIND_ID_COLOR_ORANGISH: int
+KIND_ID_COLOR_YELLOWISH: int
+KIND_ID_COLOR_GREENISH: int
+KIND_ID_COLOR_CYANISH: int
+KIND_ID_COLOR_BLUISH: int
+KIND_ID_COLOR_PURPLISH: int
+KIND_ID_COLOR_PINKISH: int
+KIND_ID_COLOR_DARK: int
+KIND_ID_COLOR_LIGHT: int
 KIND_AMBIGUOUS: tuple[int, str, str]
 KIND_KEYWORD: tuple[int, str, str]
 KIND_TYPE: tuple[int, str, str]
@@ -294,13 +306,14 @@ class SymbolSource(IntEnum):
 
     For backwards compatibility these values are also available outside this enumeration with a `SYMBOL_SOURCE_` prefix.
     """
+
     ANY: int
     INDEX: int
     OPEN_FILES: int
 
-SYMBOL_SOURCE_ANY: Incomplete
-SYMBOL_SOURCE_INDEX: Incomplete
-SYMBOL_SOURCE_OPEN_FILES: Incomplete
+SYMBOL_SOURCE_ANY: int
+SYMBOL_SOURCE_INDEX: int
+SYMBOL_SOURCE_OPEN_FILES: int
 
 class SymbolType(IntEnum):
     """
@@ -308,13 +321,14 @@ class SymbolType(IntEnum):
 
     For backwards compatibility these values are also available outside this enumeration with a `SYMBOL_TYPE_` prefix.
     """
+
     ANY: int
     DEFINITION: int
     REFERENCE: int
 
-SYMBOL_TYPE_ANY: Incomplete
-SYMBOL_TYPE_DEFINITION: Incomplete
-SYMBOL_TYPE_REFERENCE: Incomplete
+SYMBOL_TYPE_ANY: int
+SYMBOL_TYPE_DEFINITION: int
+SYMBOL_TYPE_REFERENCE: int
 
 class CompletionFormat(IntEnum):
     """
@@ -323,64 +337,77 @@ class CompletionFormat(IntEnum):
     For backwards compatibility these values are also available outside this enumeration with a `COMPLETION_FORMAT_`
     prefix.
     """
+
     TEXT: int
     SNIPPET: int
     COMMAND: int
 
-COMPLETION_FORMAT_TEXT: Incomplete
-COMPLETION_FORMAT_SNIPPET: Incomplete
-COMPLETION_FORMAT_COMMAND: Incomplete
+COMPLETION_FORMAT_TEXT: int
+COMPLETION_FORMAT_SNIPPET: int
+COMPLETION_FORMAT_COMMAND: int
 
 def version() -> str:
     """
     The version number.
     """
-def platform() -> Literal['osx', 'linux', 'windows']:
+
+def platform() -> Literal["osx", "linux", "windows"]:
     """
     The platform which the plugin is being run on.
     """
-def arch() -> Literal['x32', 'x64', 'arm64']:
+
+def arch() -> Literal["x32", "x64", "arm64"]:
     """
     The CPU architecture.
     """
-def channel() -> Literal['dev', 'stable']:
+
+def channel() -> Literal["dev", "stable"]:
     """
     The release channel of this build of Sublime Text.
     """
+
 def executable_path() -> str:
     """
     The path to the main Sublime Text executable.
     """
+
 def executable_hash() -> tuple[str, str, str]:
     """
     A tuple uniquely identifying the installation of Sublime Text.
     """
+
 def packages_path() -> str:
-    '''
+    """
     The path to the "Packages" folder.
-    '''
+    """
+
 def installed_packages_path() -> str:
-    '''
+    """
     The path to the "Installed Packages" folder.
-    '''
+    """
+
 def cache_path() -> str:
     """
     The path where Sublime Text stores cache files.
     """
+
 def status_message(msg: str) -> None:
     """
     Show a message in the status bar.
     """
+
 def error_message(msg: str) -> None:
     """
     Display an error dialog.
     """
+
 def message_dialog(msg: str) -> None:
     """
     Display a message dialog.
     """
+
 def ok_cancel_dialog(msg: str, ok_title: str = ..., title: str = ...) -> bool:
-    '''
+    """
     Show a popup dialog with an "ok" and "cancel" button.
 
     - `msg` - The message to show in the dialog.
@@ -388,9 +415,12 @@ def ok_cancel_dialog(msg: str, ok_title: str = ..., title: str = ...) -> bool:
     - `title` - Optional title for the dialog. Note Linux and macOS do not have a title in their dialog.
 
     Returns `True` if the user presses the `ok` button, `False` otherwise.
-    '''
-def yes_no_cancel_dialog(msg: str, yes_title: str = ..., no_title: str = ..., title: str = ...) -> DialogResult:
-    '''
+    """
+
+def yes_no_cancel_dialog(
+    msg: str, yes_title: str = ..., no_title: str = ..., title: str = ...
+) -> DialogResult:
+    """
     Show a popup dialog with a "yes", "no" and "cancel" button.
 
     - `msg` - The message to show in the dialog.
@@ -399,8 +429,15 @@ def yes_no_cancel_dialog(msg: str, yes_title: str = ..., no_title: str = ..., ti
     - `title` - Optional title for the dialog. Note Linux and macOS do not have a title in their dialog.
 
     Returns `DIALOG_YES`, `DIALOG_NO` or `DIALOG_CANCEL`.
-    '''
-def open_dialog(callback: Callable[[str | list[str] | None], None], file_types: list[tuple[str, list[str]]] = ..., directory: str | None = ..., multi_select: bool = ..., allow_folders: bool = ...) -> None:
+    """
+
+def open_dialog(
+    callback: Callable[[str | list[str] | None], None],
+    file_types: list[tuple[str, list[str]]] = ...,
+    directory: str | None = ...,
+    multi_select: bool = ...,
+    allow_folders: bool = ...,
+) -> None:
     """
     Show the open file dialog.
 
@@ -411,7 +448,14 @@ def open_dialog(callback: Callable[[str | list[str] | None], None], file_types: 
     - `allow_folders` - Whether to also allow selecting folders. Only works on macOS. If you only want to select folders
         use `select_folder_dialog`.
     """
-def save_dialog(callback: Callable[[str | None], None], file_types: list[tuple[str, list[str]]] = ..., directory: str | None = ..., name: str | None = ..., extension: str | None = ...) -> None:
+
+def save_dialog(
+    callback: Callable[[str | None], None],
+    file_types: list[tuple[str, list[str]]] = ...,
+    directory: str | None = ...,
+    name: str | None = ...,
+    extension: str | None = ...,
+) -> None:
     """
     Show the save file dialog.
 
@@ -421,7 +465,12 @@ def save_dialog(callback: Callable[[str | None], None], file_types: list[tuple[s
     - `name` - The default name of the file in the save dialog.
     - `extension` - The default extension used in the save dialog.
     """
-def select_folder_dialog(callback: Callable[[str | list[str] | None], None], directory: str | None = ..., multi_select: bool = ...) -> None:
+
+def select_folder_dialog(
+    callback: Callable[[str | list[str] | None], None],
+    directory: str | None = ...,
+    multi_select: bool = ...,
+) -> None:
     """
     Show the select folder dialog.
 
@@ -429,56 +478,70 @@ def select_folder_dialog(callback: Callable[[str | list[str] | None], None], dir
     - `directory` - The directory the dialog should start in. Will use the virtual working directory if not provided.
     - `multi_select` - Whether to allow selecting multiple folders. When `True` the callback will be called with a list.
     """
-def choose_font_dialog(callback: Callable[[dict[str, Any] | None], None], default: dict[str, Any] | None = ...) -> None:
-    '''
+
+def choose_font_dialog(
+    callback: Callable[[dict[str, Any] | None], None],
+    default: dict[str, Any] | None = ...,
+) -> None:
+    """
     Show a dialog for selecting a font.
 
     - `callback` - Called with the font options, matching the format used in settings
         (eg. `{ "font_face": "monospace" }`). May be called more than once, or will be called with `None` if the dialog
         is cancelled.
     - `default` - The default values to select/return. Same format as the argument passed to `callback`.
-    '''
+    """
+
 def run_command(cmd: str, args: dict[str, Any] | None = ...) -> None:
     """
     Runs the named `ApplicationCommand` with the (optional) given `args`.
     """
+
 def format_command(cmd: str, args: dict[str, Any] | None = ...) -> str:
-    '''
+    """
     Creates a "command string" from a str cmd name, and an optional dict of args. This is used when constructing a
     command-based `CompletionItem`.
-    '''
+    """
+
 def html_format_command(cmd: str, args: dict[str, Any] | None = ...) -> str:
-    '''
+    """
     Creates an escaped "command string" for usage in HTML popups and sheets.
-    '''
+    """
+
 def command_url(cmd: str, args: dict[str, Any] | None = ...) -> str:
     """
     Creates a `subl:` protocol URL for executing a command in a minihtml link.
     """
+
 def get_clipboard_async(callback: Callable[[str], None], size_limit: int = ...) -> None:
     """
     Calls `callback` with the contents of the clipboard. For performance reasons if the size of the clipboard content is
     bigger than `size_limit`, an empty string will be returned.
     """
+
 def get_clipboard(size_limit: int = ...) -> str:
     """
     Returns the content of the clipboard. For performance reasons if the size of the clipboard content is bigger than
     size_limit, an empty string will be returned.
     """
+
 def set_clipboard(text: str) -> None:
     """
     Sets the contents of the clipboard.
     """
+
 def log_commands(flag: bool | None = ...) -> None:
     """
     Controls command logging. If enabled, all commands run from key bindings and the menu will be logged to the console.
 
     - `flag` - Whether to log. Passing `None` toggles logging.
     """
+
 def get_log_commands() -> bool:
     """
     Returns whether command logging is enabled.
     """
+
 def log_input(flag: bool | None = ...) -> None:
     """
     Control whether all key presses will be logged to the console. Use this to find the names of certain keys on the
@@ -486,51 +549,61 @@ def log_input(flag: bool | None = ...) -> None:
 
     - `flag` - Whether to log. Passing `None` toggles logging.
     """
+
 def get_log_input() -> bool:
     """
     Returns whether input logging is enabled.
     """
+
 def log_fps(flag: bool | None = ...) -> None:
     """
     Control whether rendering timings like frames per second get logged.
 
     - `flag` - Whether to log. Passing `None` toggles logging.
     """
+
 def get_log_fps() -> bool:
     """
     Returns whether fps logging is enabled.
     """
+
 def log_result_regex(flag: bool | None = ...) -> None:
-    '''
+    """
     Control whether result regex logging is enabled. Use this to debug `"file_regex"` and `"line_regex"` in build
     systems.
 
     - `flag` - Whether to log. Passing `None` toggles logging.
-    '''
+    """
+
 def get_log_result_regex() -> bool:
     """
     Returns whether result regex logging is enabled.
     """
+
 def log_indexing(flag: bool | None = ...) -> None:
     """
     Control whether indexing logs are printed to the console.
 
     - `flag` - Whether to log. Passing `None` toggles logging.
     """
+
 def get_log_indexing() -> bool:
     """
     Returns whether indexing logging is enabled.
     """
+
 def log_build_systems(flag: bool | None = ...) -> None:
     """
     Control whether build system logs are printed to the console.
 
     - `flag` - Whether to log. Passing `None` toggles logging.
     """
+
 def get_log_build_systems() -> bool:
     """
     Returns whether build system logging is enabled.
     """
+
 def log_control_tree(flag: bool | None = ...) -> None:
     """
     Control whether control tree logging is enabled. When enabled clicking with Ctrl+Alt will log the control tree under
@@ -538,14 +611,17 @@ def log_control_tree(flag: bool | None = ...) -> None:
 
     - `flag` - Whether to log. Passing `None` toggles logging.
     """
+
 def get_log_control_tree() -> bool:
     """
     Returns whether control tree logging is enabled.
     """
+
 def ui_info() -> dict[str, Any]:
     """
     Information about the user interface including top-level keys `system`, `theme` and `color_scheme`.
     """
+
 def score_selector(scope_name: str, selector: str) -> int:
     """
     Match the `selector` against the given `scope_name`, returning a score for how well they match.
@@ -553,20 +629,24 @@ def score_selector(scope_name: str, selector: str) -> int:
     A score of `0` means no match, above `0` means a match. Different selectors may be compared against the same scope:
     a higher score means the selector is a better match for the scope.
     """
+
 def load_resource(name: str) -> str:
-    '''
+    """
     Loads the given resource. The name should be in the format "Packages/Default/Main.sublime-menu".
 
     Raises `FileNotFoundError` if resource is not found.
-    '''
+    """
+
 def load_binary_resource(name: str) -> bytes:
-    '''
+    """
     Loads the given binary resource. The name should be in the format "Packages/Default/Main.sublime-menu".
 
     Raises `FileNotFoundError` if resource is not found.
-    '''
+    """
+
 def find_resources(pattern: str) -> list[str]:
     """Finds resources whose file name matches the given glob pattern."""
+
 def encode_value(val: Any, pretty: bool = ..., update_text: str = ...) -> str:
     """
     Encode a JSON compatible `Value` into a string representation.
@@ -576,21 +656,24 @@ def encode_value(val: Any, pretty: bool = ..., update_text: str = ...) -> str:
         of `update_text` - comments, indentation, etc. This is the same algorithm used to change settings values.
         Providing this makes `pretty` have no effect.
     """
+
 def decode_value(data: str) -> Any:
     """
     Decode a JSON string into an object. Note that comments and trailing commas are allowed.
 
     Raises `ValueError` if the string is not valid JSON.
     """
+
 def expand_variables(value: Any, variables: dict[str, str]) -> Any:
-    '''
+    """
     Expands any variables in `val` using the variables defined in the dictionary `variables`. `val` may also be a list
     or dict, in which case the structure will be recursively expanded. Strings should use snippet syntax, for example:
 
     ```python
     expand_variables("Hello, ${name}", {"name": "Foo"})
     ```
-    '''
+    """
+
 def load_settings(base_name: str) -> Settings:
     """
     Loads the named settings. The name should include a file name and extension, but not a path. The packages will be
@@ -599,37 +682,45 @@ def load_settings(base_name: str) -> Settings:
     Subsequent calls to `load_settings` with the base_name will return the same object, and not load the settings from
     disk again.
     """
+
 def save_settings(base_name: str) -> None:
     """
     Flush any in-memory changes to the named settings object to disk.
     """
+
 def set_timeout(callback: Callable[[], Any], delay: int = ...) -> None:
     """
     Run the `callback` in the main thread after the given `delay` (in milliseconds). Callbacks with an equal delay will
     be run in the order they were added.
     """
+
 def set_timeout_async(callback: Callable[[], Any], delay: int = ...) -> None:
     """
     Runs the `callback` on an alternate thread after the given `delay` (in milliseconds).
     """
+
 def active_window() -> Window:
     """
     The most recently used `Window`.
     """
+
 def windows() -> list[Window]:
     """
     A list of all the open windows.
     """
+
 def get_macro() -> list[dict[str, Any]]:
-    '''
+    """
     A list of the commands and args that compromise the currently recorded macro. Each dict will contain the keys
     `"command"` and `"args"`.
-    '''
+    """
+
 def project_history() -> list[str]:
     """
     A list of most recently opened workspaces. Sublime-project files with the same name are listed in place of
     sublime-workspace files.
     """
+
 def folder_history() -> list[str]:
     """
     A list of recent folders added to sublime projects.
@@ -663,7 +754,9 @@ class Window:
         """
         The currently edited `View`.
         """
-    def new_html_sheet(self, name: str, contents: str, flags: NewFileFlags = ..., group: int = ...) -> Sheet:
+    def new_html_sheet(
+        self, name: str, contents: str, flags: NewFileFlags = ..., group: int = ...
+    ) -> Sheet:
         """
         Construct a sheet with HTML contents rendered using minihtml.
 
@@ -686,7 +779,9 @@ class Window:
 
         Returns the `View` for the file.
         """
-    def open_file(self, fname: str, flags: NewFileFlags = ..., group: int = ...) -> View:
+    def open_file(
+        self, fname: str, flags: NewFileFlags = ..., group: int = ...
+    ) -> View:
         """
         Open the named file. If the file is already opened, it will be brought to the front. Note that as file loading
         is asynchronous, operations on the returned view won't be possible until its `is_loading()` method returns
@@ -753,7 +848,13 @@ class Window:
         """
         Move the given `View` to the given `group` at the given `index`.
         """
-    def move_sheets_to_group(self, sheets: list[Sheet], group: int, insertion_idx: int = ..., select: bool = ...) -> None:
+    def move_sheets_to_group(
+        self,
+        sheets: list[Sheet],
+        group: int,
+        insertion_idx: int = ...,
+        select: bool = ...,
+    ) -> None:
         """
         Moves all provided sheets to specified group at insertion index provided. If an index is not provided defaults
         to last index of the destination group.
@@ -827,13 +928,13 @@ class Window:
         Set the group layout of the window.
         """
     def create_output_panel(self, name: str, unlisted: bool = ...) -> View:
-        '''
+        """
         Find the view associated with the named output panel, creating it if required. The output panel can be shown by
         running the `show_panel` window command, with the `panel` argument set to the name with an `"output."` prefix.
 
         The optional `unlisted` parameter is a boolean to control if the output panel should be listed in the panel
         switcher.
-        '''
+        """
     def find_output_panel(self, name: str) -> View | None:
         """
         The `View` associated with the named output panel, or `None` if the output panel does not exist.
@@ -843,17 +944,24 @@ class Window:
         Destroy the named output panel, hiding it if currently open.
         """
     def active_panel(self) -> str | None:
-        '''
+        """
         Returns the name of the currently open panel, or None if no panel is open. Will return built-in panel names
         (e.g. `"console"`, `"find"`, etc.) in addition to output panels.
-        '''
+        """
     def panels(self) -> list[str]:
         """
         Returns a list of the names of all panels that have not been marked as unlisted. Includes certain built-in
         panels in addition to output panels.
         """
     def get_output_panel(self, name: str) -> View | None: ...
-    def show_input_panel(self, caption: str, initial_text: str, on_done: Callable[[str], None] | None, on_change: Callable[[str], None] | None, on_cancel: Callable[[], None] | None) -> View:
+    def show_input_panel(
+        self,
+        caption: str,
+        initial_text: str,
+        on_done: Callable[[str], None] | None,
+        on_change: Callable[[str], None] | None,
+        on_cancel: Callable[[], None] | None,
+    ) -> View:
         """
         Shows the input panel, to collect a line of input from the user.
 
@@ -865,7 +973,15 @@ class Window:
 
         Returns the `View` used for the input widget.
         """
-    def show_quick_panel(self, items: list[Any], on_select: Callable[..., None], flags: QuickPanelFlags = ..., selected_index: int = ..., on_highlight: Callable[..., None] = ..., placeholder: str | None = ...) -> None:
+    def show_quick_panel(
+        self,
+        items: list[Any],
+        on_select: Callable[..., None],
+        flags: QuickPanelFlags = ...,
+        selected_index: int = ...,
+        on_highlight: Callable[..., None] = ...,
+        placeholder: str | None = ...,
+    ) -> None:
         """
         Show a quick panel to select an item in a list. on_select will be called once, with the index of the selected
         item. If the quick panel was cancelled, `on_select` will be called with an argument of `-1`.
@@ -932,12 +1048,16 @@ class Window:
         """
         The name of the currently opened workspace file, if any.
         """
-    def project_data(self) -> bool | str | int | float | list[Any] | dict[str, Any] | None:
+    def project_data(
+        self,
+    ) -> bool | str | int | float | list[Any] | dict[str, Any] | None:
         """
         The project data associated with the current window. The data is in the same format as the contents of a
         `.sublime-project` file.
         """
-    def set_project_data(self, v: bool | str | int | float | list[Any] | dict[str, Any] | None) -> None:
+    def set_project_data(
+        self, v: bool | str | int | float | list[Any] | dict[str, Any] | None
+    ) -> None:
         """
         Updates the project data associated with the current window. If the window is associated with a
         `.sublime-project` file, the project file will be updated on disk, otherwise the window will store the data
@@ -951,7 +1071,14 @@ class Window:
         """
         Per-window settings that are persisted in the session, and duplicated into new windows.
         """
-    def symbol_locations(self, sym: str, source: SymbolSource = ..., type: SymbolType = ..., kind_id: KindId = ..., kind_letter: str = ...) -> list[SymbolLocation]:
+    def symbol_locations(
+        self,
+        sym: str,
+        source: SymbolSource = ...,
+        type: SymbolType = ...,
+        kind_id: KindId = ...,
+        kind_letter: str = ...,
+    ) -> list[SymbolLocation]:
         """
         Find all locations where the symbol `sym` is located.
 
@@ -980,7 +1107,7 @@ class Window:
         All locations where the symbol is referenced across open files.
         """
     def extract_variables(self) -> dict[str, str]:
-        '''
+        """
         Get the `dict` of contextual keys of the window.
 
         May contain:
@@ -1000,7 +1127,7 @@ class Window:
         * `"project_extension"`
 
         This `dict` is suitable for use with `expand_variables()`.
-        '''
+        """
     def status_message(self, msg: str) -> None:
         """
         Show a message in the status bar.
@@ -1013,6 +1140,7 @@ class Edit:
     `Edit` objects are passed to `TextCommand`s, and can not be created by the user. Using an invalid `Edit` object, or
     an `Edit` object from a different `View`, will cause the functions that require them to fail.
     """
+
     edit_token: int
     def __init__(self, token: int) -> None: ...
 
@@ -1022,6 +1150,7 @@ class Region:
 
     Also commonly used to represent an area of the text buffer, where ordering and `xpos` are generally ignored.
     """
+
     a: int
     b: int
     xpos: float
@@ -1063,24 +1192,35 @@ class HistoricPosition:
     Provides a snapshot of the row and column info for a `Point`, before changes were made to a `View`. This is
     primarily useful for replaying changes to a document.
     """
+
     pt: int
     row: int
     col: int
     col_utf16: int
     col_utf8: int
-    def __init__(self, pt: int, row: int, col: int, col_utf16: int, col_utf8: int) -> None: ...
+    def __init__(
+        self, pt: int, row: int, col: int, col_utf16: int, col_utf8: int
+    ) -> None: ...
 
 class TextChange:
     """
     Represents a change that occurred to the text of a `View`. This is primarily useful for replaying changes to a
     document.
     """
+
     a: HistoricPosition
     b: HistoricPosition
     len_utf16: int
     len_utf8: int
     str: str
-    def __init__(self, pa: HistoricPosition, pb: HistoricPosition, len_utf16: int, len_utf8: int, s: str) -> None: ...
+    def __init__(
+        self,
+        pa: HistoricPosition,
+        pb: HistoricPosition,
+        len_utf16: int,
+        len_utf8: int,
+        s: str,
+    ) -> None: ...
 
 class Selection(Reversible):
     """
@@ -1088,6 +1228,7 @@ class Selection(Reversible):
 
     This is primarily used to represent the textual selection.
     """
+
     view_id: int
     def __init__(self, id: int) -> None: ...
     def __reversed__(self) -> Iterator[Region]: ...
@@ -1142,6 +1283,7 @@ class Sheet:
     """
     Represents a content container, i.e. a tab, within a window. Sheets may contain a `View`, or an image preview.
     """
+
     sheet_id: int
     def __init__(self, id: int) -> None: ...
     def __hash__(self) -> int: ...
@@ -1195,6 +1337,7 @@ class ContextStackFrame:
     """
     Represents a single stack frame in the syntax highlighting.
     """
+
     context_name: str
     source_file: str
     source_location: tuple[int, int]
@@ -1206,6 +1349,7 @@ class View:
     Note that multiple views may refer to the same `Buffer`, but they have their own unique selection and geometry. A
     list of these may be gotten using `View.clones()` or `Buffer.views()`.
     """
+
     view_id: int
     selection: Selection
     settings_object: Settings | None
@@ -1235,7 +1379,7 @@ class View:
         The `Sheet` for this view, if displayed in a sheet.
         """
     def element(self) -> str | None:
-        '''
+        """
         Returns `None` for normal views that are part of a `Sheet`. For views that comprise part of the UI a string is
         returned from the following list:
 
@@ -1255,7 +1399,7 @@ class View:
         * `"output:output"` - A general output panel.
 
         The console output, indexer status output and license input controls are not accessible via the API.
-        '''
+        """
     def is_valid(self) -> bool:
         """
         Check whether this view is still valid. Will return `False` for a closed view, for example.
@@ -1379,7 +1523,9 @@ class View:
         of the view in the past. This is primarily useful for plugins providing text modification that must operate in
         an asynchronous fashion and must be able to handle the view contents changing between the request and response.
         """
-    def transform_region_from(self, region: Region, change_id: tuple[int, int, int]) -> Region:
+    def transform_region_from(
+        self, region: Region, change_id: tuple[int, int, int]
+    ) -> Region:
         """
         Transforms a region from a previous point in time to an equivalent region in the current state of the `View`.
         `when` must have been obtained from `change_id()` at the point in time the region is from.
@@ -1404,7 +1550,13 @@ class View:
         - `start_pt` - The point to start searching from.
         - `flags` - Controls various behaviors of find.
         """
-    def find_all(self, pattern: str, flags: FindFlags = ..., fmt: str | None = ..., extractions: list[str] | None = ...) -> list[Region]:
+    def find_all(
+        self,
+        pattern: str,
+        flags: FindFlags = ...,
+        fmt: str | None = ...,
+        extractions: list[str] | None = ...,
+    ) -> list[Region]:
         """
         All (non-overlapping) regions matching the pattern.
 
@@ -1418,7 +1570,9 @@ class View:
         """
         The view's `Settings` object. Any changes to it will be private to this view.
         """
-    def meta_info(self, key: str, pt: int) -> bool | str | int | float | list[Any] | dict[str, Any] | None:
+    def meta_info(
+        self, key: str, pt: int
+    ) -> bool | str | int | float | list[Any] | dict[str, Any] | None:
         """
         Look up the preference `key` for the scope at the provided point `pt` from all matching `.tmPreferences` files.
 
@@ -1475,7 +1629,7 @@ class View:
         hash, e.g. `#ff0000`.
         """
     def style_for_scope(self, scope: str) -> dict[str, Any]:
-        '''
+        """
         Accepts a string scope name and returns a `dict` of style information including the keys:
 
         * `"foreground"`
@@ -1492,7 +1646,7 @@ class View:
 
         The foreground and background colors are normalized to the six character hex form with a leading hash, e.g.
         `#ff0000`.
-        '''
+        """
     def has_non_empty_selection_region(self) -> bool: ...
     def lines(self, region: Region) -> list[Region]:
         """
@@ -1521,7 +1675,14 @@ class View:
         """
         Classify the provided point.
         """
-    def find_by_class(self, pt: int, forward: bool, classes: PointClassification, separators: str = ..., sub_word_separators: str = ...) -> int:
+    def find_by_class(
+        self,
+        pt: int,
+        forward: bool,
+        classes: PointClassification,
+        separators: str = ...,
+        sub_word_separators: str = ...,
+    ) -> int:
         """
         Find the next location that matches the provided classification.
 
@@ -1531,7 +1692,13 @@ class View:
         - `separators` - The word separators to use when classifying.
         - `sub_word_separators` - The sub-word separators to use when classifying.
         """
-    def expand_by_class(self, x: Region | int, classes: PointClassification, separators: str = ..., sub_word_separators: str = ...) -> Region:
+    def expand_by_class(
+        self,
+        x: Region | int,
+        classes: PointClassification,
+        separators: str = ...,
+        sub_word_separators: str = ...,
+    ) -> Region:
         """
         Expand the provided point or `Region` to the left and right until each side lands on a location that matches the
         provided classification.
@@ -1560,14 +1727,18 @@ class View:
 
         - `clamp_column` - Whether `col` should be restricted to valid values for the given `row`.
         """
-    def text_point_utf8(self, row: int, col_utf8: int, *, clamp_column: bool = ...) -> int:
+    def text_point_utf8(
+        self, row: int, col_utf8: int, *, clamp_column: bool = ...
+    ) -> int:
         """
         Calculates the character offset of the given, 0-based, `row` and `col`. `col` is interpreted as the number of
         UTF-8 code units to advance past the beginning of the row.
 
         - `clamp_column` - Whether `col` should be restricted to valid values for the given `row`.
         """
-    def text_point_utf16(self, row: int, col_utf16: int, *, clamp_column: bool = ...) -> int:
+    def text_point_utf16(
+        self, row: int, col_utf16: int, *, clamp_column: bool = ...
+    ) -> int:
         """
         Calculates the character offset of the given, 0-based, `row` and `col`. `col` is interpreted as the number of
         UTF-16 code units to advance past the beginning of the row.
@@ -1590,7 +1761,13 @@ class View:
         """
         The currently visible area of the view.
         """
-    def show(self, location: Region | Selection | int, show_surrounds: bool = ..., keep_to_left: bool = ..., animate: bool = ...) -> None:
+    def show(
+        self,
+        location: Region | Selection | int,
+        show_surrounds: bool = ...,
+        keep_to_left: bool = ...,
+        animate: bool = ...,
+    ) -> None:
         """
         Scroll the view to show the given location.
 
@@ -1674,8 +1851,19 @@ class View:
 
         Returns the unfolded regions.
         """
-    def add_regions(self, key: str, regions: list[Region], scope: str = ..., icon: str = ..., flags: RegionFlags = ..., annotations: list[str] = ..., annotation_color: str = ..., on_navigate: Callable[[str], None] = ..., on_close: Callable[[], None] = ...) -> None:
-        '''
+    def add_regions(
+        self,
+        key: str,
+        regions: list[Region],
+        scope: str = ...,
+        icon: str = ...,
+        flags: RegionFlags = ...,
+        annotations: list[str] = ...,
+        annotation_color: str = ...,
+        on_navigate: Callable[[str], None] = ...,
+        on_close: Callable[[], None] = ...,
+    ) -> None:
+        """
         Adds visual indicators to regions of text in the view. Indicators include icons in the gutter, underlines under
         the text, borders around the text and annotations. Annotations are drawn aligned to the right-hand edge of the
         view and may contain HTML markup.
@@ -1709,7 +1897,7 @@ class View:
             formats.
         - `on_navigate` - Called when a link in an annotation is clicked. Will be passed the `href` of the link.
         - `on_close` - Called when the annotations are closed.
-        '''
+        """
     def get_regions(self, key: str) -> list[Region]:
         """
         The regions associated with the given `key`, if any.
@@ -1743,10 +1931,10 @@ class View:
         - `type` - The type of symbol to return.
         """
     def set_status(self, key: str, value: str) -> None:
-        '''
+        """
         Add the status `key` to the view. The `value` will be displayed in the status bar, in a comma separated list of
         all status values, ordered by key. Setting the `value` to `""` will clear the status.
-        '''
+        """
     def get_status(self, key: str) -> str:
         """
         The previous assigned value associated with the given `key`, if any.
@@ -1762,7 +1950,9 @@ class View:
         - `prefix` - The prefix to filter words by.
         - `tp` - The point by which to weigh words. Closer words are preferred.
         """
-    def command_history(self, index: int, modifying_only: bool = ...) -> tuple[str | None, dict | None, int]:
+    def command_history(
+        self, index: int, modifying_only: bool = ...
+    ) -> tuple[str | None, dict | None, int]:
         """
         Get info on previous run commands stored in the undo/redo stack.
 
@@ -1780,7 +1970,9 @@ class View:
         """
         Set the overwrite status.
         """
-    def show_popup_menu(self, items: list[str], on_done: Callable[[int], None], flags: int = ...) -> None:
+    def show_popup_menu(
+        self, items: list[str], on_done: Callable[[int], None], flags: int = ...
+    ) -> None:
         """
         Show a popup menu at the caret, for selecting an item in a list.
 
@@ -1789,7 +1981,16 @@ class View:
             instead.
         - `flags` - must be `0`, currently unused.
         """
-    def show_popup(self, content: str, flags: PopupFlags = ..., location: int = ..., max_width: int = ..., max_height: int = ..., on_navigate: Callable[[str], None] | None = ..., on_hide: Callable[[], None] | None = ...) -> None:
+    def show_popup(
+        self,
+        content: str,
+        flags: PopupFlags = ...,
+        location: int = ...,
+        max_width: int = ...,
+        max_height: int = ...,
+        on_navigate: Callable[[str], None] | None = ...,
+        on_hide: Callable[[], None] | None = ...,
+    ) -> None:
         """
         Show a popup displaying HTML content.
 
@@ -1824,7 +2025,14 @@ class View:
         Sets the auto complete popup state to be preserved the next time the `View` loses focus. When the `View` regains
         focus, the auto complete window will be re-shown, with the previously selected entry pre-selected.
         """
-    def export_to_html(self, regions: Region | list[Region] | None = ..., minihtml: bool = ..., enclosing_tags: bool = ..., font_size: bool = ..., font_family: bool = ...) -> str:
+    def export_to_html(
+        self,
+        regions: Region | list[Region] | None = ...,
+        minihtml: bool = ...,
+        enclosing_tags: bool = ...,
+        font_size: bool = ...,
+        font_family: bool = ...,
+    ) -> str:
         """
         Generates an HTML string of the current view contents, including styling for syntax highlighting.
 
@@ -1846,6 +2054,7 @@ class Buffer:
     """
     Represents a text buffer. Multiple `View` objects may share the same buffer.
     """
+
     buffer_id: int
     def __init__(self, id: int) -> None: ...
     def __hash__(self) -> int: ...
@@ -1871,6 +2080,7 @@ class Settings:
     """
     A `dict` like object that a settings hierarchy.
     """
+
     settings_id: int
     def __init__(self, id: int) -> None: ...
     def __getitem__(self, key: str) -> Any: ...
@@ -1897,7 +2107,11 @@ class Settings:
         * An object that iterates over key/value pairs
         * Keyword arguments, i.e. `update(**kwargs)`.
         """
-    def get(self, key: str, default: bool | str | int | float | list[Any] | dict[str, Any] | None = ...) -> Any:
+    def get(
+        self,
+        key: str,
+        default: bool | str | int | float | list[Any] | dict[str, Any] | None = ...,
+    ) -> Any:
         """
         Returns the named setting.
         """
@@ -1905,7 +2119,11 @@ class Settings:
         """
         Returns whether the provided `key` is set.
         """
-    def set(self, key: str, value: bool | str | int | float | list[Any] | dict[str, Any] | None) -> None:
+    def set(
+        self,
+        key: str,
+        value: bool | str | int | float | list[Any] | dict[str, Any] | None,
+    ) -> None:
         """
         Set the named `key` to the provided `value`.
         """
@@ -1932,13 +2150,22 @@ class Phantom:
     `PhantomSet` to actually add the phantoms to the `View`. Once a `Phantom` has been constructed and added to the
     `View`, changes to the attributes will have no effect.
     """
+
     region: Region
     content: str
     layout: PhantomLayout
     on_navigate: Callable[[str], None] | None
-    def __init__(self, region: Region, content: str, layout: PhantomLayout, on_navigate: Callable[[str], None] | None = ...) -> None: ...
+    def __init__(
+        self,
+        region: Region,
+        content: str,
+        layout: PhantomLayout,
+        on_navigate: Callable[[str], None] | None = ...,
+    ) -> None: ...
     def __eq__(self, rhs: Any) -> bool: ...
-    def to_tuple(self) -> tuple[tuple[int, int], str, int, Callable[[str], None] | None]:
+    def to_tuple(
+        self,
+    ) -> tuple[tuple[int, int], str, int, Callable[[str], None] | None]:
         """
         Returns a tuple of this phantom containing the region, content, layout
         and callback.
@@ -1952,6 +2179,7 @@ class PhantomSet:
     A collection that manages `Phantom` objects and the process of adding them, updating them and removing them from a
     `View`.
     """
+
     view: View
     key: str
     phantoms: list[Phantom]
@@ -1967,6 +2195,7 @@ class Html:
     """
     Used to indicate that a string is formatted as HTML.
     """
+
     data: str
     def __init__(self, data: str) -> None: ...
 
@@ -1974,16 +2203,28 @@ class CompletionList:
     """
     Represents a list of completions, some of which may be in the process of being asynchronously fetched.
     """
+
     target: Any
     completions: list[str] | list[tuple[str, str]] | list[CompletionItem] | None
     flags: AutoCompleteFlags
-    def __init__(self, completions: list[str] | list[tuple[str, str]] | list[CompletionItem] | None = ..., flags: AutoCompleteFlags = ...) -> None:
+    def __init__(
+        self,
+        completions: list[str]
+        | list[tuple[str, str]]
+        | list[CompletionItem]
+        | None = ...,
+        flags: AutoCompleteFlags = ...,
+    ) -> None:
         """
         - `completions` - If `None` is passed, the method `set_completions()` must be called before the completions will
             be displayed to the user.
         - `flags` - Flags controlling auto-complete behavior.
         """
-    def set_completions(self, completions: list[str] | list[tuple[str, str]] | list[CompletionItem], flags: AutoCompleteFlags = ...) -> None:
+    def set_completions(
+        self,
+        completions: list[str] | list[tuple[str, str]] | list[CompletionItem],
+        flags: AutoCompleteFlags = ...,
+    ) -> None:
         """
         Sets the list of completions, allowing the list to be displayed to the user.
         """
@@ -1992,6 +2233,7 @@ class CompletionItem:
     """
     Represents an available auto-completion item.
     """
+
     trigger: str
     annotation: str
     completion: str
@@ -1999,15 +2241,39 @@ class CompletionItem:
     kind: tuple[int, str, str]
     details: str
     flags: CompletionItemFlags
-    def __init__(self, trigger: str, annotation: str = ..., completion: str = ..., completion_format: CompletionFormat = ..., kind: tuple[int, str, str] = ..., details: str = ..., flags: CompletionItemFlags = ...) -> None: ...
+    def __init__(
+        self,
+        trigger: str,
+        annotation: str = ...,
+        completion: str = ...,
+        completion_format: CompletionFormat = ...,
+        kind: tuple[int, str, str] = ...,
+        details: str = ...,
+        flags: CompletionItemFlags = ...,
+    ) -> None: ...
     def __eq__(self, rhs: CompletionItem) -> bool: ...
     @classmethod
-    def snippet_completion(cls, trigger: str, snippet: str, annotation: str = ..., kind: tuple[int, str, str] = ..., details: str = ...) -> CompletionItem:
+    def snippet_completion(
+        cls,
+        trigger: str,
+        snippet: str,
+        annotation: str = ...,
+        kind: tuple[int, str, str] = ...,
+        details: str = ...,
+    ) -> CompletionItem:
         """
         Specialized constructor for snippet completions. The `completion_format` is always `COMPLETION_FORMAT_SNIPPET`.
         """
     @classmethod
-    def command_completion(cls, trigger: str, command: str, args: dict[str, Any] = ..., annotation: str = ..., kind: tuple[int, str, str] = ..., details: str = ...) -> CompletionItem:
+    def command_completion(
+        cls,
+        trigger: str,
+        command: str,
+        args: dict[str, Any] = ...,
+        annotation: str = ...,
+        kind: tuple[int, str, str] = ...,
+        details: str = ...,
+    ) -> CompletionItem:
         """
         Specialized constructor for command completions. The `completion_format` is always `COMPLETION_FORMAT_COMMAND`.
         """
@@ -2017,21 +2283,25 @@ def list_syntaxes() -> list[Syntax]:
 
     Returns a list of `Syntax`.
     """
+
 def syntax_from_path(path: str) -> Syntax | None:
     """Get the syntax for a specific path.
 
     Returns a Syntax or `None`.
     """
+
 def find_syntax_by_name(name: str) -> list[Syntax]:
     """Find syntaxes with the specified name.
 
     Name must match exactly. Return a list of `Syntax`.
     """
+
 def find_syntax_by_scope(scope: str) -> list[Syntax]:
     """Find syntaxes with the specified scope.
 
     Scope must match exactly. Return a list of `Syntax`.
     """
+
 def find_syntax_for_file(path: str, first_line: str = ...) -> Syntax | None:
     """Find the syntax to use for a path.
 
@@ -2045,6 +2315,7 @@ class Syntax:
     """
     Contains information about a syntax.
     """
+
     path: str
     name: str
     hidden: bool
@@ -2057,38 +2328,62 @@ class QuickPanelItem:
     """
     Represents a row in the quick panel, shown via `Window.show_quick_panel()`.
     """
+
     trigger: str
     details: str | list[str] | tuple[str]
     annotation: str
     kind: tuple[int, str, str]
-    def __init__(self, trigger: str, details: str | Sequence[str] = ..., annotation: str = ..., kind: tuple[int, str, str] = ...) -> None: ...
+    def __init__(
+        self,
+        trigger: str,
+        details: str | Sequence[str] = ...,
+        annotation: str = ...,
+        kind: tuple[int, str, str] = ...,
+    ) -> None: ...
 
 class ListInputItem:
     """
     Represents a row shown via `ListInputHandler`.
     """
+
     text: str
     value: Any
     details: str | list[str] | tuple[str]
     annotation: str
     kind: tuple[int, str, str]
-    def __init__(self, text: str, value: bool | str | int | float | list[Any] | dict[str, Any] | None, details: str | Sequence[str] = ..., annotation: str = ..., kind: tuple[int, str, str] = ...) -> None: ...
+    def __init__(
+        self,
+        text: str,
+        value: bool | str | int | float | list[Any] | dict[str, Any] | None,
+        details: str | Sequence[str] = ...,
+        annotation: str = ...,
+        kind: tuple[int, str, str] = ...,
+    ) -> None: ...
 
 class SymbolRegion:
     """
     Contains information about a `Region` of a `View` that contains a symbol.
     """
+
     name: str
     region: Region
     syntax: str
     type: int
     kind: tuple[int, str, str]
-    def __init__(self, name: str, region: Region, syntax: str, type: int, kind: tuple[int, str, str]) -> None: ...
+    def __init__(
+        self,
+        name: str,
+        region: Region,
+        syntax: str,
+        type: int,
+        kind: tuple[int, str, str],
+    ) -> None: ...
 
 class SymbolLocation:
     """
     Contains information about a file that contains a symbol.
     """
+
     path: str
     display_name: str
     row: int
@@ -2096,5 +2391,14 @@ class SymbolLocation:
     syntax: str
     type: int
     kind: tuple[int, str, str]
-    def __init__(self, path: str, display_name: str, row: int, col: int, syntax: str, type: int, kind: tuple[int, str, str]) -> None: ...
+    def __init__(
+        self,
+        path: str,
+        display_name: str,
+        row: int,
+        col: int,
+        syntax: str,
+        type: int,
+        kind: tuple[int, str, str],
+    ) -> None: ...
     def path_encoded_position(self) -> str: ...

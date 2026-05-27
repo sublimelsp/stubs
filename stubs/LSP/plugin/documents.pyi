@@ -1,53 +1,114 @@
 import sublime
 import sublime_plugin
-from ..protocol import Diagnostic as Diagnostic, DocumentHighlight as DocumentHighlight, DocumentUri, FoldingRange as FoldingRange, SignatureHelpTriggerKind
-from .code_actions import CodeActionOrCommand as CodeActionOrCommand, CodeActionsByConfigName as CodeActionsByConfigName, actions_manager as actions_manager
+from ..protocol import (
+    CodeAction as CodeAction,
+    Command as Command,
+    Diagnostic as Diagnostic,
+    DocumentHighlight as DocumentHighlight,
+    DocumentUri,
+    FoldingRange as FoldingRange,
+    SignatureHelpTriggerKind,
+)
+from .code_actions import filter_quickfix_actions as filter_quickfix_actions
 from .code_lens import LspToggleCodeLensesCommand as LspToggleCodeLensesCommand
 from .completion import QueryCompletionsTask as QueryCompletionsTask
-from .core.constants import CODE_ACTION_ANNOTATION_SCOPE as CODE_ACTION_ANNOTATION_SCOPE, DOCUMENT_HIGHLIGHT_KIND_SCOPES as DOCUMENT_HIGHLIGHT_KIND_SCOPES, HOVER_ENABLED_KEY as HOVER_ENABLED_KEY, RegionKey as RegionKey, RequestFlags as RequestFlags, SIGNATURE_HELP_ACTIVE_PARAMETER_SCOPE as SIGNATURE_HELP_ACTIVE_PARAMETER_SCOPE, SIGNATURE_HELP_FUNCTION_SCOPE as SIGNATURE_HELP_FUNCTION_SCOPE, SIGNATURE_HELP_INACTIVE_PARAMETER_SCOPE as SIGNATURE_HELP_INACTIVE_PARAMETER_SCOPE, ST_VERSION as ST_VERSION
+from .core.constants import (
+    CODE_ACTION_ANNOTATION_SCOPE as CODE_ACTION_ANNOTATION_SCOPE,
+    COMMAND_TO_CHANGE_EVENT_ACTION as COMMAND_TO_CHANGE_EVENT_ACTION,
+    ChangeEventAction as ChangeEventAction,
+    DOCUMENT_HIGHLIGHT_KIND_SCOPES as DOCUMENT_HIGHLIGHT_KIND_SCOPES,
+    HOVER_ENABLED_KEY as HOVER_ENABLED_KEY,
+    LIGHTBULB_SCOPE as LIGHTBULB_SCOPE,
+    MarkdownLangMap as MarkdownLangMap,
+    RegionKey as RegionKey,
+    RequestFlags as RequestFlags,
+    SIGNATURE_HELP_ACTIVE_PARAMETER_SCOPE as SIGNATURE_HELP_ACTIVE_PARAMETER_SCOPE,
+    SIGNATURE_HELP_FUNCTION_SCOPE as SIGNATURE_HELP_FUNCTION_SCOPE,
+    SIGNATURE_HELP_INACTIVE_PARAMETER_SCOPE as SIGNATURE_HELP_INACTIVE_PARAMETER_SCOPE,
+    ST_VERSION as ST_VERSION,
+)
 from .core.logging import debug as debug
-from .core.open import open_in_browser as open_in_browser
+from .core.open import (
+    open_file_uri as open_file_uri,
+    open_in_browser as open_in_browser,
+)
 from .core.panels import PanelName as PanelName
+from .core.promise import Promise as Promise
 from .core.protocol import Request as Request
-from .core.registry import best_session as best_session, get_position as get_position, windows as windows
-from .core.sessions import AbstractViewListener as AbstractViewListener, Session as Session, SessionBufferProtocol as SessionBufferProtocol
+from .core.registry import (
+    best_session as best_session,
+    get_position as get_position,
+    windows as windows,
+)
+from .core.sessions import (
+    AbstractViewListener as AbstractViewListener,
+    Session as Session,
+    SessionBufferProtocol as SessionBufferProtocol,
+)
 from .core.settings import userprefs as userprefs
-from .core.signature_help import SigHelp as SigHelp, SignatureHelpStyle as SignatureHelpStyle
-from .core.types import ClientConfig as ClientConfig, FEATURES_TIMEOUT as FEATURES_TIMEOUT, SettingsRegistration as SettingsRegistration, basescope2languageid as basescope2languageid, debounced as debounced
-from .core.url import parse_uri as parse_uri, view_to_uri as view_to_uri
-from .core.views import MarkdownLangMap as MarkdownLangMap, diagnostic_severity as diagnostic_severity, document_highlight_key as document_highlight_key, first_selection_region as first_selection_region, format_code_actions_for_quick_panel as format_code_actions_for_quick_panel, format_diagnostic_for_html as format_diagnostic_for_html, make_link as make_link, range_to_region as range_to_region, show_lsp_popup as show_lsp_popup, text_document_identifier as text_document_identifier, text_document_position_params as text_document_position_params, update_lsp_popup as update_lsp_popup
+from .core.signature_help import (
+    SigHelp as SigHelp,
+    SignatureHelpStyle as SignatureHelpStyle,
+)
+from .core.types import (
+    FEATURES_TIMEOUT as FEATURES_TIMEOUT,
+    SettingsRegistration as SettingsRegistration,
+    basescope2languageid as basescope2languageid,
+    debounced as debounced,
+)
+from .core.url import (
+    CODE_ACTION_SCHEME as CODE_ACTION_SCHEME,
+    decode_code_action_uri as decode_code_action_uri,
+    encode_code_action_uri as encode_code_action_uri,
+    parse_uri as parse_uri,
+    view_to_uri as view_to_uri,
+)
+from .core.views import (
+    diagnostic_severity as diagnostic_severity,
+    document_highlight_key as document_highlight_key,
+    first_selection_region as first_selection_region,
+    format_diagnostics_for_html as format_diagnostics_for_html,
+    make_link as make_link,
+    range_to_region as range_to_region,
+    show_lsp_popup as show_lsp_popup,
+    text_document_identifier as text_document_identifier,
+    text_document_position_params as text_document_position_params,
+    update_lsp_popup as update_lsp_popup,
+)
 from .core.windows import WindowManager as WindowManager
-from .diagnostics import get_diagnostics_identifiers as get_diagnostics_identifiers
 from .folding_range import folding_range_to_range as folding_range_to_range
-from .hover import code_actions_content as code_actions_content
 from .session_buffer import SessionBuffer as SessionBuffer
 from .session_view import SessionView as SessionView
-from _typeshed import Incomplete
-from typing import Any, Callable, Iterable, Literal, TypeVar, overload
+from typing import Any, Callable, Literal, TypeVar, overload
 from typing_extensions import Concatenate, ParamSpec
 from weakref import WeakValueDictionary
+from weakref import WeakSet
 
-P = ParamSpec('P')
-R = TypeVar('R')
+P = ParamSpec("P")
+R = TypeVar("R")
 
-def requires_session(func: Callable[Concatenate[DocumentSyncListener, P], R]) -> Callable[Concatenate[DocumentSyncListener, P], R | None]:
+def requires_session(
+    func: Callable[Concatenate[DocumentSyncListener, P], R],
+) -> Callable[Concatenate[DocumentSyncListener, P], R | None]:
     """
     A decorator for the `DocumentSyncListener` event handlers, which immediately returns `None` if there are no
     `SessionView`s.
     """
+
 def is_regular_view(v: sublime.View) -> bool: ...
 
 class TextChangeListener(sublime_plugin.TextChangeListener):
     ids_to_listeners: WeakValueDictionary[int, TextChangeListener]
     @classmethod
     def is_applicable(cls, buffer: sublime.Buffer) -> bool: ...
-    view_listeners: Incomplete
+    view_listeners: WeakSet[DocumentSyncListener]
     def __init__(self) -> None: ...
     def attach(self, buffer: sublime.Buffer) -> None: ...
     def detach(self) -> None: ...
-    def on_text_changed(self, changes: Iterable[sublime.TextChange]) -> None: ...
+    def on_text_changed(self, changes: list[sublime.TextChange]) -> None: ...
     def on_reload_async(self) -> None: ...
     def on_revert_async(self) -> None: ...
+    def set_last_edit_action(self, action: ChangeEventAction) -> None: ...
 
 class DocumentSyncListener(sublime_plugin.ViewEventListener, AbstractViewListener):
     ACTIVE_DIAGNOSTIC: str
@@ -61,11 +122,22 @@ class DocumentSyncListener(sublime_plugin.ViewEventListener, AbstractViewListene
     def on_documentation_popup_toggle(self, *, opened: bool) -> None: ...
     def on_session_initialized_async(self, session: Session) -> None: ...
     def on_session_shutdown_async(self, session: Session) -> None: ...
-    def get_diagnostics_async(self, location: sublime.Region | int, max_diagnostic_severity_level: int = ...) -> list[tuple[SessionBufferProtocol, list[Diagnostic]]]: ...
-    def on_diagnostics_updated_async(self, is_view_visible: bool) -> None: ...
-    def session_buffers_async(self, capability: str | None = None) -> list[SessionBuffer]: ...
+    def get_diagnostics_async(
+        self, location: sublime.Region | int, max_diagnostic_severity_level: int = ...
+    ) -> list[tuple[SessionBufferProtocol, list[Diagnostic]]]: ...
+    def on_diagnostics_updated_async(
+        self, session_buffer: SessionBufferProtocol, is_view_visible: bool
+    ) -> None: ...
+    def session_buffers_async(
+        self, capability: str | None = None
+    ) -> list[SessionBuffer]: ...
     def session_views_async(self) -> list[SessionView]: ...
-    def on_text_changed_async(self, change_count: int, changes: Iterable[sublime.TextChange]) -> None: ...
+    def on_text_changed_async(
+        self,
+        change_count: int,
+        changes: list[sublime.TextChange],
+        action: ChangeEventAction,
+    ) -> None: ...
     def get_uri(self) -> DocumentUri: ...
     def set_uri(self, new_uri: DocumentUri) -> None: ...
     def get_language_id(self) -> str: ...
@@ -76,23 +148,49 @@ class DocumentSyncListener(sublime_plugin.ViewEventListener, AbstractViewListene
     def on_selection_modified_async(self) -> None: ...
     def on_post_save_async(self) -> None: ...
     def on_close(self) -> None: ...
-    def on_query_context(self, key: str, operator: int, operand: Any, match_all: bool) -> bool | None: ...
+    def on_query_context(
+        self, key: str, operator: int, operand: Any, match_all: bool
+    ) -> bool | None: ...
     def on_hover(self, point: int, hover_zone: int) -> None: ...
-    def on_text_command(self, command_name: str, args: dict | None) -> tuple[str, dict] | None: ...
-    def on_post_text_command(self, command_name: str, args: dict[str, Any] | None) -> None: ...
-    def on_query_completions(self, prefix: str, locations: list[int]) -> sublime.CompletionList | None: ...
+    def on_text_command(
+        self, command_name: str, args: dict[str, Any] | None
+    ) -> tuple[str, dict[str, Any]] | None: ...
+    def get_change_event_action(
+        self, command_name: str, args: dict[str, Any] | None
+    ) -> ChangeEventAction | None: ...
+    def on_post_text_command(
+        self, command_name: str, args: dict[str, Any] | None
+    ) -> None: ...
+    def on_query_completions(
+        self, prefix: str, locations: list[int]
+    ) -> sublime.CompletionList | None: ...
     @overload
-    def do_signature_help_async(self, trigger_kind: Literal[SignatureHelpTriggerKind.TriggerCharacter], trigger_char: str) -> None: ...
+    def do_signature_help_async(
+        self,
+        trigger_kind: Literal[SignatureHelpTriggerKind.TriggerCharacter],
+        trigger_char: str,
+    ) -> None: ...
     @overload
-    def do_signature_help_async(self, trigger_kind: Literal[SignatureHelpTriggerKind.Invoked, SignatureHelpTriggerKind.ContentChange], trigger_char: None = None) -> None: ...
+    def do_signature_help_async(
+        self,
+        trigger_kind: Literal[
+            SignatureHelpTriggerKind.Invoked, SignatureHelpTriggerKind.ContentChange
+        ],
+        trigger_char: None = None,
+    ) -> None: ...
     def navigate_signature_help(self, forward: bool) -> None: ...
-    def handle_code_action_select(self, config_name: str, actions: list[CodeActionOrCommand], index: int) -> None: ...
-    def session_async(self, capability: str, point: int | None = None) -> Session | None: ...
+    def session_async(
+        self, capability: str, point: int | None = None
+    ) -> Session | None: ...
     def sessions_async(self, capability: str | None = None) -> list[Session]: ...
     def session_by_name(self, name: str | None = None) -> Session | None: ...
-    def get_capability_async(self, session: Session, capability_path: str) -> Any | None: ...
+    def get_capability_async(
+        self, session: Session, capability_path: str
+    ) -> Any | None: ...
     def has_capability_async(self, session: Session, capability_path: str) -> bool: ...
     def purge_changes_async(self) -> None: ...
     def trigger_on_pre_save_async(self) -> None: ...
     def revert_async(self) -> None: ...
     def reload_async(self) -> None: ...
+    def on_userprefs_changed_async(self) -> None: ...
+    def set_change_event_action(self, action: ChangeEventAction) -> None: ...

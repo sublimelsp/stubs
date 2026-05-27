@@ -4,7 +4,10 @@ from .core.constants import RequestFlags as RequestFlags, ST_VERSION as ST_VERSI
 from .core.css import css as css
 from .core.edit import apply_text_edits as apply_text_edits
 from .core.protocol import Request as Request
-from .core.registry import LspTextCommand as LspTextCommand, LspWindowCommand as LspWindowCommand
+from .core.registry import (
+    LspTextCommand as LspTextCommand,
+    LspWindowCommand as LspWindowCommand,
+)
 from .core.sessions import Session as Session
 from .core.settings import userprefs as userprefs
 from .core.views import position_to_offset as position_to_offset
@@ -17,12 +20,36 @@ class LspToggleInlayHintsCommand(LspWindowCommand):
 
 class LspInlayHintClickCommand(LspTextCommand):
     capability: str
-    def run(self, _edit: sublime.Edit, session_name: str, inlay_hint: InlayHint, phantom_uuid: str, event: dict | None = None, label_part: InlayHintLabelPart | None = None) -> None: ...
-    def handle(self, session_name: str, inlay_hint: InlayHint, phantom_uuid: str, label_part: InlayHintLabelPart | None = None) -> None: ...
-    def handle_inlay_hint_text_edits(self, session_name: str, inlay_hint: InlayHint, phantom_uuid: str) -> None: ...
-    def handle_label_part_command(self, session_name: str, label_part: InlayHintLabelPart | None = None) -> None: ...
+    def run(
+        self,
+        _edit: sublime.Edit,
+        session_name: str,
+        inlay_hint: InlayHint,
+        phantom_uuid: str,
+        event: dict | None = None,
+        label_part: InlayHintLabelPart | None = None,
+    ) -> None: ...
+    def handle(
+        self,
+        session_name: str,
+        inlay_hint: InlayHint,
+        phantom_uuid: str,
+        label_part: InlayHintLabelPart | None = None,
+    ) -> None: ...
+    def handle_inlay_hint_text_edits(
+        self, session_name: str, inlay_hint: InlayHint, phantom_uuid: str
+    ) -> None: ...
+    def handle_label_part_command(
+        self, session_name: str, label_part: InlayHintLabelPart | None = None
+    ) -> None: ...
 
-def inlay_hint_to_phantom(view: sublime.View, inlay_hint: InlayHint, session: Session) -> sublime.Phantom: ...
-def get_inlay_hint_html(view: sublime.View, inlay_hint: InlayHint, session: Session, phantom_uuid: str) -> str: ...
+def inlay_hint_to_phantom(
+    view: sublime.View, inlay_hint: InlayHint, session: Session
+) -> sublime.Phantom: ...
+def get_inlay_hint_html(
+    view: sublime.View, inlay_hint: InlayHint, session: Session, phantom_uuid: str
+) -> str: ...
 def format_inlay_hint_tooltip(tooltip: str | MarkupContent | None) -> str: ...
-def format_inlay_hint_label(inlay_hint: InlayHint, session: Session, phantom_uuid: str) -> str: ...
+def format_inlay_hint_label(
+    inlay_hint: InlayHint, session: Session, phantom_uuid: str
+) -> str: ...

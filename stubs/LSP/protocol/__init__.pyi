@@ -1,8 +1,12 @@
 from ..plugin.core.typing import StrEnum
-from _typeshed import Incomplete
 from enum import IntEnum, IntFlag
-from typing import Any, Literal, Mapping, TypedDict
-from typing_extensions import NotRequired
+from typing import Literal, TypedDict
+from typing_extensions import NotRequired, TypeAlias
+from typing import Any
+from typing import List
+from typing import Mapping
+from typing import Sequence
+from typing import Union
 
 URI = str
 DocumentUri = str
@@ -17,6 +21,7 @@ class SemanticTokenTypes(StrEnum):
 
     @since 3.16.0
     """
+
     Namespace: str
     Type: str
     Class: str
@@ -50,6 +55,7 @@ class SemanticTokenModifiers(StrEnum):
 
     @since 3.16.0
     """
+
     Declaration: str
     Definition: str
     Readonly: str
@@ -67,11 +73,13 @@ class DocumentDiagnosticReportKind(StrEnum):
 
     @since 3.17.0
     """
+
     Full: str
     Unchanged: str
 
 class ErrorCodes(IntEnum):
     """Predefined error codes."""
+
     ParseError: int
     InvalidRequest: int
     MethodNotFound: int
@@ -88,12 +96,14 @@ class LSPErrorCodes(IntEnum):
 
 class FoldingRangeKind(StrEnum):
     """A set of predefined range kinds."""
+
     Comment: str
     Imports: str
     Region: str
 
 class SymbolKind(IntEnum):
     """A symbol kind."""
+
     File: int
     Module: int
     Namespace: int
@@ -127,6 +137,7 @@ class SymbolTag(IntEnum):
 
     @since 3.16
     """
+
     Deprecated: int
 
 class UniquenessLevel(StrEnum):
@@ -135,6 +146,7 @@ class UniquenessLevel(StrEnum):
 
     @since 3.16.0
     """
+
     Document: str
     Project: str
     Group: str
@@ -147,6 +159,7 @@ class MonikerKind(StrEnum):
 
     @since 3.16.0
     """
+
     Import: str
     Export: str
     Local: str
@@ -157,11 +170,13 @@ class InlayHintKind(IntEnum):
 
     @since 3.17.0
     """
+
     Type: int
     Parameter: int
 
 class MessageType(IntEnum):
     """The message type"""
+
     Error: int
     Warning: int
     Info: int
@@ -173,18 +188,21 @@ class TextDocumentSyncKind(IntEnum):
     Defines how the host (editor) should sync
     document changes to the language server.
     """
+
     None_: int
     Full: int
     Incremental: int
 
 class TextDocumentSaveReason(IntEnum):
     """Represents reasons why a text document is saved."""
+
     Manual: int
     AfterDelay: int
     FocusOut: int
 
 class CompletionItemKind(IntEnum):
     """The kind of a completion entry."""
+
     Text: int
     Method: int
     Function: int
@@ -218,6 +236,7 @@ class CompletionItemTag(IntEnum):
 
     @since 3.15.0
     """
+
     Deprecated: int
 
 class InsertTextFormat(IntEnum):
@@ -225,6 +244,7 @@ class InsertTextFormat(IntEnum):
     Defines whether the insert text in a completion item should be interpreted as
     plain text or a snippet.
     """
+
     PlainText: int
     Snippet: int
 
@@ -235,17 +255,20 @@ class InsertTextMode(IntEnum):
 
     @since 3.16.0
     """
+
     AsIs: int
     AdjustIndentation: int
 
 class DocumentHighlightKind(IntEnum):
     """A document highlight kind."""
+
     Text: int
     Read: int
     Write: int
 
 class CodeActionKind(StrEnum):
     """A set of predefined code action kinds"""
+
     Empty: str
     QuickFix: str
     Refactor: str
@@ -264,6 +287,7 @@ class CodeActionTag(IntEnum):
 
     @since 3.18.0 - proposed
     """
+
     LLMGenerated: int
 
 class TraceValue(StrEnum):
@@ -279,6 +303,7 @@ class MarkupKind(StrEnum):
     Please note that `MarkupKinds` must not start with a `$`. This kinds
     are reserved for internal usage.
     """
+
     PlainText: str
     Markdown: str
 
@@ -287,6 +312,7 @@ class LanguageKind(StrEnum):
     Predefined Language kinds
     @since 3.18.0
     """
+
     ABAP: str
     WindowsBat: str
     BibTeX: str
@@ -356,6 +382,7 @@ class InlineCompletionTriggerKind(IntEnum):
     @since 3.18.0
     @proposed
     """
+
     Invoked: int
     Automatic: int
 
@@ -365,12 +392,14 @@ class PositionEncodingKind(StrEnum):
 
     @since 3.17.0
     """
+
     UTF8: str
     UTF16: str
     UTF32: str
 
 class FileChangeType(IntEnum):
     """The file event type"""
+
     Created: int
     Changed: int
     Deleted: int
@@ -382,6 +411,7 @@ class WatchKind(IntFlag):
 
 class DiagnosticSeverity(IntEnum):
     """The diagnostic's severity."""
+
     Error: int
     Warning: int
     Information: int
@@ -393,22 +423,25 @@ class DiagnosticTag(IntEnum):
 
     @since 3.15.0
     """
+
     Unnecessary: int
     Deprecated: int
 
 class CompletionTriggerKind(IntEnum):
     """How a completion was triggered"""
+
     Invoked: int
     TriggerCharacter: int
     TriggerForIncompleteCompletions: int
 
-class ApplyKind(IntFlag):
+class ApplyKind(IntEnum):
     """
     Defines how values from a set of defaults and an individual item will be
     merged.
 
     @since 3.18.0
     """
+
     Replace: int
     Merge: int
 
@@ -418,6 +451,7 @@ class SignatureHelpTriggerKind(IntEnum):
 
     @since 3.15.0
     """
+
     Invoked: int
     TriggerCharacter: int
     ContentChange: int
@@ -428,6 +462,7 @@ class CodeActionTriggerKind(IntEnum):
 
     @since 3.17.0
     """
+
     Invoked: int
     Automatic: int
 
@@ -438,6 +473,7 @@ class FileOperationPatternKind(StrEnum):
 
     @since 3.16.0
     """
+
     File: str
     Folder: str
 
@@ -447,6 +483,7 @@ class NotebookCellKind(IntEnum):
 
     @since 3.17.0
     """
+
     Markup: int
     Code: int
 
@@ -467,40 +504,62 @@ class PrepareSupportDefaultBehavior(IntEnum):
 class TokenFormat(StrEnum):
     Relative: str
 
-Definition: Incomplete
-DefinitionLink: str
-LSPArray: Incomplete
-LSPAny: Incomplete
-Declaration: Incomplete
-DeclarationLink: str
-InlineValue: Incomplete
-DocumentDiagnosticReport: Incomplete
-PrepareRenameResult: Incomplete
-DocumentSelector: Incomplete
-ProgressToken = int | str
-ChangeAnnotationIdentifier = str
-WorkspaceDocumentDiagnosticReport: Incomplete
-TextDocumentContentChangeEvent: Incomplete
-MarkedString: Incomplete
-DocumentFilter: Incomplete
-LSPObject = Mapping[str, Any]
-GlobPattern: Incomplete
-TextDocumentFilter: Incomplete
-NotebookDocumentFilter: Incomplete
-Pattern = str
-RegularExpressionEngineKind = str
+Definition: TypeAlias = Union["Location", List["Location"]]
+DefinitionLink: TypeAlias = "LocationLink"
+LSPArray: TypeAlias = Sequence["LSPAny"]
+LSPAny: TypeAlias = Union["LSPObject", LSPArray, str, int, Uint, float, bool, None]
+Declaration: TypeAlias = Union["Location", List["Location"]]
+DeclarationLink: TypeAlias = "LocationLink"
+InlineValue: TypeAlias = Union[
+    "InlineValueText", "InlineValueVariableLookup", "InlineValueEvaluatableExpression"
+]
+DocumentDiagnosticReport: TypeAlias = Union[
+    "RelatedFullDocumentDiagnosticReport", "RelatedUnchangedDocumentDiagnosticReport"
+]
+PrepareRenameResult: TypeAlias = Union[
+    "Range", "PrepareRenamePlaceholder", "PrepareRenameDefaultBehavior"
+]
+DocumentSelector: TypeAlias = List["DocumentFilter"]
+ProgressToken: TypeAlias = Union[int, str]
+ChangeAnnotationIdentifier: TypeAlias = str
+WorkspaceDocumentDiagnosticReport: TypeAlias = Union[
+    "WorkspaceFullDocumentDiagnosticReport",
+    "WorkspaceUnchangedDocumentDiagnosticReport",
+]
+TextDocumentContentChangeEvent: TypeAlias = Union[
+    "TextDocumentContentChangePartial", "TextDocumentContentChangeWholeDocument"
+]
+MarkedString: TypeAlias = Union[str, "MarkedStringWithLanguage"]
+DocumentFilter: TypeAlias = Union[
+    "TextDocumentFilter", "NotebookCellTextDocumentFilter"
+]
+LSPObject: TypeAlias = Mapping[str, Any]
+GlobPattern: TypeAlias = Union["Pattern", "RelativePattern"]
+TextDocumentFilter: TypeAlias = Union[
+    "TextDocumentFilterLanguage",
+    "TextDocumentFilterScheme",
+    "TextDocumentFilterPattern",
+]
+NotebookDocumentFilter: TypeAlias = Union[
+    "NotebookDocumentFilterNotebookType",
+    "NotebookDocumentFilterScheme",
+    "NotebookDocumentFilterPattern",
+]
+Pattern: TypeAlias = str
+RegularExpressionEngineKind: TypeAlias = str
 
 class ImplementationParams(TypedDict):
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class Location(TypedDict):
     """
     Represents a location inside a resource, such as a line
     inside a text file.
     """
+
     uri: DocumentUri
     range: Range
 
@@ -511,8 +570,8 @@ class ImplementationRegistrationOptions(TypedDict):
 class TypeDefinitionParams(TypedDict):
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class TypeDefinitionRegistrationOptions(TypedDict):
     documentSelector: DocumentSelector | None
@@ -520,25 +579,30 @@ class TypeDefinitionRegistrationOptions(TypedDict):
 
 class WorkspaceFolder(TypedDict):
     """A workspace folder inside a client."""
+
     uri: URI
     name: str
 
 class DidChangeWorkspaceFoldersParams(TypedDict):
     """The parameters of a `workspace/didChangeWorkspaceFolders` notification."""
+
     event: WorkspaceFoldersChangeEvent
 
 class ConfigurationParams(TypedDict):
     """The parameters of a configuration request."""
-    items: list['ConfigurationItem']
+
+    items: list["ConfigurationItem"]
 
 class DocumentColorParams(TypedDict):
     """Parameters for a {@link DocumentColorRequest}."""
+
     textDocument: TextDocumentIdentifier
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class ColorInformation(TypedDict):
     """Represents a color range from a document."""
+
     range: Range
     color: Color
 
@@ -548,40 +612,44 @@ class DocumentColorRegistrationOptions(TypedDict):
 
 class ColorPresentationParams(TypedDict):
     """Parameters for a {@link ColorPresentationRequest}."""
+
     textDocument: TextDocumentIdentifier
     color: Color
     range: Range
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class ColorPresentation(TypedDict):
     label: str
-    textEdit: NotRequired['TextEdit']
-    additionalTextEdits: NotRequired[list['TextEdit']]
+    textEdit: NotRequired["TextEdit"]
+    additionalTextEdits: NotRequired[list["TextEdit"]]
 
 class WorkDoneProgressOptions(TypedDict):
     workDoneProgress: NotRequired[bool]
 
 class TextDocumentRegistrationOptions(TypedDict):
     """General text document registration options."""
+
     documentSelector: DocumentSelector | None
 
 class FoldingRangeParams(TypedDict):
     """Parameters for a {@link FoldingRangeRequest}."""
+
     textDocument: TextDocumentIdentifier
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class FoldingRange(TypedDict):
     """
     Represents a folding range. To be valid, start and end line must be bigger than zero and smaller
     than the number of lines in the document. Clients are free to ignore invalid ranges.
     """
+
     startLine: Uint
     startCharacter: NotRequired[Uint]
     endLine: Uint
     endCharacter: NotRequired[Uint]
-    kind: NotRequired['FoldingRangeKind']
+    kind: NotRequired[str | FoldingRangeKind]
     collapsedText: NotRequired[str]
 
 class FoldingRangeRegistrationOptions(TypedDict):
@@ -591,8 +659,8 @@ class FoldingRangeRegistrationOptions(TypedDict):
 class DeclarationParams(TypedDict):
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class DeclarationRegistrationOptions(TypedDict):
     documentSelector: DocumentSelector | None
@@ -600,18 +668,20 @@ class DeclarationRegistrationOptions(TypedDict):
 
 class SelectionRangeParams(TypedDict):
     """A parameter literal used in selection range requests."""
+
     textDocument: TextDocumentIdentifier
-    positions: list['Position']
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    positions: list["Position"]
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class SelectionRange(TypedDict):
     """
     A selection range represents a part of a selection hierarchy. A selection range
     may have a parent selection range that contains it.
     """
+
     range: Range
-    parent: NotRequired['SelectionRange']
+    parent: NotRequired["SelectionRange"]
 
 class SelectionRangeRegistrationOptions(TypedDict):
     documentSelector: DocumentSelector | None
@@ -629,9 +699,10 @@ class CallHierarchyPrepareParams(TypedDict):
 
     @since 3.16.0
     """
+
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class CallHierarchyItem(TypedDict):
     """
@@ -640,14 +711,15 @@ class CallHierarchyItem(TypedDict):
 
     @since 3.16.0
     """
+
     name: str
     kind: SymbolKind
-    tags: NotRequired[list['SymbolTag']]
+    tags: NotRequired[list["SymbolTag"]]
     detail: NotRequired[str]
     uri: DocumentUri
     range: Range
     selectionRange: Range
-    data: NotRequired['LSPAny']
+    data: NotRequired["LSPAny"]
 
 class CallHierarchyRegistrationOptions(TypedDict):
     """
@@ -655,6 +727,7 @@ class CallHierarchyRegistrationOptions(TypedDict):
 
     @since 3.16.0
     """
+
     documentSelector: DocumentSelector | None
     id: NotRequired[str]
 
@@ -664,11 +737,15 @@ class CallHierarchyIncomingCallsParams(TypedDict):
 
     @since 3.16.0
     """
-    item: CallHierarchyItem
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
 
-CallHierarchyIncomingCall = TypedDict('CallHierarchyIncomingCall', {'from': 'CallHierarchyItem', 'fromRanges': list['Range']})
+    item: CallHierarchyItem
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
+
+CallHierarchyIncomingCall = TypedDict(
+    "CallHierarchyIncomingCall",
+    {"from": "CallHierarchyItem", "fromRanges": list["Range"]},
+)
 
 class CallHierarchyOutgoingCallsParams(TypedDict):
     """
@@ -676,9 +753,10 @@ class CallHierarchyOutgoingCallsParams(TypedDict):
 
     @since 3.16.0
     """
+
     item: CallHierarchyItem
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class CallHierarchyOutgoingCall(TypedDict):
     """
@@ -686,26 +764,31 @@ class CallHierarchyOutgoingCall(TypedDict):
 
     @since 3.16.0
     """
+
     to: CallHierarchyItem
-    fromRanges: list['Range']
+    fromRanges: list["Range"]
 
 class SemanticTokensParams(TypedDict):
     """@since 3.16.0"""
+
     textDocument: TextDocumentIdentifier
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class SemanticTokens(TypedDict):
     """@since 3.16.0"""
+
     resultId: NotRequired[str]
     data: list[Uint]
 
 class SemanticTokensPartialResult(TypedDict):
     """@since 3.16.0"""
+
     data: list[Uint]
 
 class SemanticTokensRegistrationOptions(TypedDict):
     """@since 3.16.0"""
+
     documentSelector: DocumentSelector | None
     legend: SemanticTokensLegend
     range: NotRequired[bool | dict[str, LSPAny]]
@@ -714,26 +797,30 @@ class SemanticTokensRegistrationOptions(TypedDict):
 
 class SemanticTokensDeltaParams(TypedDict):
     """@since 3.16.0"""
+
     textDocument: TextDocumentIdentifier
     previousResultId: str
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class SemanticTokensDelta(TypedDict):
     """@since 3.16.0"""
+
     resultId: NotRequired[str]
-    edits: list['SemanticTokensEdit']
+    edits: list["SemanticTokensEdit"]
 
 class SemanticTokensDeltaPartialResult(TypedDict):
     """@since 3.16.0"""
-    edits: list['SemanticTokensEdit']
+
+    edits: list["SemanticTokensEdit"]
 
 class SemanticTokensRangeParams(TypedDict):
     """@since 3.16.0"""
+
     textDocument: TextDocumentIdentifier
     range: Range
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class ShowDocumentParams(TypedDict):
     """
@@ -741,10 +828,11 @@ class ShowDocumentParams(TypedDict):
 
     @since 3.16.0
     """
+
     uri: URI
     external: NotRequired[bool]
     takeFocus: NotRequired[bool]
-    selection: NotRequired['Range']
+    selection: NotRequired["Range"]
 
 class ShowDocumentResult(TypedDict):
     """
@@ -752,12 +840,13 @@ class ShowDocumentResult(TypedDict):
 
     @since 3.16.0
     """
+
     success: bool
 
 class LinkedEditingRangeParams(TypedDict):
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class LinkedEditingRanges(TypedDict):
     """
@@ -765,7 +854,8 @@ class LinkedEditingRanges(TypedDict):
 
     @since 3.16.0
     """
-    ranges: list['Range']
+
+    ranges: list["Range"]
     wordPattern: NotRequired[str]
 
 class LinkedEditingRangeRegistrationOptions(TypedDict):
@@ -779,7 +869,8 @@ class CreateFilesParams(TypedDict):
 
     @since 3.16.0
     """
-    files: list['FileCreate']
+
+    files: list["FileCreate"]
 
 class WorkspaceEdit(TypedDict):
     """
@@ -796,9 +887,12 @@ class WorkspaceEdit(TypedDict):
     cause failure of the operation. How the client recovers from the failure is described by
     the client capability: `workspace.workspaceEdit.failureHandling`
     """
-    changes: NotRequired[dict[DocumentUri, list['TextEdit']]]
-    documentChanges: NotRequired[list[TextDocumentEdit | CreateFile | RenameFile | DeleteFile]]
-    changeAnnotations: NotRequired[dict[ChangeAnnotationIdentifier, 'ChangeAnnotation']]
+
+    changes: NotRequired[dict[DocumentUri, list["TextEdit"]]]
+    documentChanges: NotRequired[
+        list[TextDocumentEdit | CreateFile | RenameFile | DeleteFile]
+    ]
+    changeAnnotations: NotRequired[dict[ChangeAnnotationIdentifier, "ChangeAnnotation"]]
 
 class FileOperationRegistrationOptions(TypedDict):
     """
@@ -806,7 +900,8 @@ class FileOperationRegistrationOptions(TypedDict):
 
     @since 3.16.0
     """
-    filters: list['FileOperationFilter']
+
+    filters: list["FileOperationFilter"]
 
 class RenameFilesParams(TypedDict):
     """
@@ -815,7 +910,8 @@ class RenameFilesParams(TypedDict):
 
     @since 3.16.0
     """
-    files: list['FileRename']
+
+    files: list["FileRename"]
 
 class DeleteFilesParams(TypedDict):
     """
@@ -824,13 +920,14 @@ class DeleteFilesParams(TypedDict):
 
     @since 3.16.0
     """
-    files: list['FileDelete']
+
+    files: list["FileDelete"]
 
 class MonikerParams(TypedDict):
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class Moniker(TypedDict):
     """
@@ -838,10 +935,11 @@ class Moniker(TypedDict):
 
     @since 3.16.0
     """
+
     scheme: str
     identifier: str
     unique: UniquenessLevel
-    kind: NotRequired['MonikerKind']
+    kind: NotRequired["MonikerKind"]
 
 class MonikerRegistrationOptions(TypedDict):
     documentSelector: DocumentSelector | None
@@ -852,20 +950,22 @@ class TypeHierarchyPrepareParams(TypedDict):
 
     @since 3.17.0
     """
+
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class TypeHierarchyItem(TypedDict):
     """@since 3.17.0"""
+
     name: str
     kind: SymbolKind
-    tags: NotRequired[list['SymbolTag']]
+    tags: NotRequired[list["SymbolTag"]]
     detail: NotRequired[str]
     uri: DocumentUri
     range: Range
     selectionRange: Range
-    data: NotRequired['LSPAny']
+    data: NotRequired["LSPAny"]
 
 class TypeHierarchyRegistrationOptions(TypedDict):
     """
@@ -873,6 +973,7 @@ class TypeHierarchyRegistrationOptions(TypedDict):
 
     @since 3.17.0
     """
+
     documentSelector: DocumentSelector | None
     id: NotRequired[str]
 
@@ -882,9 +983,10 @@ class TypeHierarchySupertypesParams(TypedDict):
 
     @since 3.17.0
     """
+
     item: TypeHierarchyItem
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class TypeHierarchySubtypesParams(TypedDict):
     """
@@ -892,9 +994,10 @@ class TypeHierarchySubtypesParams(TypedDict):
 
     @since 3.17.0
     """
+
     item: TypeHierarchyItem
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class InlineValueParams(TypedDict):
     """
@@ -902,10 +1005,11 @@ class InlineValueParams(TypedDict):
 
     @since 3.17.0
     """
+
     textDocument: TextDocumentIdentifier
     range: Range
     context: InlineValueContext
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class InlineValueRegistrationOptions(TypedDict):
     """
@@ -913,6 +1017,7 @@ class InlineValueRegistrationOptions(TypedDict):
 
     @since 3.17.0
     """
+
     documentSelector: DocumentSelector | None
     id: NotRequired[str]
 
@@ -922,9 +1027,10 @@ class InlayHintParams(TypedDict):
 
     @since 3.17.0
     """
+
     textDocument: TextDocumentIdentifier
     range: Range
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class InlayHint(TypedDict):
     """
@@ -932,14 +1038,15 @@ class InlayHint(TypedDict):
 
     @since 3.17.0
     """
+
     position: Position
-    label: str | list['InlayHintLabelPart']
-    kind: NotRequired['InlayHintKind']
-    textEdits: NotRequired[list['TextEdit']]
+    label: str | list["InlayHintLabelPart"]
+    kind: NotRequired["InlayHintKind"]
+    textEdits: NotRequired[list["TextEdit"]]
     tooltip: NotRequired[str | MarkupContent]
     paddingLeft: NotRequired[bool]
     paddingRight: NotRequired[bool]
-    data: NotRequired['LSPAny']
+    data: NotRequired["LSPAny"]
 
 class InlayHintRegistrationOptions(TypedDict):
     """
@@ -947,6 +1054,7 @@ class InlayHintRegistrationOptions(TypedDict):
 
     @since 3.17.0
     """
+
     resolveProvider: NotRequired[bool]
     documentSelector: DocumentSelector | None
     id: NotRequired[str]
@@ -957,11 +1065,12 @@ class DocumentDiagnosticParams(TypedDict):
 
     @since 3.17.0
     """
+
     textDocument: TextDocumentIdentifier
     identifier: NotRequired[str]
     previousResultId: NotRequired[str]
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class DocumentDiagnosticReportPartialResult(TypedDict):
     """
@@ -969,7 +1078,10 @@ class DocumentDiagnosticReportPartialResult(TypedDict):
 
     @since 3.17.0
     """
-    relatedDocuments: dict[DocumentUri, FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport]
+
+    relatedDocuments: dict[
+        DocumentUri, FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport
+    ]
 
 class DiagnosticServerCancellationData(TypedDict):
     """
@@ -977,6 +1089,7 @@ class DiagnosticServerCancellationData(TypedDict):
 
     @since 3.17.0
     """
+
     retriggerRequest: bool
 
 class DiagnosticRegistrationOptions(TypedDict):
@@ -985,6 +1098,7 @@ class DiagnosticRegistrationOptions(TypedDict):
 
     @since 3.17.0
     """
+
     documentSelector: DocumentSelector | None
     identifier: NotRequired[str]
     interFileDependencies: bool
@@ -997,10 +1111,11 @@ class WorkspaceDiagnosticParams(TypedDict):
 
     @since 3.17.0
     """
+
     identifier: NotRequired[str]
-    previousResultIds: list['PreviousResultId']
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    previousResultIds: list["PreviousResultId"]
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class WorkspaceDiagnosticReport(TypedDict):
     """
@@ -1008,7 +1123,8 @@ class WorkspaceDiagnosticReport(TypedDict):
 
     @since 3.17.0
     """
-    items: list['WorkspaceDocumentDiagnosticReport']
+
+    items: list["WorkspaceDocumentDiagnosticReport"]
 
 class WorkspaceDiagnosticReportPartialResult(TypedDict):
     """
@@ -1016,7 +1132,8 @@ class WorkspaceDiagnosticReportPartialResult(TypedDict):
 
     @since 3.17.0
     """
-    items: list['WorkspaceDocumentDiagnosticReport']
+
+    items: list["WorkspaceDocumentDiagnosticReport"]
 
 class DidOpenNotebookDocumentParams(TypedDict):
     """
@@ -1024,8 +1141,9 @@ class DidOpenNotebookDocumentParams(TypedDict):
 
     @since 3.17.0
     """
+
     notebookDocument: NotebookDocument
-    cellTextDocuments: list['TextDocumentItem']
+    cellTextDocuments: list["TextDocumentItem"]
 
 class NotebookDocumentSyncRegistrationOptions(TypedDict):
     """
@@ -1033,7 +1151,10 @@ class NotebookDocumentSyncRegistrationOptions(TypedDict):
 
     @since 3.17.0
     """
-    notebookSelector: list[NotebookDocumentFilterWithNotebook | NotebookDocumentFilterWithCells]
+
+    notebookSelector: list[
+        NotebookDocumentFilterWithNotebook | NotebookDocumentFilterWithCells
+    ]
     save: NotRequired[bool]
     id: NotRequired[str]
 
@@ -1043,6 +1164,7 @@ class DidChangeNotebookDocumentParams(TypedDict):
 
     @since 3.17.0
     """
+
     notebookDocument: VersionedNotebookDocumentIdentifier
     change: NotebookDocumentChangeEvent
 
@@ -1052,6 +1174,7 @@ class DidSaveNotebookDocumentParams(TypedDict):
 
     @since 3.17.0
     """
+
     notebookDocument: NotebookDocumentIdentifier
 
 class DidCloseNotebookDocumentParams(TypedDict):
@@ -1060,8 +1183,9 @@ class DidCloseNotebookDocumentParams(TypedDict):
 
     @since 3.17.0
     """
+
     notebookDocument: NotebookDocumentIdentifier
-    cellTextDocuments: list['TextDocumentIdentifier']
+    cellTextDocuments: list["TextDocumentIdentifier"]
 
 class InlineCompletionParams(TypedDict):
     """
@@ -1070,10 +1194,11 @@ class InlineCompletionParams(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     context: InlineCompletionContext
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class InlineCompletionList(TypedDict):
     """
@@ -1082,7 +1207,8 @@ class InlineCompletionList(TypedDict):
     @since 3.18.0
     @proposed
     """
-    items: list['InlineCompletionItem']
+
+    items: list["InlineCompletionItem"]
 
 class InlineCompletionItem(TypedDict):
     """
@@ -1091,10 +1217,11 @@ class InlineCompletionItem(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     insertText: str | StringValue
     filterText: NotRequired[str]
-    range: NotRequired['Range']
-    command: NotRequired['Command']
+    range: NotRequired["Range"]
+    command: NotRequired["Command"]
 
 class InlineCompletionRegistrationOptions(TypedDict):
     """
@@ -1103,6 +1230,7 @@ class InlineCompletionRegistrationOptions(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     documentSelector: DocumentSelector | None
     id: NotRequired[str]
 
@@ -1113,6 +1241,7 @@ class TextDocumentContentParams(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     uri: DocumentUri
 
 class TextDocumentContentResult(TypedDict):
@@ -1122,6 +1251,7 @@ class TextDocumentContentResult(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     text: str
 
 class TextDocumentContentRegistrationOptions(TypedDict):
@@ -1131,6 +1261,7 @@ class TextDocumentContentRegistrationOptions(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     schemes: list[str]
     id: NotRequired[str]
 
@@ -1141,41 +1272,45 @@ class TextDocumentContentRefreshParams(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     uri: DocumentUri
 
 class RegistrationParams(TypedDict):
-    registrations: list['Registration']
+    registrations: list["Registration"]
 
 class UnregistrationParams(TypedDict):
-    unregisterations: list['Unregistration']
+    unregisterations: list["Unregistration"]
 
 class InitializeParams(TypedDict):
     processId: int | None
-    clientInfo: NotRequired['ClientInfo']
+    clientInfo: NotRequired["ClientInfo"]
     locale: NotRequired[str]
     rootPath: NotRequired[str | None]
     rootUri: DocumentUri | None
     capabilities: ClientCapabilities
-    initializationOptions: NotRequired['LSPAny']
-    trace: NotRequired['TraceValue']
-    workspaceFolders: NotRequired[list['WorkspaceFolder'] | None]
+    initializationOptions: NotRequired["LSPAny"]
+    trace: NotRequired["TraceValue"]
+    workspaceFolders: NotRequired[list["WorkspaceFolder"] | None]
 
 class InitializeResult(TypedDict):
     """The result returned from an initialize request."""
+
     capabilities: ServerCapabilities
-    serverInfo: NotRequired['ServerInfo']
+    serverInfo: NotRequired["ServerInfo"]
 
 class InitializeError(TypedDict):
     """
     The data type of the ResponseError if the
     initialize request fails.
     """
+
     retry: bool
 
 class InitializedParams(TypedDict): ...
 
 class DidChangeConfigurationParams(TypedDict):
     """The parameters of a change configuration notification."""
+
     settings: LSPAny
 
 class DidChangeConfigurationRegistrationOptions(TypedDict):
@@ -1183,91 +1318,106 @@ class DidChangeConfigurationRegistrationOptions(TypedDict):
 
 class ShowMessageParams(TypedDict):
     """The parameters of a notification message."""
+
     type: MessageType
     message: str
 
 class ShowMessageRequestParams(TypedDict):
     type: MessageType
     message: str
-    actions: NotRequired[list['MessageActionItem']]
+    actions: NotRequired[list["MessageActionItem"]]
 
 class MessageActionItem(TypedDict):
     title: str
 
 class LogMessageParams(TypedDict):
     """The log message parameters."""
+
     type: MessageType
     message: str
 
 class DidOpenTextDocumentParams(TypedDict):
     """The parameters sent in an open text document notification"""
+
     textDocument: TextDocumentItem
 
 class DidChangeTextDocumentParams(TypedDict):
     """The change text document notification's parameters."""
+
     textDocument: VersionedTextDocumentIdentifier
-    contentChanges: list['TextDocumentContentChangeEvent']
+    contentChanges: list["TextDocumentContentChangeEvent"]
 
 class TextDocumentChangeRegistrationOptions(TypedDict):
     """Describe options to be used when registered for text document change events."""
+
     syncKind: TextDocumentSyncKind
     documentSelector: DocumentSelector | None
 
 class DidCloseTextDocumentParams(TypedDict):
     """The parameters sent in a close text document notification"""
+
     textDocument: TextDocumentIdentifier
 
 class DidSaveTextDocumentParams(TypedDict):
     """The parameters sent in a save text document notification"""
+
     textDocument: TextDocumentIdentifier
     text: NotRequired[str]
 
 class TextDocumentSaveRegistrationOptions(TypedDict):
     """Save registration options."""
+
     documentSelector: DocumentSelector | None
     includeText: NotRequired[bool]
 
 class WillSaveTextDocumentParams(TypedDict):
     """The parameters sent in a will save text document notification."""
+
     textDocument: TextDocumentIdentifier
     reason: TextDocumentSaveReason
 
 class TextEdit(TypedDict):
     """A text edit applicable to a text document."""
+
     range: Range
     newText: str
 
 class DidChangeWatchedFilesParams(TypedDict):
     """The watched files change notification's parameters."""
-    changes: list['FileEvent']
+
+    changes: list["FileEvent"]
 
 class DidChangeWatchedFilesRegistrationOptions(TypedDict):
     """Describe options to be used when registered for text document change events."""
-    watchers: list['FileSystemWatcher']
+
+    watchers: list["FileSystemWatcher"]
 
 class PublishDiagnosticsParams(TypedDict):
     """The publish diagnostic notification's parameters."""
+
     uri: DocumentUri
     version: NotRequired[int]
-    diagnostics: list['Diagnostic']
+    diagnostics: list["Diagnostic"]
 
 class CompletionParams(TypedDict):
     """Completion parameters"""
-    context: NotRequired['CompletionContext']
+
+    context: NotRequired["CompletionContext"]
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class CompletionItem(TypedDict):
     """
     A completion item represents a text snippet that is
     proposed to complete text that is being typed.
     """
+
     label: str
-    labelDetails: NotRequired['CompletionItemLabelDetails']
-    kind: NotRequired['CompletionItemKind']
-    tags: NotRequired[list['CompletionItemTag']]
+    labelDetails: NotRequired["CompletionItemLabelDetails"]
+    kind: NotRequired["CompletionItemKind"]
+    tags: NotRequired[list["CompletionItemTag"]]
     detail: NotRequired[str]
     documentation: NotRequired[str | MarkupContent]
     deprecated: NotRequired[bool]
@@ -1275,54 +1425,60 @@ class CompletionItem(TypedDict):
     sortText: NotRequired[str]
     filterText: NotRequired[str]
     insertText: NotRequired[str]
-    insertTextFormat: NotRequired['InsertTextFormat']
-    insertTextMode: NotRequired['InsertTextMode']
+    insertTextFormat: NotRequired["InsertTextFormat"]
+    insertTextMode: NotRequired["InsertTextMode"]
     textEdit: NotRequired[TextEdit | InsertReplaceEdit]
     textEditText: NotRequired[str]
-    additionalTextEdits: NotRequired[list['TextEdit']]
+    additionalTextEdits: NotRequired[list["TextEdit"]]
     commitCharacters: NotRequired[list[str]]
-    command: NotRequired['Command']
-    data: NotRequired['LSPAny']
+    command: NotRequired["Command"]
+    data: NotRequired["LSPAny"]
 
 class CompletionList(TypedDict):
     """
     Represents a collection of {@link CompletionItem completion items} to be presented
     in the editor.
     """
+
     isIncomplete: bool
-    itemDefaults: NotRequired['CompletionItemDefaults']
-    applyKind: NotRequired['CompletionItemApplyKinds']
-    items: list['CompletionItem']
+    itemDefaults: NotRequired["CompletionItemDefaults"]
+    applyKind: NotRequired["CompletionItemApplyKinds"]
+    items: list["CompletionItem"]
 
 class CompletionRegistrationOptions(TypedDict):
     """Registration options for a {@link CompletionRequest}."""
+
     documentSelector: DocumentSelector | None
     triggerCharacters: NotRequired[list[str]]
     allCommitCharacters: NotRequired[list[str]]
     resolveProvider: NotRequired[bool]
-    completionItem: NotRequired['ServerCompletionItemOptions']
+    completionItem: NotRequired["ServerCompletionItemOptions"]
 
 class HoverParams(TypedDict):
     """Parameters for a {@link HoverRequest}."""
+
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class Hover(TypedDict):
     """The result of a hover request."""
-    contents: MarkupContent | MarkedString | list['MarkedString']
-    range: NotRequired['Range']
+
+    contents: MarkupContent | MarkedString | list["MarkedString"]
+    range: NotRequired["Range"]
 
 class HoverRegistrationOptions(TypedDict):
     """Registration options for a {@link HoverRequest}."""
+
     documentSelector: DocumentSelector | None
 
 class SignatureHelpParams(TypedDict):
     """Parameters for a {@link SignatureHelpRequest}."""
-    context: NotRequired['SignatureHelpContext']
+
+    context: NotRequired["SignatureHelpContext"]
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class SignatureHelp(TypedDict):
     """
@@ -1330,45 +1486,52 @@ class SignatureHelp(TypedDict):
     callable. There can be multiple signature but only one
     active and only one active parameter.
     """
-    signatures: list['SignatureInformation']
+
+    signatures: list["SignatureInformation"]
     activeSignature: NotRequired[Uint]
     activeParameter: NotRequired[Uint | None]
 
 class SignatureHelpRegistrationOptions(TypedDict):
     """Registration options for a {@link SignatureHelpRequest}."""
+
     documentSelector: DocumentSelector | None
     triggerCharacters: NotRequired[list[str]]
     retriggerCharacters: NotRequired[list[str]]
 
 class DefinitionParams(TypedDict):
     """Parameters for a {@link DefinitionRequest}."""
+
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class DefinitionRegistrationOptions(TypedDict):
     """Registration options for a {@link DefinitionRequest}."""
+
     documentSelector: DocumentSelector | None
 
 class ReferenceParams(TypedDict):
     """Parameters for a {@link ReferencesRequest}."""
+
     context: ReferenceContext
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class ReferenceRegistrationOptions(TypedDict):
     """Registration options for a {@link ReferencesRequest}."""
+
     documentSelector: DocumentSelector | None
 
 class DocumentHighlightParams(TypedDict):
     """Parameters for a {@link DocumentHighlightRequest}."""
+
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class DocumentHighlight(TypedDict):
     """
@@ -1376,29 +1539,33 @@ class DocumentHighlight(TypedDict):
     special attention. Usually a document highlight is visualized by changing
     the background color of its range.
     """
+
     range: Range
-    kind: NotRequired['DocumentHighlightKind']
+    kind: NotRequired["DocumentHighlightKind"]
 
 class DocumentHighlightRegistrationOptions(TypedDict):
     """Registration options for a {@link DocumentHighlightRequest}."""
+
     documentSelector: DocumentSelector | None
 
 class DocumentSymbolParams(TypedDict):
     """Parameters for a {@link DocumentSymbolRequest}."""
+
     textDocument: TextDocumentIdentifier
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class SymbolInformation(TypedDict):
     """
     Represents information about programming constructs like variables, classes,
     interfaces etc.
     """
+
     deprecated: NotRequired[bool]
     location: Location
     name: str
     kind: SymbolKind
-    tags: NotRequired[list['SymbolTag']]
+    tags: NotRequired[list["SymbolTag"]]
     containerName: NotRequired[str]
 
 class DocumentSymbol(TypedDict):
@@ -1408,27 +1575,30 @@ class DocumentSymbol(TypedDict):
     have two ranges: one that encloses its definition and one that points to
     its most interesting range, e.g. the range of an identifier.
     """
+
     name: str
     detail: NotRequired[str]
     kind: SymbolKind
-    tags: NotRequired[list['SymbolTag']]
+    tags: NotRequired[list["SymbolTag"]]
     deprecated: NotRequired[bool]
     range: Range
     selectionRange: Range
-    children: NotRequired[list['DocumentSymbol']]
+    children: NotRequired[list["DocumentSymbol"]]
 
 class DocumentSymbolRegistrationOptions(TypedDict):
     """Registration options for a {@link DocumentSymbolRequest}."""
+
     documentSelector: DocumentSelector | None
     label: NotRequired[str]
 
 class CodeActionParams(TypedDict):
     """The parameters of a {@link CodeActionRequest}."""
+
     textDocument: TextDocumentIdentifier
     range: Range
     context: CodeActionContext
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class Command(TypedDict):
     """
@@ -1437,10 +1607,11 @@ class Command(TypedDict):
     an array of arguments which will be passed to the command handler
     function when invoked.
     """
+
     title: str
     tooltip: NotRequired[str]
     command: str
-    arguments: NotRequired[list['LSPAny']]
+    arguments: NotRequired[list["LSPAny"]]
 
 class CodeAction(TypedDict):
     """
@@ -1449,28 +1620,31 @@ class CodeAction(TypedDict):
 
     A CodeAction must set either `edit` and/or a `command`. If both are supplied, the `edit` is applied first, then the `command` is executed.
     """
+
     title: str
-    kind: NotRequired['CodeActionKind']
-    diagnostics: NotRequired[list['Diagnostic']]
+    kind: NotRequired[str | CodeActionKind]
+    diagnostics: NotRequired[list["Diagnostic"]]
     isPreferred: NotRequired[bool]
-    disabled: NotRequired['CodeActionDisabled']
-    edit: NotRequired['WorkspaceEdit']
-    command: NotRequired['Command']
-    data: NotRequired['LSPAny']
-    tags: NotRequired[list['CodeActionTag']]
+    disabled: NotRequired["CodeActionDisabled"]
+    edit: NotRequired["WorkspaceEdit"]
+    command: NotRequired["Command"]
+    data: NotRequired["LSPAny"]
+    tags: NotRequired[list["CodeActionTag"]]
 
 class CodeActionRegistrationOptions(TypedDict):
     """Registration options for a {@link CodeActionRequest}."""
+
     documentSelector: DocumentSelector | None
-    codeActionKinds: NotRequired[list['CodeActionKind']]
-    documentation: NotRequired[list['CodeActionKindDocumentation']]
+    codeActionKinds: NotRequired[list[str | CodeActionKind]]
+    documentation: NotRequired[list["CodeActionKindDocumentation"]]
     resolveProvider: NotRequired[bool]
 
 class WorkspaceSymbolParams(TypedDict):
     """The parameters of a {@link WorkspaceSymbolRequest}."""
+
     query: str
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class WorkspaceSymbol(TypedDict):
     """
@@ -1480,22 +1654,25 @@ class WorkspaceSymbol(TypedDict):
 
     @since 3.17.0
     """
+
     location: Location | LocationUriOnly
-    data: NotRequired['LSPAny']
+    data: NotRequired["LSPAny"]
     name: str
     kind: SymbolKind
-    tags: NotRequired[list['SymbolTag']]
+    tags: NotRequired[list["SymbolTag"]]
     containerName: NotRequired[str]
 
 class WorkspaceSymbolRegistrationOptions(TypedDict):
     """Registration options for a {@link WorkspaceSymbolRequest}."""
+
     resolveProvider: NotRequired[bool]
 
 class CodeLensParams(TypedDict):
     """The parameters of a {@link CodeLensRequest}."""
+
     textDocument: TextDocumentIdentifier
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class CodeLens(TypedDict):
     """
@@ -1505,55 +1682,64 @@ class CodeLens(TypedDict):
     A code lens is _unresolved_ when no command is associated to it. For performance
     reasons the creation of a code lens and resolving should be done in two stages.
     """
+
     range: Range
-    command: NotRequired['Command']
-    data: NotRequired['LSPAny']
+    command: NotRequired["Command"]
+    data: NotRequired["LSPAny"]
 
 class CodeLensRegistrationOptions(TypedDict):
     """Registration options for a {@link CodeLensRequest}."""
+
     documentSelector: DocumentSelector | None
     resolveProvider: NotRequired[bool]
 
 class DocumentLinkParams(TypedDict):
     """The parameters of a {@link DocumentLinkRequest}."""
+
     textDocument: TextDocumentIdentifier
-    workDoneToken: NotRequired['ProgressToken']
-    partialResultToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class DocumentLink(TypedDict):
     """
     A document link is a range in a text document that links to an internal or external resource, like another
     text document or a web site.
     """
+
     range: Range
     target: NotRequired[URI]
     tooltip: NotRequired[str]
-    data: NotRequired['LSPAny']
+    data: NotRequired["LSPAny"]
 
 class DocumentLinkRegistrationOptions(TypedDict):
     """Registration options for a {@link DocumentLinkRequest}."""
+
     documentSelector: DocumentSelector | None
     resolveProvider: NotRequired[bool]
 
 class DocumentFormattingParams(TypedDict):
     """The parameters of a {@link DocumentFormattingRequest}."""
+
     textDocument: TextDocumentIdentifier
     options: FormattingOptions
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class DocumentFormattingRegistrationOptions(TypedDict):
     """Registration options for a {@link DocumentFormattingRequest}."""
+
     documentSelector: DocumentSelector | None
 
 class DocumentRangeFormattingParams(TypedDict):
     """The parameters of a {@link DocumentRangeFormattingRequest}."""
+
     textDocument: TextDocumentIdentifier
     range: Range
     options: FormattingOptions
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class DocumentRangeFormattingRegistrationOptions(TypedDict):
     """Registration options for a {@link DocumentRangeFormattingRequest}."""
+
     documentSelector: DocumentSelector | None
     rangesSupport: NotRequired[bool]
 
@@ -1564,13 +1750,15 @@ class DocumentRangesFormattingParams(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     textDocument: TextDocumentIdentifier
-    ranges: list['Range']
+    ranges: list["Range"]
     options: FormattingOptions
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class DocumentOnTypeFormattingParams(TypedDict):
     """The parameters of a {@link DocumentOnTypeFormattingRequest}."""
+
     textDocument: TextDocumentIdentifier
     position: Position
     ch: str
@@ -1578,42 +1766,48 @@ class DocumentOnTypeFormattingParams(TypedDict):
 
 class DocumentOnTypeFormattingRegistrationOptions(TypedDict):
     """Registration options for a {@link DocumentOnTypeFormattingRequest}."""
+
     documentSelector: DocumentSelector | None
     firstTriggerCharacter: str
     moreTriggerCharacter: NotRequired[list[str]]
 
 class RenameParams(TypedDict):
     """The parameters of a {@link RenameRequest}."""
+
+    newName: str
     textDocument: TextDocumentIdentifier
     position: Position
-    newName: str
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class RenameRegistrationOptions(TypedDict):
     """Registration options for a {@link RenameRequest}."""
+
     documentSelector: DocumentSelector | None
     prepareProvider: NotRequired[bool]
 
 class PrepareRenameParams(TypedDict):
     textDocument: TextDocumentIdentifier
     position: Position
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class ExecuteCommandParams(TypedDict):
     """The parameters of a {@link ExecuteCommandRequest}."""
+
     command: str
-    arguments: NotRequired[list['LSPAny']]
-    workDoneToken: NotRequired['ProgressToken']
+    arguments: NotRequired[list["LSPAny"]]
+    workDoneToken: NotRequired["ProgressToken"]
 
 class ExecuteCommandRegistrationOptions(TypedDict):
     """Registration options for a {@link ExecuteCommandRequest}."""
+
     commands: list[str]
 
 class ApplyWorkspaceEditParams(TypedDict):
     """The parameters passed via an apply workspace edit request."""
+
     label: NotRequired[str]
     edit: WorkspaceEdit
-    metadata: NotRequired['WorkspaceEditMetadata']
+    metadata: NotRequired["WorkspaceEditMetadata"]
 
 class ApplyWorkspaceEditResult(TypedDict):
     """
@@ -1621,25 +1815,26 @@ class ApplyWorkspaceEditResult(TypedDict):
 
     @since 3.17 renamed from ApplyWorkspaceEditResponse
     """
+
     applied: bool
     failureReason: NotRequired[str]
     failedChange: NotRequired[Uint]
 
 class WorkDoneProgressBegin(TypedDict):
-    kind: Literal['begin']
+    kind: Literal["begin"]
     title: str
     cancellable: NotRequired[bool]
     message: NotRequired[str]
     percentage: NotRequired[Uint]
 
 class WorkDoneProgressReport(TypedDict):
-    kind: Literal['report']
+    kind: Literal["report"]
     cancellable: NotRequired[bool]
     message: NotRequired[str]
     percentage: NotRequired[Uint]
 
 class WorkDoneProgressEnd(TypedDict):
-    kind: Literal['end']
+    kind: Literal["end"]
     message: NotRequired[str]
 
 class SetTraceParams(TypedDict):
@@ -1661,21 +1856,23 @@ class TextDocumentPositionParams(TypedDict):
     A parameter literal used in requests to pass a text document and a position inside that
     document.
     """
+
     textDocument: TextDocumentIdentifier
     position: Position
 
 class WorkDoneProgressParams(TypedDict):
-    workDoneToken: NotRequired['ProgressToken']
+    workDoneToken: NotRequired["ProgressToken"]
 
 class PartialResultParams(TypedDict):
-    partialResultToken: NotRequired['ProgressToken']
+    partialResultToken: NotRequired["ProgressToken"]
 
 class LocationLink(TypedDict):
     """
     Represents the connection of two locations. Provides additional metadata over normal {@link Location locations},
     including an origin range.
     """
-    originSelectionRange: NotRequired['Range']
+
+    originSelectionRange: NotRequired["Range"]
     targetUri: DocumentUri
     targetRange: Range
     targetSelectionRange: Range
@@ -1694,6 +1891,7 @@ class Range(TypedDict):
     }
     ```
     """
+
     start: Position
     end: Position
 
@@ -1705,6 +1903,7 @@ class StaticRegistrationOptions(TypedDict):
     Static registration options to be returned in the initialize
     request.
     """
+
     id: NotRequired[str]
 
 class TypeDefinitionOptions(TypedDict):
@@ -1712,8 +1911,9 @@ class TypeDefinitionOptions(TypedDict):
 
 class WorkspaceFoldersChangeEvent(TypedDict):
     """The workspace folder change event."""
-    added: list['WorkspaceFolder']
-    removed: list['WorkspaceFolder']
+
+    added: list["WorkspaceFolder"]
+    removed: list["WorkspaceFolder"]
 
 class ConfigurationItem(TypedDict):
     scopeUri: NotRequired[URI]
@@ -1721,10 +1921,12 @@ class ConfigurationItem(TypedDict):
 
 class TextDocumentIdentifier(TypedDict):
     """A literal to identify a text document in the client."""
+
     uri: DocumentUri
 
 class Color(TypedDict):
     """Represents a color in RGBA space."""
+
     red: float
     green: float
     blue: float
@@ -1769,6 +1971,7 @@ class Position(TypedDict):
 
     @since 3.17.0 - support for negotiated position encoding.
     """
+
     line: Uint
     character: Uint
 
@@ -1781,10 +1984,12 @@ class CallHierarchyOptions(TypedDict):
 
     @since 3.16.0
     """
+
     workDoneProgress: NotRequired[bool]
 
 class SemanticTokensOptions(TypedDict):
     """@since 3.16.0"""
+
     legend: SemanticTokensLegend
     range: NotRequired[bool | dict[str, LSPAny]]
     full: NotRequired[bool | SemanticTokensFullDelta]
@@ -1792,6 +1997,7 @@ class SemanticTokensOptions(TypedDict):
 
 class SemanticTokensEdit(TypedDict):
     """@since 3.16.0"""
+
     start: Uint
     deleteCount: Uint
     data: NotRequired[list[Uint]]
@@ -1805,6 +2011,7 @@ class FileCreate(TypedDict):
 
     @since 3.16.0
     """
+
     uri: str
 
 class TextDocumentEdit(TypedDict):
@@ -1814,30 +2021,34 @@ class TextDocumentEdit(TypedDict):
     So the creator of a TextDocumentEdit doesn't need to sort the array of edits or do any
     kind of ordering. However the edits must be non overlapping.
     """
+
     textDocument: OptionalVersionedTextDocumentIdentifier
     edits: list[TextEdit | AnnotatedTextEdit | SnippetTextEdit]
 
 class CreateFile(TypedDict):
     """Create file operation."""
-    kind: Literal['create']
+
+    kind: Literal["create"]
     uri: DocumentUri
-    options: NotRequired['CreateFileOptions']
-    annotationId: NotRequired['ChangeAnnotationIdentifier']
+    options: NotRequired["CreateFileOptions"]
+    annotationId: NotRequired["ChangeAnnotationIdentifier"]
 
 class RenameFile(TypedDict):
     """Rename file operation"""
-    kind: Literal['rename']
+
+    kind: Literal["rename"]
     oldUri: DocumentUri
     newUri: DocumentUri
-    options: NotRequired['RenameFileOptions']
-    annotationId: NotRequired['ChangeAnnotationIdentifier']
+    options: NotRequired["RenameFileOptions"]
+    annotationId: NotRequired["ChangeAnnotationIdentifier"]
 
 class DeleteFile(TypedDict):
     """Delete file operation"""
-    kind: Literal['delete']
+
+    kind: Literal["delete"]
     uri: DocumentUri
-    options: NotRequired['DeleteFileOptions']
-    annotationId: NotRequired['ChangeAnnotationIdentifier']
+    options: NotRequired["DeleteFileOptions"]
+    annotationId: NotRequired["ChangeAnnotationIdentifier"]
 
 class ChangeAnnotation(TypedDict):
     """
@@ -1845,6 +2056,7 @@ class ChangeAnnotation(TypedDict):
 
     @since 3.16.0
     """
+
     label: str
     needsConfirmation: NotRequired[bool]
     description: NotRequired[str]
@@ -1856,6 +2068,7 @@ class FileOperationFilter(TypedDict):
 
     @since 3.16.0
     """
+
     scheme: NotRequired[str]
     pattern: FileOperationPattern
 
@@ -1865,6 +2078,7 @@ class FileRename(TypedDict):
 
     @since 3.16.0
     """
+
     oldUri: str
     newUri: str
 
@@ -1874,6 +2088,7 @@ class FileDelete(TypedDict):
 
     @since 3.16.0
     """
+
     uri: str
 
 class MonikerOptions(TypedDict):
@@ -1885,10 +2100,12 @@ class TypeHierarchyOptions(TypedDict):
 
     @since 3.17.0
     """
+
     workDoneProgress: NotRequired[bool]
 
 class InlineValueContext(TypedDict):
     """@since 3.17.0"""
+
     frameId: int
     stoppedLocation: Range
 
@@ -1898,6 +2115,7 @@ class InlineValueText(TypedDict):
 
     @since 3.17.0
     """
+
     range: Range
     text: str
 
@@ -1909,6 +2127,7 @@ class InlineValueVariableLookup(TypedDict):
 
     @since 3.17.0
     """
+
     range: Range
     variableName: NotRequired[str]
     caseSensitiveLookup: bool
@@ -1921,6 +2140,7 @@ class InlineValueEvaluatableExpression(TypedDict):
 
     @since 3.17.0
     """
+
     range: Range
     expression: NotRequired[str]
 
@@ -1930,6 +2150,7 @@ class InlineValueOptions(TypedDict):
 
     @since 3.17.0
     """
+
     workDoneProgress: NotRequired[bool]
 
 class InlayHintLabelPart(TypedDict):
@@ -1939,10 +2160,11 @@ class InlayHintLabelPart(TypedDict):
 
     @since 3.17.0
     """
+
     value: str
     tooltip: NotRequired[str | MarkupContent]
-    location: NotRequired['Location']
-    command: NotRequired['Command']
+    location: NotRequired["Location"]
+    command: NotRequired["Command"]
 
 class MarkupContent(TypedDict):
     """
@@ -1969,6 +2191,7 @@ class MarkupContent(TypedDict):
     *Please Note* that clients might sanitize the return markdown. A client could decide to
     remove HTML from the markdown to avoid script execution.
     """
+
     kind: MarkupKind
     value: str
 
@@ -1978,6 +2201,7 @@ class InlayHintOptions(TypedDict):
 
     @since 3.17.0
     """
+
     resolveProvider: NotRequired[bool]
     workDoneProgress: NotRequired[bool]
 
@@ -1987,10 +2211,16 @@ class RelatedFullDocumentDiagnosticReport(TypedDict):
 
     @since 3.17.0
     """
-    relatedDocuments: NotRequired[dict[DocumentUri, FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport]]
-    kind: Literal['full']
+
+    relatedDocuments: NotRequired[
+        dict[
+            DocumentUri,
+            FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport,
+        ]
+    ]
+    kind: Literal["full"]
     resultId: NotRequired[str]
-    items: list['Diagnostic']
+    items: list["Diagnostic"]
 
 class RelatedUnchangedDocumentDiagnosticReport(TypedDict):
     """
@@ -1998,8 +2228,14 @@ class RelatedUnchangedDocumentDiagnosticReport(TypedDict):
 
     @since 3.17.0
     """
-    relatedDocuments: NotRequired[dict[DocumentUri, FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport]]
-    kind: Literal['unchanged']
+
+    relatedDocuments: NotRequired[
+        dict[
+            DocumentUri,
+            FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport,
+        ]
+    ]
+    kind: Literal["unchanged"]
     resultId: str
 
 class FullDocumentDiagnosticReport(TypedDict):
@@ -2008,9 +2244,10 @@ class FullDocumentDiagnosticReport(TypedDict):
 
     @since 3.17.0
     """
-    kind: Literal['full']
+
+    kind: Literal["full"]
     resultId: NotRequired[str]
-    items: list['Diagnostic']
+    items: list["Diagnostic"]
 
 class UnchangedDocumentDiagnosticReport(TypedDict):
     """
@@ -2019,7 +2256,8 @@ class UnchangedDocumentDiagnosticReport(TypedDict):
 
     @since 3.17.0
     """
-    kind: Literal['unchanged']
+
+    kind: Literal["unchanged"]
     resultId: str
 
 class DiagnosticOptions(TypedDict):
@@ -2028,6 +2266,7 @@ class DiagnosticOptions(TypedDict):
 
     @since 3.17.0
     """
+
     identifier: NotRequired[str]
     interFileDependencies: bool
     workspaceDiagnostics: bool
@@ -2039,6 +2278,7 @@ class PreviousResultId(TypedDict):
 
     @since 3.17.0
     """
+
     uri: DocumentUri
     value: str
 
@@ -2048,19 +2288,21 @@ class NotebookDocument(TypedDict):
 
     @since 3.17.0
     """
+
     uri: URI
     notebookType: str
     version: int
-    metadata: NotRequired['LSPObject']
-    cells: list['NotebookCell']
+    metadata: NotRequired["LSPObject"]
+    cells: list["NotebookCell"]
 
 class TextDocumentItem(TypedDict):
     """
     An item to transfer a text document from the client to the
     server.
     """
+
     uri: DocumentUri
-    languageId: LanguageKind
+    languageId: str | LanguageKind
     version: int
     text: str
 
@@ -2080,7 +2322,10 @@ class NotebookDocumentSyncOptions(TypedDict):
 
     @since 3.17.0
     """
-    notebookSelector: list[NotebookDocumentFilterWithNotebook | NotebookDocumentFilterWithCells]
+
+    notebookSelector: list[
+        NotebookDocumentFilterWithNotebook | NotebookDocumentFilterWithCells
+    ]
     save: NotRequired[bool]
 
 class VersionedNotebookDocumentIdentifier(TypedDict):
@@ -2089,6 +2334,7 @@ class VersionedNotebookDocumentIdentifier(TypedDict):
 
     @since 3.17.0
     """
+
     version: int
     uri: URI
 
@@ -2098,8 +2344,9 @@ class NotebookDocumentChangeEvent(TypedDict):
 
     @since 3.17.0
     """
-    metadata: NotRequired['LSPObject']
-    cells: NotRequired['NotebookDocumentCellChanges']
+
+    metadata: NotRequired["LSPObject"]
+    cells: NotRequired["NotebookDocumentCellChanges"]
 
 class NotebookDocumentIdentifier(TypedDict):
     """
@@ -2107,6 +2354,7 @@ class NotebookDocumentIdentifier(TypedDict):
 
     @since 3.17.0
     """
+
     uri: URI
 
 class InlineCompletionContext(TypedDict):
@@ -2116,8 +2364,9 @@ class InlineCompletionContext(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     triggerKind: InlineCompletionTriggerKind
-    selectedCompletionInfo: NotRequired['SelectedCompletionInfo']
+    selectedCompletionInfo: NotRequired["SelectedCompletionInfo"]
 
 class StringValue(TypedDict):
     """
@@ -2132,7 +2381,8 @@ class StringValue(TypedDict):
     @since 3.18.0
     @proposed
     """
-    kind: Literal['snippet']
+
+    kind: Literal["snippet"]
     value: str
 
 class InlineCompletionOptions(TypedDict):
@@ -2142,6 +2392,7 @@ class InlineCompletionOptions(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     workDoneProgress: NotRequired[bool]
 
 class TextDocumentContentOptions(TypedDict):
@@ -2151,63 +2402,93 @@ class TextDocumentContentOptions(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     schemes: list[str]
 
 class Registration(TypedDict):
     """General parameters to register for a notification or to register a provider."""
+
     id: str
     method: str
-    registerOptions: NotRequired['LSPAny']
+    registerOptions: NotRequired["LSPAny"]
 
 class Unregistration(TypedDict):
     """General parameters to unregister a request or notification."""
+
     id: str
     method: str
 
 class WorkspaceFoldersInitializeParams(TypedDict):
-    workspaceFolders: NotRequired[list['WorkspaceFolder'] | None]
+    workspaceFolders: NotRequired[list["WorkspaceFolder"] | None]
 
 class ServerCapabilities(TypedDict):
     """
     Defines the capabilities provided by a language
     server.
     """
-    positionEncoding: NotRequired['PositionEncodingKind']
+
+    positionEncoding: NotRequired[str | PositionEncodingKind]
     textDocumentSync: NotRequired[TextDocumentSyncOptions | TextDocumentSyncKind]
-    notebookDocumentSync: NotRequired[NotebookDocumentSyncOptions | NotebookDocumentSyncRegistrationOptions]
-    completionProvider: NotRequired['CompletionOptions']
+    notebookDocumentSync: NotRequired[
+        NotebookDocumentSyncOptions | NotebookDocumentSyncRegistrationOptions
+    ]
+    completionProvider: NotRequired["CompletionOptions"]
     hoverProvider: NotRequired[bool | HoverOptions]
-    signatureHelpProvider: NotRequired['SignatureHelpOptions']
-    declarationProvider: NotRequired[bool | DeclarationOptions | DeclarationRegistrationOptions]
+    signatureHelpProvider: NotRequired["SignatureHelpOptions"]
+    declarationProvider: NotRequired[
+        bool | DeclarationOptions | DeclarationRegistrationOptions
+    ]
     definitionProvider: NotRequired[bool | DefinitionOptions]
-    typeDefinitionProvider: NotRequired[bool | TypeDefinitionOptions | TypeDefinitionRegistrationOptions]
-    implementationProvider: NotRequired[bool | ImplementationOptions | ImplementationRegistrationOptions]
+    typeDefinitionProvider: NotRequired[
+        bool | TypeDefinitionOptions | TypeDefinitionRegistrationOptions
+    ]
+    implementationProvider: NotRequired[
+        bool | ImplementationOptions | ImplementationRegistrationOptions
+    ]
     referencesProvider: NotRequired[bool | ReferenceOptions]
     documentHighlightProvider: NotRequired[bool | DocumentHighlightOptions]
     documentSymbolProvider: NotRequired[bool | DocumentSymbolOptions]
     codeActionProvider: NotRequired[bool | CodeActionOptions]
-    codeLensProvider: NotRequired['CodeLensOptions']
-    documentLinkProvider: NotRequired['DocumentLinkOptions']
-    colorProvider: NotRequired[bool | DocumentColorOptions | DocumentColorRegistrationOptions]
+    codeLensProvider: NotRequired["CodeLensOptions"]
+    documentLinkProvider: NotRequired["DocumentLinkOptions"]
+    colorProvider: NotRequired[
+        bool | DocumentColorOptions | DocumentColorRegistrationOptions
+    ]
     workspaceSymbolProvider: NotRequired[bool | WorkspaceSymbolOptions]
     documentFormattingProvider: NotRequired[bool | DocumentFormattingOptions]
     documentRangeFormattingProvider: NotRequired[bool | DocumentRangeFormattingOptions]
-    documentOnTypeFormattingProvider: NotRequired['DocumentOnTypeFormattingOptions']
+    documentOnTypeFormattingProvider: NotRequired["DocumentOnTypeFormattingOptions"]
     renameProvider: NotRequired[bool | RenameOptions]
-    foldingRangeProvider: NotRequired[bool | FoldingRangeOptions | FoldingRangeRegistrationOptions]
-    selectionRangeProvider: NotRequired[bool | SelectionRangeOptions | SelectionRangeRegistrationOptions]
-    executeCommandProvider: NotRequired['ExecuteCommandOptions']
-    callHierarchyProvider: NotRequired[bool | CallHierarchyOptions | CallHierarchyRegistrationOptions]
-    linkedEditingRangeProvider: NotRequired[bool | LinkedEditingRangeOptions | LinkedEditingRangeRegistrationOptions]
-    semanticTokensProvider: NotRequired[SemanticTokensOptions | SemanticTokensRegistrationOptions]
+    foldingRangeProvider: NotRequired[
+        bool | FoldingRangeOptions | FoldingRangeRegistrationOptions
+    ]
+    selectionRangeProvider: NotRequired[
+        bool | SelectionRangeOptions | SelectionRangeRegistrationOptions
+    ]
+    executeCommandProvider: NotRequired["ExecuteCommandOptions"]
+    callHierarchyProvider: NotRequired[
+        bool | CallHierarchyOptions | CallHierarchyRegistrationOptions
+    ]
+    linkedEditingRangeProvider: NotRequired[
+        bool | LinkedEditingRangeOptions | LinkedEditingRangeRegistrationOptions
+    ]
+    semanticTokensProvider: NotRequired[
+        SemanticTokensOptions | SemanticTokensRegistrationOptions
+    ]
     monikerProvider: NotRequired[bool | MonikerOptions | MonikerRegistrationOptions]
-    typeHierarchyProvider: NotRequired[bool | TypeHierarchyOptions | TypeHierarchyRegistrationOptions]
-    inlineValueProvider: NotRequired[bool | InlineValueOptions | InlineValueRegistrationOptions]
-    inlayHintProvider: NotRequired[bool | InlayHintOptions | InlayHintRegistrationOptions]
+    typeHierarchyProvider: NotRequired[
+        bool | TypeHierarchyOptions | TypeHierarchyRegistrationOptions
+    ]
+    inlineValueProvider: NotRequired[
+        bool | InlineValueOptions | InlineValueRegistrationOptions
+    ]
+    inlayHintProvider: NotRequired[
+        bool | InlayHintOptions | InlayHintRegistrationOptions
+    ]
     diagnosticProvider: NotRequired[DiagnosticOptions | DiagnosticRegistrationOptions]
     inlineCompletionProvider: NotRequired[bool | InlineCompletionOptions]
-    workspace: NotRequired['WorkspaceOptions']
-    experimental: NotRequired['LSPAny']
+    workspace: NotRequired["WorkspaceOptions"]
+    experimental: NotRequired["LSPAny"]
 
 class ServerInfo(TypedDict):
     """
@@ -2216,44 +2497,50 @@ class ServerInfo(TypedDict):
     @since 3.15.0
     @since 3.18.0 ServerInfo type name added.
     """
+
     name: str
     version: NotRequired[str]
 
 class VersionedTextDocumentIdentifier(TypedDict):
     """A text document identifier to denote a specific version of a text document."""
+
     version: int
     uri: DocumentUri
 
 class SaveOptions(TypedDict):
     """Save options."""
+
     includeText: NotRequired[bool]
 
 class FileEvent(TypedDict):
     """An event describing a file change."""
+
     uri: DocumentUri
     type: FileChangeType
 
 class FileSystemWatcher(TypedDict):
     globPattern: GlobPattern
-    kind: NotRequired['WatchKind']
+    kind: NotRequired["WatchKind"]
 
 class Diagnostic(TypedDict):
     """
     Represents a diagnostic, such as a compiler error or warning. Diagnostic objects
     are only valid in the scope of a resource.
     """
+
     range: Range
-    severity: NotRequired['DiagnosticSeverity']
+    severity: NotRequired["DiagnosticSeverity"]
     code: NotRequired[int | str]
-    codeDescription: NotRequired['CodeDescription']
+    codeDescription: NotRequired["CodeDescription"]
     source: NotRequired[str]
-    message: str
-    tags: NotRequired[list['DiagnosticTag']]
-    relatedInformation: NotRequired[list['DiagnosticRelatedInformation']]
-    data: NotRequired['LSPAny']
+    message: str | MarkupContent
+    tags: NotRequired[list["DiagnosticTag"]]
+    relatedInformation: NotRequired[list["DiagnosticRelatedInformation"]]
+    data: NotRequired["LSPAny"]
 
 class CompletionContext(TypedDict):
     """Contains additional information about the context in which a completion request is triggered."""
+
     triggerKind: CompletionTriggerKind
     triggerCharacter: NotRequired[str]
 
@@ -2263,6 +2550,7 @@ class CompletionItemLabelDetails(TypedDict):
 
     @since 3.17.0
     """
+
     detail: NotRequired[str]
     description: NotRequired[str]
 
@@ -2272,6 +2560,7 @@ class InsertReplaceEdit(TypedDict):
 
     @since 3.16.0
     """
+
     newText: str
     insert: Range
     replace: Range
@@ -2294,11 +2583,12 @@ class CompletionItemDefaults(TypedDict):
 
     @since 3.17.0
     """
+
     commitCharacters: NotRequired[list[str]]
     editRange: NotRequired[Range | EditRangeWithInsertReplace]
-    insertTextFormat: NotRequired['InsertTextFormat']
-    insertTextMode: NotRequired['InsertTextMode']
-    data: NotRequired['LSPAny']
+    insertTextFormat: NotRequired["InsertTextFormat"]
+    insertTextMode: NotRequired["InsertTextMode"]
+    data: NotRequired["LSPAny"]
 
 class CompletionItemApplyKinds(TypedDict):
     """
@@ -2320,19 +2610,22 @@ class CompletionItemApplyKinds(TypedDict):
 
     @since 3.18.0
     """
-    commitCharacters: NotRequired['ApplyKind']
-    data: NotRequired['ApplyKind']
+
+    commitCharacters: NotRequired["ApplyKind"]
+    data: NotRequired["ApplyKind"]
 
 class CompletionOptions(TypedDict):
     """Completion options."""
+
     triggerCharacters: NotRequired[list[str]]
     allCommitCharacters: NotRequired[list[str]]
     resolveProvider: NotRequired[bool]
-    completionItem: NotRequired['ServerCompletionItemOptions']
+    completionItem: NotRequired["ServerCompletionItemOptions"]
     workDoneProgress: NotRequired[bool]
 
 class HoverOptions(TypedDict):
     """Hover options."""
+
     workDoneProgress: NotRequired[bool]
 
 class SignatureHelpContext(TypedDict):
@@ -2341,10 +2634,11 @@ class SignatureHelpContext(TypedDict):
 
     @since 3.15.0
     """
+
     triggerKind: SignatureHelpTriggerKind
     triggerCharacter: NotRequired[str]
     isRetrigger: bool
-    activeSignatureHelp: NotRequired['SignatureHelp']
+    activeSignatureHelp: NotRequired["SignatureHelp"]
 
 class SignatureInformation(TypedDict):
     """
@@ -2352,19 +2646,22 @@ class SignatureInformation(TypedDict):
     can have a label, like a function-name, a doc-comment, and
     a set of parameters.
     """
+
     label: str
     documentation: NotRequired[str | MarkupContent]
-    parameters: NotRequired[list['ParameterInformation']]
+    parameters: NotRequired[list["ParameterInformation"]]
     activeParameter: NotRequired[Uint | None]
 
 class SignatureHelpOptions(TypedDict):
     """Server Capabilities for a {@link SignatureHelpRequest}."""
+
     triggerCharacters: NotRequired[list[str]]
     retriggerCharacters: NotRequired[list[str]]
     workDoneProgress: NotRequired[bool]
 
 class DefinitionOptions(TypedDict):
     """Server Capabilities for a {@link DefinitionRequest}."""
+
     workDoneProgress: NotRequired[bool]
 
 class ReferenceContext(TypedDict):
@@ -2372,25 +2669,30 @@ class ReferenceContext(TypedDict):
     Value-object that contains additional information when
     requesting references.
     """
+
     includeDeclaration: bool
 
 class ReferenceOptions(TypedDict):
     """Reference options."""
+
     workDoneProgress: NotRequired[bool]
 
 class DocumentHighlightOptions(TypedDict):
     """Provider options for a {@link DocumentHighlightRequest}."""
+
     workDoneProgress: NotRequired[bool]
 
 class BaseSymbolInformation(TypedDict):
     """A base for all symbol information."""
+
     name: str
     kind: SymbolKind
-    tags: NotRequired[list['SymbolTag']]
+    tags: NotRequired[list["SymbolTag"]]
     containerName: NotRequired[str]
 
 class DocumentSymbolOptions(TypedDict):
     """Provider options for a {@link DocumentSymbolRequest}."""
+
     label: NotRequired[str]
     workDoneProgress: NotRequired[bool]
 
@@ -2399,9 +2701,10 @@ class CodeActionContext(TypedDict):
     Contains additional diagnostic information about the context in which
     a {@link CodeActionProvider.provideCodeActions code action} is run.
     """
-    diagnostics: list['Diagnostic']
-    only: NotRequired[list['CodeActionKind']]
-    triggerKind: NotRequired['CodeActionTriggerKind']
+
+    diagnostics: list["Diagnostic"]
+    only: NotRequired[list[str | CodeActionKind]]
+    triggerKind: NotRequired["CodeActionTriggerKind"]
 
 class CodeActionDisabled(TypedDict):
     """
@@ -2409,12 +2712,14 @@ class CodeActionDisabled(TypedDict):
 
     @since 3.18.0
     """
+
     reason: str
 
 class CodeActionOptions(TypedDict):
     """Provider options for a {@link CodeActionRequest}."""
-    codeActionKinds: NotRequired[list['CodeActionKind']]
-    documentation: NotRequired[list['CodeActionKindDocumentation']]
+
+    codeActionKinds: NotRequired[list[str | CodeActionKind]]
+    documentation: NotRequired[list["CodeActionKindDocumentation"]]
     resolveProvider: NotRequired[bool]
     workDoneProgress: NotRequired[bool]
 
@@ -2424,25 +2729,30 @@ class LocationUriOnly(TypedDict):
 
     @since 3.18.0
     """
+
     uri: DocumentUri
 
 class WorkspaceSymbolOptions(TypedDict):
     """Server capabilities for a {@link WorkspaceSymbolRequest}."""
+
     resolveProvider: NotRequired[bool]
     workDoneProgress: NotRequired[bool]
 
 class CodeLensOptions(TypedDict):
     """Code Lens provider options of a {@link CodeLensRequest}."""
+
     resolveProvider: NotRequired[bool]
     workDoneProgress: NotRequired[bool]
 
 class DocumentLinkOptions(TypedDict):
     """Provider options for a {@link DocumentLinkRequest}."""
+
     resolveProvider: NotRequired[bool]
     workDoneProgress: NotRequired[bool]
 
 class FormattingOptions(TypedDict):
     """Value-object describing what options formatting should use."""
+
     tabSize: Uint
     insertSpaces: bool
     trimTrailingWhitespace: NotRequired[bool]
@@ -2451,34 +2761,41 @@ class FormattingOptions(TypedDict):
 
 class DocumentFormattingOptions(TypedDict):
     """Provider options for a {@link DocumentFormattingRequest}."""
+
     workDoneProgress: NotRequired[bool]
 
 class DocumentRangeFormattingOptions(TypedDict):
     """Provider options for a {@link DocumentRangeFormattingRequest}."""
+
     rangesSupport: NotRequired[bool]
     workDoneProgress: NotRequired[bool]
 
 class DocumentOnTypeFormattingOptions(TypedDict):
     """Provider options for a {@link DocumentOnTypeFormattingRequest}."""
+
     firstTriggerCharacter: str
     moreTriggerCharacter: NotRequired[list[str]]
 
 class RenameOptions(TypedDict):
     """Provider options for a {@link RenameRequest}."""
+
     prepareProvider: NotRequired[bool]
     workDoneProgress: NotRequired[bool]
 
 class PrepareRenamePlaceholder(TypedDict):
     """@since 3.18.0"""
+
     range: Range
     placeholder: str
 
 class PrepareRenameDefaultBehavior(TypedDict):
     """@since 3.18.0"""
+
     defaultBehavior: bool
 
 class ExecuteCommandOptions(TypedDict):
     """The server capabilities of a {@link ExecuteCommandRequest}."""
+
     commands: list[str]
     workDoneProgress: NotRequired[bool]
 
@@ -2489,10 +2806,12 @@ class WorkspaceEditMetadata(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     isRefactoring: NotRequired[bool]
 
 class SemanticTokensLegend(TypedDict):
     """@since 3.16.0"""
+
     tokenTypes: list[str]
     tokenModifiers: list[str]
 
@@ -2502,10 +2821,12 @@ class SemanticTokensFullDelta(TypedDict):
 
     @since 3.18.0
     """
+
     delta: NotRequired[bool]
 
 class OptionalVersionedTextDocumentIdentifier(TypedDict):
     """A text document identifier to optionally denote a specific version of a text document."""
+
     version: int | None
     uri: DocumentUri
 
@@ -2515,6 +2836,7 @@ class AnnotatedTextEdit(TypedDict):
 
     @since 3.16.0.
     """
+
     annotationId: ChangeAnnotationIdentifier
     range: Range
     newText: str
@@ -2526,27 +2848,32 @@ class SnippetTextEdit(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     range: Range
     snippet: StringValue
-    annotationId: NotRequired['ChangeAnnotationIdentifier']
+    annotationId: NotRequired["ChangeAnnotationIdentifier"]
 
 class ResourceOperation(TypedDict):
     """A generic resource operation."""
+
     kind: str
-    annotationId: NotRequired['ChangeAnnotationIdentifier']
+    annotationId: NotRequired["ChangeAnnotationIdentifier"]
 
 class CreateFileOptions(TypedDict):
     """Options to create a file."""
+
     overwrite: NotRequired[bool]
     ignoreIfExists: NotRequired[bool]
 
 class RenameFileOptions(TypedDict):
     """Rename file options"""
+
     overwrite: NotRequired[bool]
     ignoreIfExists: NotRequired[bool]
 
 class DeleteFileOptions(TypedDict):
     """Delete file options"""
+
     recursive: NotRequired[bool]
     ignoreIfNotExists: NotRequired[bool]
 
@@ -2557,9 +2884,10 @@ class FileOperationPattern(TypedDict):
 
     @since 3.16.0
     """
+
     glob: str
-    matches: NotRequired['FileOperationPatternKind']
-    options: NotRequired['FileOperationPatternOptions']
+    matches: NotRequired["FileOperationPatternKind"]
+    options: NotRequired["FileOperationPatternOptions"]
 
 class WorkspaceFullDocumentDiagnosticReport(TypedDict):
     """
@@ -2567,11 +2895,12 @@ class WorkspaceFullDocumentDiagnosticReport(TypedDict):
 
     @since 3.17.0
     """
+
     uri: DocumentUri
     version: int | None
-    kind: Literal['full']
+    kind: Literal["full"]
     resultId: NotRequired[str]
-    items: list['Diagnostic']
+    items: list["Diagnostic"]
 
 class WorkspaceUnchangedDocumentDiagnosticReport(TypedDict):
     """
@@ -2579,9 +2908,10 @@ class WorkspaceUnchangedDocumentDiagnosticReport(TypedDict):
 
     @since 3.17.0
     """
+
     uri: DocumentUri
     version: int | None
-    kind: Literal['unchanged']
+    kind: Literal["unchanged"]
     resultId: str
 
 class NotebookCell(TypedDict):
@@ -2594,20 +2924,23 @@ class NotebookCell(TypedDict):
 
     @since 3.17.0
     """
+
     kind: NotebookCellKind
     document: DocumentUri
-    metadata: NotRequired['LSPObject']
-    executionSummary: NotRequired['ExecutionSummary']
+    metadata: NotRequired["LSPObject"]
+    executionSummary: NotRequired["ExecutionSummary"]
 
 class NotebookDocumentFilterWithNotebook(TypedDict):
     """@since 3.18.0"""
+
     notebook: str | NotebookDocumentFilter
-    cells: NotRequired[list['NotebookCellLanguage']]
+    cells: NotRequired[list["NotebookCellLanguage"]]
 
 class NotebookDocumentFilterWithCells(TypedDict):
     """@since 3.18.0"""
+
     notebook: NotRequired[str | NotebookDocumentFilter]
-    cells: list['NotebookCellLanguage']
+    cells: list["NotebookCellLanguage"]
 
 class NotebookDocumentCellChanges(TypedDict):
     """
@@ -2615,9 +2948,10 @@ class NotebookDocumentCellChanges(TypedDict):
 
     @since 3.18.0
     """
-    structure: NotRequired['NotebookDocumentCellChangeStructure']
-    data: NotRequired[list['NotebookCell']]
-    textContent: NotRequired[list['NotebookDocumentCellContentChanges']]
+
+    structure: NotRequired["NotebookDocumentCellChangeStructure"]
+    data: NotRequired[list["NotebookCell"]]
+    textContent: NotRequired[list["NotebookDocumentCellContentChanges"]]
 
 class SelectedCompletionInfo(TypedDict):
     """
@@ -2626,6 +2960,7 @@ class SelectedCompletionInfo(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     range: Range
     text: str
 
@@ -2636,21 +2971,23 @@ class ClientInfo(TypedDict):
     @since 3.15.0
     @since 3.18.0 ClientInfo type name added.
     """
+
     name: str
     version: NotRequired[str]
 
 class ClientCapabilities(TypedDict):
     """Defines the capabilities provided by the client."""
-    workspace: NotRequired['WorkspaceClientCapabilities']
-    textDocument: NotRequired['TextDocumentClientCapabilities']
-    notebookDocument: NotRequired['NotebookDocumentClientCapabilities']
-    window: NotRequired['WindowClientCapabilities']
-    general: NotRequired['GeneralClientCapabilities']
-    experimental: NotRequired['LSPAny']
+
+    workspace: NotRequired["WorkspaceClientCapabilities"]
+    textDocument: NotRequired["TextDocumentClientCapabilities"]
+    notebookDocument: NotRequired["NotebookDocumentClientCapabilities"]
+    window: NotRequired["WindowClientCapabilities"]
+    general: NotRequired["GeneralClientCapabilities"]
+    experimental: NotRequired["LSPAny"]
 
 class TextDocumentSyncOptions(TypedDict):
     openClose: NotRequired[bool]
-    change: NotRequired['TextDocumentSyncKind']
+    change: NotRequired["TextDocumentSyncKind"]
     willSave: NotRequired[bool]
     willSaveWaitUntil: NotRequired[bool]
     save: NotRequired[bool | SaveOptions]
@@ -2661,18 +2998,23 @@ class WorkspaceOptions(TypedDict):
 
     @since 3.18.0
     """
-    workspaceFolders: NotRequired['WorkspaceFoldersServerCapabilities']
-    fileOperations: NotRequired['FileOperationOptions']
-    textDocumentContent: NotRequired[TextDocumentContentOptions | TextDocumentContentRegistrationOptions]
+
+    workspaceFolders: NotRequired["WorkspaceFoldersServerCapabilities"]
+    fileOperations: NotRequired["FileOperationOptions"]
+    textDocumentContent: NotRequired[
+        TextDocumentContentOptions | TextDocumentContentRegistrationOptions
+    ]
 
 class TextDocumentContentChangePartial(TypedDict):
     """@since 3.18.0"""
+
     range: Range
     rangeLength: NotRequired[Uint]
     text: str
 
 class TextDocumentContentChangeWholeDocument(TypedDict):
     """@since 3.18.0"""
+
     text: str
 
 class CodeDescription(TypedDict):
@@ -2681,6 +3023,7 @@ class CodeDescription(TypedDict):
 
     @since 3.16.0
     """
+
     href: URI
 
 class DiagnosticRelatedInformation(TypedDict):
@@ -2689,6 +3032,7 @@ class DiagnosticRelatedInformation(TypedDict):
     used to point to code locations that cause or related to a diagnostics, e.g when duplicating
     a symbol in a scope.
     """
+
     location: Location
     message: str
 
@@ -2698,11 +3042,13 @@ class EditRangeWithInsertReplace(TypedDict):
 
     @since 3.18.0
     """
+
     insert: Range
     replace: Range
 
 class ServerCompletionItemOptions(TypedDict):
     """@since 3.18.0"""
+
     labelDetailsSupport: NotRequired[bool]
 
 class MarkedStringWithLanguage(TypedDict):
@@ -2710,6 +3056,7 @@ class MarkedStringWithLanguage(TypedDict):
     @since 3.18.0
     @deprecated use MarkupContent instead.
     """
+
     language: str
     value: str
 
@@ -2718,6 +3065,7 @@ class ParameterInformation(TypedDict):
     Represents a parameter of a callable-signature. A parameter can
     have a label and a doc-comment.
     """
+
     label: str | list[Uint]
     documentation: NotRequired[str | MarkupContent]
 
@@ -2728,7 +3076,8 @@ class CodeActionKindDocumentation(TypedDict):
     @since 3.18.0
     @proposed
     """
-    kind: CodeActionKind
+
+    kind: str | CodeActionKind
     command: Command
 
 class NotebookCellTextDocumentFilter(TypedDict):
@@ -2738,6 +3087,7 @@ class NotebookCellTextDocumentFilter(TypedDict):
 
     @since 3.17.0
     """
+
     notebook: str | NotebookDocumentFilter
     language: NotRequired[str]
 
@@ -2747,6 +3097,7 @@ class FileOperationPatternOptions(TypedDict):
 
     @since 3.16.0
     """
+
     ignoreCase: NotRequired[bool]
 
 class ExecutionSummary(TypedDict):
@@ -2755,6 +3106,7 @@ class ExecutionSummary(TypedDict):
 
 class NotebookCellLanguage(TypedDict):
     """@since 3.18.0"""
+
     language: str
 
 class NotebookDocumentCellChangeStructure(TypedDict):
@@ -2763,9 +3115,10 @@ class NotebookDocumentCellChangeStructure(TypedDict):
 
     @since 3.18.0
     """
+
     array: NotebookCellArrayChange
-    didOpen: NotRequired[list['TextDocumentItem']]
-    didClose: NotRequired[list['TextDocumentIdentifier']]
+    didOpen: NotRequired[list["TextDocumentItem"]]
+    didClose: NotRequired[list["TextDocumentIdentifier"]]
 
 class NotebookDocumentCellContentChanges(TypedDict):
     """
@@ -2773,62 +3126,65 @@ class NotebookDocumentCellContentChanges(TypedDict):
 
     @since 3.18.0
     """
+
     document: VersionedTextDocumentIdentifier
-    changes: list['TextDocumentContentChangeEvent']
+    changes: list["TextDocumentContentChangeEvent"]
 
 class WorkspaceClientCapabilities(TypedDict):
     """Workspace specific client capabilities."""
+
     applyEdit: NotRequired[bool]
-    workspaceEdit: NotRequired['WorkspaceEditClientCapabilities']
-    didChangeConfiguration: NotRequired['DidChangeConfigurationClientCapabilities']
-    didChangeWatchedFiles: NotRequired['DidChangeWatchedFilesClientCapabilities']
-    symbol: NotRequired['WorkspaceSymbolClientCapabilities']
-    executeCommand: NotRequired['ExecuteCommandClientCapabilities']
+    workspaceEdit: NotRequired["WorkspaceEditClientCapabilities"]
+    didChangeConfiguration: NotRequired["DidChangeConfigurationClientCapabilities"]
+    didChangeWatchedFiles: NotRequired["DidChangeWatchedFilesClientCapabilities"]
+    symbol: NotRequired["WorkspaceSymbolClientCapabilities"]
+    executeCommand: NotRequired["ExecuteCommandClientCapabilities"]
     workspaceFolders: NotRequired[bool]
     configuration: NotRequired[bool]
-    semanticTokens: NotRequired['SemanticTokensWorkspaceClientCapabilities']
-    codeLens: NotRequired['CodeLensWorkspaceClientCapabilities']
-    fileOperations: NotRequired['FileOperationClientCapabilities']
-    inlineValue: NotRequired['InlineValueWorkspaceClientCapabilities']
-    inlayHint: NotRequired['InlayHintWorkspaceClientCapabilities']
-    diagnostics: NotRequired['DiagnosticWorkspaceClientCapabilities']
-    foldingRange: NotRequired['FoldingRangeWorkspaceClientCapabilities']
-    textDocumentContent: NotRequired['TextDocumentContentClientCapabilities']
+    semanticTokens: NotRequired["SemanticTokensWorkspaceClientCapabilities"]
+    codeLens: NotRequired["CodeLensWorkspaceClientCapabilities"]
+    fileOperations: NotRequired["FileOperationClientCapabilities"]
+    inlineValue: NotRequired["InlineValueWorkspaceClientCapabilities"]
+    inlayHint: NotRequired["InlayHintWorkspaceClientCapabilities"]
+    diagnostics: NotRequired["DiagnosticWorkspaceClientCapabilities"]
+    foldingRange: NotRequired["FoldingRangeWorkspaceClientCapabilities"]
+    textDocumentContent: NotRequired["TextDocumentContentClientCapabilities"]
 
 class TextDocumentClientCapabilities(TypedDict):
     """Text document specific client capabilities."""
-    synchronization: NotRequired['TextDocumentSyncClientCapabilities']
-    filters: NotRequired['TextDocumentFilterClientCapabilities']
-    completion: NotRequired['CompletionClientCapabilities']
-    hover: NotRequired['HoverClientCapabilities']
-    signatureHelp: NotRequired['SignatureHelpClientCapabilities']
-    declaration: NotRequired['DeclarationClientCapabilities']
-    definition: NotRequired['DefinitionClientCapabilities']
-    typeDefinition: NotRequired['TypeDefinitionClientCapabilities']
-    implementation: NotRequired['ImplementationClientCapabilities']
-    references: NotRequired['ReferenceClientCapabilities']
-    documentHighlight: NotRequired['DocumentHighlightClientCapabilities']
-    documentSymbol: NotRequired['DocumentSymbolClientCapabilities']
-    codeAction: NotRequired['CodeActionClientCapabilities']
-    codeLens: NotRequired['CodeLensClientCapabilities']
-    documentLink: NotRequired['DocumentLinkClientCapabilities']
-    colorProvider: NotRequired['DocumentColorClientCapabilities']
-    formatting: NotRequired['DocumentFormattingClientCapabilities']
-    rangeFormatting: NotRequired['DocumentRangeFormattingClientCapabilities']
-    onTypeFormatting: NotRequired['DocumentOnTypeFormattingClientCapabilities']
-    rename: NotRequired['RenameClientCapabilities']
-    foldingRange: NotRequired['FoldingRangeClientCapabilities']
-    selectionRange: NotRequired['SelectionRangeClientCapabilities']
-    publishDiagnostics: NotRequired['PublishDiagnosticsClientCapabilities']
-    callHierarchy: NotRequired['CallHierarchyClientCapabilities']
-    semanticTokens: NotRequired['SemanticTokensClientCapabilities']
-    linkedEditingRange: NotRequired['LinkedEditingRangeClientCapabilities']
-    moniker: NotRequired['MonikerClientCapabilities']
-    typeHierarchy: NotRequired['TypeHierarchyClientCapabilities']
-    inlineValue: NotRequired['InlineValueClientCapabilities']
-    inlayHint: NotRequired['InlayHintClientCapabilities']
-    diagnostic: NotRequired['DiagnosticClientCapabilities']
-    inlineCompletion: NotRequired['InlineCompletionClientCapabilities']
+
+    synchronization: NotRequired["TextDocumentSyncClientCapabilities"]
+    filters: NotRequired["TextDocumentFilterClientCapabilities"]
+    completion: NotRequired["CompletionClientCapabilities"]
+    hover: NotRequired["HoverClientCapabilities"]
+    signatureHelp: NotRequired["SignatureHelpClientCapabilities"]
+    declaration: NotRequired["DeclarationClientCapabilities"]
+    definition: NotRequired["DefinitionClientCapabilities"]
+    typeDefinition: NotRequired["TypeDefinitionClientCapabilities"]
+    implementation: NotRequired["ImplementationClientCapabilities"]
+    references: NotRequired["ReferenceClientCapabilities"]
+    documentHighlight: NotRequired["DocumentHighlightClientCapabilities"]
+    documentSymbol: NotRequired["DocumentSymbolClientCapabilities"]
+    codeAction: NotRequired["CodeActionClientCapabilities"]
+    codeLens: NotRequired["CodeLensClientCapabilities"]
+    documentLink: NotRequired["DocumentLinkClientCapabilities"]
+    colorProvider: NotRequired["DocumentColorClientCapabilities"]
+    formatting: NotRequired["DocumentFormattingClientCapabilities"]
+    rangeFormatting: NotRequired["DocumentRangeFormattingClientCapabilities"]
+    onTypeFormatting: NotRequired["DocumentOnTypeFormattingClientCapabilities"]
+    rename: NotRequired["RenameClientCapabilities"]
+    foldingRange: NotRequired["FoldingRangeClientCapabilities"]
+    selectionRange: NotRequired["SelectionRangeClientCapabilities"]
+    publishDiagnostics: NotRequired["PublishDiagnosticsClientCapabilities"]
+    callHierarchy: NotRequired["CallHierarchyClientCapabilities"]
+    semanticTokens: NotRequired["SemanticTokensClientCapabilities"]
+    linkedEditingRange: NotRequired["LinkedEditingRangeClientCapabilities"]
+    moniker: NotRequired["MonikerClientCapabilities"]
+    typeHierarchy: NotRequired["TypeHierarchyClientCapabilities"]
+    inlineValue: NotRequired["InlineValueClientCapabilities"]
+    inlayHint: NotRequired["InlayHintClientCapabilities"]
+    diagnostic: NotRequired["DiagnosticClientCapabilities"]
+    inlineCompletion: NotRequired["InlineCompletionClientCapabilities"]
 
 class NotebookDocumentClientCapabilities(TypedDict):
     """
@@ -2836,12 +3192,13 @@ class NotebookDocumentClientCapabilities(TypedDict):
 
     @since 3.17.0
     """
+
     synchronization: NotebookDocumentSyncClientCapabilities
 
 class WindowClientCapabilities(TypedDict):
     workDoneProgress: NotRequired[bool]
-    showMessage: NotRequired['ShowMessageRequestClientCapabilities']
-    showDocument: NotRequired['ShowDocumentClientCapabilities']
+    showMessage: NotRequired["ShowMessageRequestClientCapabilities"]
+    showDocument: NotRequired["ShowDocumentClientCapabilities"]
 
 class GeneralClientCapabilities(TypedDict):
     """
@@ -2849,10 +3206,11 @@ class GeneralClientCapabilities(TypedDict):
 
     @since 3.16.0
     """
-    staleRequestSupport: NotRequired['StaleRequestSupportOptions']
-    regularExpressions: NotRequired['RegularExpressionsClientCapabilities']
-    markdown: NotRequired['MarkdownClientCapabilities']
-    positionEncodings: NotRequired[list['PositionEncodingKind']]
+
+    staleRequestSupport: NotRequired["StaleRequestSupportOptions"]
+    regularExpressions: NotRequired["RegularExpressionsClientCapabilities"]
+    markdown: NotRequired["MarkdownClientCapabilities"]
+    positionEncodings: NotRequired[list[str | PositionEncodingKind]]
 
 class WorkspaceFoldersServerCapabilities(TypedDict):
     supported: NotRequired[bool]
@@ -2864,12 +3222,13 @@ class FileOperationOptions(TypedDict):
 
     @since 3.16.0
     """
-    didCreate: NotRequired['FileOperationRegistrationOptions']
-    willCreate: NotRequired['FileOperationRegistrationOptions']
-    didRename: NotRequired['FileOperationRegistrationOptions']
-    willRename: NotRequired['FileOperationRegistrationOptions']
-    didDelete: NotRequired['FileOperationRegistrationOptions']
-    willDelete: NotRequired['FileOperationRegistrationOptions']
+
+    didCreate: NotRequired["FileOperationRegistrationOptions"]
+    willCreate: NotRequired["FileOperationRegistrationOptions"]
+    didRename: NotRequired["FileOperationRegistrationOptions"]
+    willRename: NotRequired["FileOperationRegistrationOptions"]
+    didDelete: NotRequired["FileOperationRegistrationOptions"]
+    willDelete: NotRequired["FileOperationRegistrationOptions"]
 
 class RelativePattern(TypedDict):
     """
@@ -2879,6 +3238,7 @@ class RelativePattern(TypedDict):
 
     @since 3.17.0
     """
+
     baseUri: WorkspaceFolder | URI
     pattern: Pattern
 
@@ -2888,9 +3248,10 @@ class TextDocumentFilterLanguage(TypedDict):
 
     @since 3.18.0
     """
+
     language: str
     scheme: NotRequired[str]
-    pattern: NotRequired['GlobPattern']
+    pattern: NotRequired["GlobPattern"]
 
 class TextDocumentFilterScheme(TypedDict):
     """
@@ -2898,9 +3259,10 @@ class TextDocumentFilterScheme(TypedDict):
 
     @since 3.18.0
     """
+
     language: NotRequired[str]
     scheme: str
-    pattern: NotRequired['GlobPattern']
+    pattern: NotRequired["GlobPattern"]
 
 class TextDocumentFilterPattern(TypedDict):
     """
@@ -2908,6 +3270,7 @@ class TextDocumentFilterPattern(TypedDict):
 
     @since 3.18.0
     """
+
     language: NotRequired[str]
     scheme: NotRequired[str]
     pattern: GlobPattern
@@ -2918,9 +3281,10 @@ class NotebookDocumentFilterNotebookType(TypedDict):
 
     @since 3.18.0
     """
+
     notebookType: str
     scheme: NotRequired[str]
-    pattern: NotRequired['GlobPattern']
+    pattern: NotRequired["GlobPattern"]
 
 class NotebookDocumentFilterScheme(TypedDict):
     """
@@ -2928,9 +3292,10 @@ class NotebookDocumentFilterScheme(TypedDict):
 
     @since 3.18.0
     """
+
     notebookType: NotRequired[str]
     scheme: str
-    pattern: NotRequired['GlobPattern']
+    pattern: NotRequired["GlobPattern"]
 
 class NotebookDocumentFilterPattern(TypedDict):
     """
@@ -2938,6 +3303,7 @@ class NotebookDocumentFilterPattern(TypedDict):
 
     @since 3.18.0
     """
+
     notebookType: NotRequired[str]
     scheme: NotRequired[str]
     pattern: GlobPattern
@@ -2949,16 +3315,17 @@ class NotebookCellArrayChange(TypedDict):
 
     @since 3.17.0
     """
+
     start: Uint
     deleteCount: Uint
-    cells: NotRequired[list['NotebookCell']]
+    cells: NotRequired[list["NotebookCell"]]
 
 class WorkspaceEditClientCapabilities(TypedDict):
     documentChanges: NotRequired[bool]
-    resourceOperations: NotRequired[list['ResourceOperationKind']]
-    failureHandling: NotRequired['FailureHandlingKind']
+    resourceOperations: NotRequired[list["ResourceOperationKind"]]
+    failureHandling: NotRequired["FailureHandlingKind"]
     normalizesLineEndings: NotRequired[bool]
-    changeAnnotationSupport: NotRequired['ChangeAnnotationsSupportOptions']
+    changeAnnotationSupport: NotRequired["ChangeAnnotationsSupportOptions"]
     metadataSupport: NotRequired[bool]
     snippetEditSupport: NotRequired[bool]
 
@@ -2971,21 +3338,25 @@ class DidChangeWatchedFilesClientCapabilities(TypedDict):
 
 class WorkspaceSymbolClientCapabilities(TypedDict):
     """Client capabilities for a {@link WorkspaceSymbolRequest}."""
+
     dynamicRegistration: NotRequired[bool]
-    symbolKind: NotRequired['ClientSymbolKindOptions']
-    tagSupport: NotRequired['ClientSymbolTagOptions']
-    resolveSupport: NotRequired['ClientSymbolResolveOptions']
+    symbolKind: NotRequired["ClientSymbolKindOptions"]
+    tagSupport: NotRequired["ClientSymbolTagOptions"]
+    resolveSupport: NotRequired["ClientSymbolResolveOptions"]
 
 class ExecuteCommandClientCapabilities(TypedDict):
     """The client capabilities of a {@link ExecuteCommandRequest}."""
+
     dynamicRegistration: NotRequired[bool]
 
 class SemanticTokensWorkspaceClientCapabilities(TypedDict):
     """@since 3.16.0"""
+
     refreshSupport: NotRequired[bool]
 
 class CodeLensWorkspaceClientCapabilities(TypedDict):
     """@since 3.16.0"""
+
     refreshSupport: NotRequired[bool]
 
 class FileOperationClientCapabilities(TypedDict):
@@ -2997,6 +3368,7 @@ class FileOperationClientCapabilities(TypedDict):
 
     @since 3.16.0
     """
+
     dynamicRegistration: NotRequired[bool]
     didCreate: NotRequired[bool]
     willCreate: NotRequired[bool]
@@ -3011,6 +3383,7 @@ class InlineValueWorkspaceClientCapabilities(TypedDict):
 
     @since 3.17.0
     """
+
     refreshSupport: NotRequired[bool]
 
 class InlayHintWorkspaceClientCapabilities(TypedDict):
@@ -3019,6 +3392,7 @@ class InlayHintWorkspaceClientCapabilities(TypedDict):
 
     @since 3.17.0
     """
+
     refreshSupport: NotRequired[bool]
 
 class DiagnosticWorkspaceClientCapabilities(TypedDict):
@@ -3027,6 +3401,7 @@ class DiagnosticWorkspaceClientCapabilities(TypedDict):
 
     @since 3.17.0
     """
+
     refreshSupport: NotRequired[bool]
 
 class FoldingRangeWorkspaceClientCapabilities(TypedDict):
@@ -3036,6 +3411,7 @@ class FoldingRangeWorkspaceClientCapabilities(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     refreshSupport: NotRequired[bool]
 
 class TextDocumentContentClientCapabilities(TypedDict):
@@ -3045,6 +3421,7 @@ class TextDocumentContentClientCapabilities(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     dynamicRegistration: NotRequired[bool]
 
 class TextDocumentSyncClientCapabilities(TypedDict):
@@ -3058,78 +3435,90 @@ class TextDocumentFilterClientCapabilities(TypedDict):
 
 class CompletionClientCapabilities(TypedDict):
     """Completion client capabilities"""
+
     dynamicRegistration: NotRequired[bool]
-    completionItem: NotRequired['ClientCompletionItemOptions']
-    completionItemKind: NotRequired['ClientCompletionItemOptionsKind']
-    insertTextMode: NotRequired['InsertTextMode']
+    completionItem: NotRequired["ClientCompletionItemOptions"]
+    completionItemKind: NotRequired["ClientCompletionItemOptionsKind"]
+    insertTextMode: NotRequired["InsertTextMode"]
     contextSupport: NotRequired[bool]
-    completionList: NotRequired['CompletionListCapabilities']
+    completionList: NotRequired["CompletionListCapabilities"]
 
 class HoverClientCapabilities(TypedDict):
     dynamicRegistration: NotRequired[bool]
-    contentFormat: NotRequired[list['MarkupKind']]
+    contentFormat: NotRequired[list["MarkupKind"]]
 
 class SignatureHelpClientCapabilities(TypedDict):
     """Client Capabilities for a {@link SignatureHelpRequest}."""
+
     dynamicRegistration: NotRequired[bool]
-    signatureInformation: NotRequired['ClientSignatureInformationOptions']
+    signatureInformation: NotRequired["ClientSignatureInformationOptions"]
     contextSupport: NotRequired[bool]
 
 class DeclarationClientCapabilities(TypedDict):
     """@since 3.14.0"""
+
     dynamicRegistration: NotRequired[bool]
     linkSupport: NotRequired[bool]
 
 class DefinitionClientCapabilities(TypedDict):
     """Client Capabilities for a {@link DefinitionRequest}."""
+
     dynamicRegistration: NotRequired[bool]
     linkSupport: NotRequired[bool]
 
 class TypeDefinitionClientCapabilities(TypedDict):
     """Since 3.6.0"""
+
     dynamicRegistration: NotRequired[bool]
     linkSupport: NotRequired[bool]
 
 class ImplementationClientCapabilities(TypedDict):
     """@since 3.6.0"""
+
     dynamicRegistration: NotRequired[bool]
     linkSupport: NotRequired[bool]
 
 class ReferenceClientCapabilities(TypedDict):
     """Client Capabilities for a {@link ReferencesRequest}."""
+
     dynamicRegistration: NotRequired[bool]
 
 class DocumentHighlightClientCapabilities(TypedDict):
     """Client Capabilities for a {@link DocumentHighlightRequest}."""
+
     dynamicRegistration: NotRequired[bool]
 
 class DocumentSymbolClientCapabilities(TypedDict):
     """Client Capabilities for a {@link DocumentSymbolRequest}."""
+
     dynamicRegistration: NotRequired[bool]
-    symbolKind: NotRequired['ClientSymbolKindOptions']
+    symbolKind: NotRequired["ClientSymbolKindOptions"]
     hierarchicalDocumentSymbolSupport: NotRequired[bool]
-    tagSupport: NotRequired['ClientSymbolTagOptions']
+    tagSupport: NotRequired["ClientSymbolTagOptions"]
     labelSupport: NotRequired[bool]
 
 class CodeActionClientCapabilities(TypedDict):
     """The Client Capabilities of a {@link CodeActionRequest}."""
+
     dynamicRegistration: NotRequired[bool]
-    codeActionLiteralSupport: NotRequired['ClientCodeActionLiteralOptions']
+    codeActionLiteralSupport: NotRequired["ClientCodeActionLiteralOptions"]
     isPreferredSupport: NotRequired[bool]
     disabledSupport: NotRequired[bool]
     dataSupport: NotRequired[bool]
-    resolveSupport: NotRequired['ClientCodeActionResolveOptions']
+    resolveSupport: NotRequired["ClientCodeActionResolveOptions"]
     honorsChangeAnnotations: NotRequired[bool]
     documentationSupport: NotRequired[bool]
-    tagSupport: NotRequired['CodeActionTagOptions']
+    tagSupport: NotRequired["CodeActionTagOptions"]
 
 class CodeLensClientCapabilities(TypedDict):
     """The client capabilities  of a {@link CodeLensRequest}."""
+
     dynamicRegistration: NotRequired[bool]
-    resolveSupport: NotRequired['ClientCodeLensResolveOptions']
+    resolveSupport: NotRequired["ClientCodeLensResolveOptions"]
 
 class DocumentLinkClientCapabilities(TypedDict):
     """The client capabilities of a {@link DocumentLinkRequest}."""
+
     dynamicRegistration: NotRequired[bool]
     tooltipSupport: NotRequired[bool]
 
@@ -3138,52 +3527,58 @@ class DocumentColorClientCapabilities(TypedDict):
 
 class DocumentFormattingClientCapabilities(TypedDict):
     """Client capabilities of a {@link DocumentFormattingRequest}."""
+
     dynamicRegistration: NotRequired[bool]
 
 class DocumentRangeFormattingClientCapabilities(TypedDict):
     """Client capabilities of a {@link DocumentRangeFormattingRequest}."""
+
     dynamicRegistration: NotRequired[bool]
     rangesSupport: NotRequired[bool]
 
 class DocumentOnTypeFormattingClientCapabilities(TypedDict):
     """Client capabilities of a {@link DocumentOnTypeFormattingRequest}."""
+
     dynamicRegistration: NotRequired[bool]
 
 class RenameClientCapabilities(TypedDict):
     dynamicRegistration: NotRequired[bool]
     prepareSupport: NotRequired[bool]
-    prepareSupportDefaultBehavior: NotRequired['PrepareSupportDefaultBehavior']
+    prepareSupportDefaultBehavior: NotRequired["PrepareSupportDefaultBehavior"]
     honorsChangeAnnotations: NotRequired[bool]
 
 class FoldingRangeClientCapabilities(TypedDict):
     dynamicRegistration: NotRequired[bool]
     rangeLimit: NotRequired[Uint]
     lineFoldingOnly: NotRequired[bool]
-    foldingRangeKind: NotRequired['ClientFoldingRangeKindOptions']
-    foldingRange: NotRequired['ClientFoldingRangeOptions']
+    foldingRangeKind: NotRequired["ClientFoldingRangeKindOptions"]
+    foldingRange: NotRequired["ClientFoldingRangeOptions"]
 
 class SelectionRangeClientCapabilities(TypedDict):
     dynamicRegistration: NotRequired[bool]
 
 class PublishDiagnosticsClientCapabilities(TypedDict):
     """The publish diagnostic client capabilities."""
+
     versionSupport: NotRequired[bool]
     relatedInformation: NotRequired[bool]
-    tagSupport: NotRequired['ClientDiagnosticsTagOptions']
+    tagSupport: NotRequired["ClientDiagnosticsTagOptions"]
     codeDescriptionSupport: NotRequired[bool]
     dataSupport: NotRequired[bool]
 
 class CallHierarchyClientCapabilities(TypedDict):
     """@since 3.16.0"""
+
     dynamicRegistration: NotRequired[bool]
 
 class SemanticTokensClientCapabilities(TypedDict):
     """@since 3.16.0"""
+
     dynamicRegistration: NotRequired[bool]
     requests: ClientSemanticTokensRequestOptions
     tokenTypes: list[str]
     tokenModifiers: list[str]
-    formats: list['TokenFormat']
+    formats: list["TokenFormat"]
     overlappingTokenSupport: NotRequired[bool]
     multilineTokenSupport: NotRequired[bool]
     serverCancelSupport: NotRequired[bool]
@@ -3195,6 +3590,7 @@ class LinkedEditingRangeClientCapabilities(TypedDict):
 
     @since 3.16.0
     """
+
     dynamicRegistration: NotRequired[bool]
 
 class MonikerClientCapabilities(TypedDict):
@@ -3203,10 +3599,12 @@ class MonikerClientCapabilities(TypedDict):
 
     @since 3.16.0
     """
+
     dynamicRegistration: NotRequired[bool]
 
 class TypeHierarchyClientCapabilities(TypedDict):
     """@since 3.17.0"""
+
     dynamicRegistration: NotRequired[bool]
 
 class InlineValueClientCapabilities(TypedDict):
@@ -3215,6 +3613,7 @@ class InlineValueClientCapabilities(TypedDict):
 
     @since 3.17.0
     """
+
     dynamicRegistration: NotRequired[bool]
 
 class InlayHintClientCapabilities(TypedDict):
@@ -3223,8 +3622,9 @@ class InlayHintClientCapabilities(TypedDict):
 
     @since 3.17.0
     """
+
     dynamicRegistration: NotRequired[bool]
-    resolveSupport: NotRequired['ClientInlayHintResolveOptions']
+    resolveSupport: NotRequired["ClientInlayHintResolveOptions"]
 
 class DiagnosticClientCapabilities(TypedDict):
     """
@@ -3232,11 +3632,13 @@ class DiagnosticClientCapabilities(TypedDict):
 
     @since 3.17.0
     """
+
     dynamicRegistration: NotRequired[bool]
     relatedDocumentSupport: NotRequired[bool]
     relatedInformation: NotRequired[bool]
-    tagSupport: NotRequired['ClientDiagnosticsTagOptions']
+    tagSupport: NotRequired["ClientDiagnosticsTagOptions"]
     codeDescriptionSupport: NotRequired[bool]
+    markupMessageSupport: NotRequired[bool]
     dataSupport: NotRequired[bool]
 
 class InlineCompletionClientCapabilities(TypedDict):
@@ -3246,6 +3648,7 @@ class InlineCompletionClientCapabilities(TypedDict):
     @since 3.18.0
     @proposed
     """
+
     dynamicRegistration: NotRequired[bool]
 
 class NotebookDocumentSyncClientCapabilities(TypedDict):
@@ -3254,12 +3657,14 @@ class NotebookDocumentSyncClientCapabilities(TypedDict):
 
     @since 3.17.0
     """
+
     dynamicRegistration: NotRequired[bool]
     executionSummarySupport: NotRequired[bool]
 
 class ShowMessageRequestClientCapabilities(TypedDict):
     """Show message request client capabilities"""
-    messageActionItem: NotRequired['ClientShowMessageActionItemOptions']
+
+    messageActionItem: NotRequired["ClientShowMessageActionItemOptions"]
 
 class ShowDocumentClientCapabilities(TypedDict):
     """
@@ -3267,10 +3672,12 @@ class ShowDocumentClientCapabilities(TypedDict):
 
     @since 3.16.0
     """
+
     support: bool
 
 class StaleRequestSupportOptions(TypedDict):
     """@since 3.18.0"""
+
     cancel: bool
     retryOnContentModified: list[str]
 
@@ -3280,6 +3687,7 @@ class RegularExpressionsClientCapabilities(TypedDict):
 
     @since 3.16.0
     """
+
     engine: RegularExpressionEngineKind
     version: NotRequired[str]
 
@@ -3289,42 +3697,49 @@ class MarkdownClientCapabilities(TypedDict):
 
     @since 3.16.0
     """
+
     parser: str
     version: NotRequired[str]
     allowedTags: NotRequired[list[str]]
 
 class ChangeAnnotationsSupportOptions(TypedDict):
     """@since 3.18.0"""
+
     groupsOnLabel: NotRequired[bool]
 
 class ClientSymbolKindOptions(TypedDict):
     """@since 3.18.0"""
-    valueSet: NotRequired[list['SymbolKind']]
+
+    valueSet: NotRequired[list["SymbolKind"]]
 
 class ClientSymbolTagOptions(TypedDict):
     """@since 3.18.0"""
-    valueSet: list['SymbolTag']
+
+    valueSet: list["SymbolTag"]
 
 class ClientSymbolResolveOptions(TypedDict):
     """@since 3.18.0"""
+
     properties: list[str]
 
 class ClientCompletionItemOptions(TypedDict):
     """@since 3.18.0"""
+
     snippetSupport: NotRequired[bool]
     commitCharactersSupport: NotRequired[bool]
-    documentationFormat: NotRequired[list['MarkupKind']]
+    documentationFormat: NotRequired[list["MarkupKind"]]
     deprecatedSupport: NotRequired[bool]
     preselectSupport: NotRequired[bool]
-    tagSupport: NotRequired['CompletionItemTagOptions']
+    tagSupport: NotRequired["CompletionItemTagOptions"]
     insertReplaceSupport: NotRequired[bool]
-    resolveSupport: NotRequired['ClientCompletionItemResolveOptions']
-    insertTextModeSupport: NotRequired['ClientCompletionItemInsertTextModeOptions']
+    resolveSupport: NotRequired["ClientCompletionItemResolveOptions"]
+    insertTextModeSupport: NotRequired["ClientCompletionItemInsertTextModeOptions"]
     labelDetailsSupport: NotRequired[bool]
 
 class ClientCompletionItemOptionsKind(TypedDict):
     """@since 3.18.0"""
-    valueSet: NotRequired[list['CompletionItemKind']]
+
+    valueSet: NotRequired[list["CompletionItemKind"]]
 
 class CompletionListCapabilities(TypedDict):
     """
@@ -3333,84 +3748,103 @@ class CompletionListCapabilities(TypedDict):
 
     @since 3.17.0
     """
+
     itemDefaults: NotRequired[list[str]]
     applyKindSupport: NotRequired[bool]
 
 class ClientSignatureInformationOptions(TypedDict):
     """@since 3.18.0"""
-    documentationFormat: NotRequired[list['MarkupKind']]
-    parameterInformation: NotRequired['ClientSignatureParameterInformationOptions']
+
+    documentationFormat: NotRequired[list["MarkupKind"]]
+    parameterInformation: NotRequired["ClientSignatureParameterInformationOptions"]
     activeParameterSupport: NotRequired[bool]
     noActiveParameterSupport: NotRequired[bool]
 
 class ClientCodeActionLiteralOptions(TypedDict):
     """@since 3.18.0"""
+
     codeActionKind: ClientCodeActionKindOptions
 
 class ClientCodeActionResolveOptions(TypedDict):
     """@since 3.18.0"""
+
     properties: list[str]
 
 class CodeActionTagOptions(TypedDict):
     """@since 3.18.0 - proposed"""
-    valueSet: list['CodeActionTag']
+
+    valueSet: list["CodeActionTag"]
 
 class ClientCodeLensResolveOptions(TypedDict):
     """@since 3.18.0"""
+
     properties: list[str]
 
 class ClientFoldingRangeKindOptions(TypedDict):
     """@since 3.18.0"""
-    valueSet: NotRequired[list['FoldingRangeKind']]
+
+    valueSet: NotRequired[list[str | FoldingRangeKind]]
 
 class ClientFoldingRangeOptions(TypedDict):
     """@since 3.18.0"""
+
     collapsedText: NotRequired[bool]
 
 class DiagnosticsCapabilities(TypedDict):
     """General diagnostics capabilities for pull and push model."""
+
     relatedInformation: NotRequired[bool]
-    tagSupport: NotRequired['ClientDiagnosticsTagOptions']
+    tagSupport: NotRequired["ClientDiagnosticsTagOptions"]
     codeDescriptionSupport: NotRequired[bool]
     dataSupport: NotRequired[bool]
 
 class ClientSemanticTokensRequestOptions(TypedDict):
     """@since 3.18.0"""
+
     range: NotRequired[bool | dict[str, LSPAny]]
     full: NotRequired[bool | ClientSemanticTokensRequestFullDelta]
 
 class ClientInlayHintResolveOptions(TypedDict):
     """@since 3.18.0"""
+
     properties: list[str]
 
 class ClientShowMessageActionItemOptions(TypedDict):
     """@since 3.18.0"""
+
     additionalPropertiesSupport: NotRequired[bool]
 
 class CompletionItemTagOptions(TypedDict):
     """@since 3.18.0"""
-    valueSet: list['CompletionItemTag']
+
+    valueSet: list["CompletionItemTag"]
 
 class ClientCompletionItemResolveOptions(TypedDict):
     """@since 3.18.0"""
+
     properties: list[str]
 
 class ClientCompletionItemInsertTextModeOptions(TypedDict):
     """@since 3.18.0"""
-    valueSet: list['InsertTextMode']
+
+    valueSet: list["InsertTextMode"]
 
 class ClientSignatureParameterInformationOptions(TypedDict):
     """@since 3.18.0"""
+
     labelOffsetSupport: NotRequired[bool]
 
 class ClientCodeActionKindOptions(TypedDict):
     """@since 3.18.0"""
-    valueSet: list['CodeActionKind']
+
+    valueSet: list[str | CodeActionKind]
 
 class ClientDiagnosticsTagOptions(TypedDict):
     """@since 3.18.0"""
-    valueSet: list['DiagnosticTag']
+
+    valueSet: list["DiagnosticTag"]
 
 class ClientSemanticTokensRequestFullDelta(TypedDict):
     """@since 3.18.0"""
+
     delta: NotRequired[bool]

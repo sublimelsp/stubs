@@ -1,16 +1,37 @@
 import sublime
 import sublime_plugin
-from ..protocol import DocumentSymbol, Location, Range, SymbolInformation, SymbolKind, WorkspaceSymbol
+from ..protocol import (
+    DocumentSymbol,
+    Location as Location,
+    Range,
+    SymbolInformation,
+    SymbolKind,
+    WorkspaceSymbol,
+)
 from .core.constants import SYMBOL_KINDS as SYMBOL_KINDS
-from .core.input_handlers import DynamicListInputHandler as DynamicListInputHandler, PreselectedListInputHandler as PreselectedListInputHandler
+from .core.input_handlers import (
+    DynamicListInputHandler as DynamicListInputHandler,
+    PreselectedListInputHandler as PreselectedListInputHandler,
+)
 from .core.promise import Promise as Promise
-from .core.protocol import Error as Error, Point as Point, Request as Request, ResponseError as ResponseError
-from .core.registry import LspTextCommand as LspTextCommand, LspWindowCommand as LspWindowCommand
+from .core.protocol import (
+    Error as Error,
+    Point as Point,
+    Request as Request,
+    ResponseError as ResponseError,
+)
+from .core.registry import (
+    LspTextCommand as LspTextCommand,
+    LspWindowCommand as LspWindowCommand,
+)
 from .core.sessions import print_to_status_bar as print_to_status_bar
-from .core.views import offset_to_point as offset_to_point, range_to_region as range_to_region, text_document_identifier as text_document_identifier
-from _typeshed import Incomplete
-from typing import Any
-from typing_extensions import NotRequired, TypeGuard, TypedDict
+from .core.views import (
+    offset_to_point as offset_to_point,
+    range_to_region as range_to_region,
+    text_document_identifier as text_document_identifier,
+)
+from typing import Any, TypedDict
+from typing_extensions import NotRequired, TypeGuard
 
 SUPPRESS_INPUT_SETTING_KEY: str
 SYMBOL_KIND_NAMES: dict[SymbolKind, str]
@@ -28,7 +49,11 @@ class WorkspaceSymbolValue(TypedDict):
     workspaceSymbol: NotRequired[WorkspaceSymbol]
 
 def is_document_symbol_value(val: Any) -> TypeGuard[DocumentSymbolValue]: ...
-def symbol_to_list_input_item(item: DocumentSymbol | WorkspaceSymbol | SymbolInformation, hierarchy: str = '', session_name: str | None = None) -> sublime.ListInputItem: ...
+def symbol_to_list_input_item(
+    item: DocumentSymbol | WorkspaceSymbol | SymbolInformation,
+    hierarchy: str = "",
+    session_name: str | None = None,
+) -> sublime.ListInputItem: ...
 
 class LspSelectionClearCommand(sublime_plugin.TextCommand):
     """
@@ -47,23 +72,39 @@ class LspSelectionSetCommand(sublime_plugin.TextCommand):
 
 class LspDocumentSymbolsCommand(LspTextCommand):
     capability: str
-    items: Incomplete
+    items: list[sublime.ListInputItem]
     kind: int
     cached: bool
     has_matching_symbols: bool
     def __init__(self, view: sublime.View) -> None: ...
-    def run(self, edit: sublime.Edit, event: dict[str, Any] | None = None, kind: int = 0, index: int | None = None) -> None: ...
+    def run(
+        self,
+        edit: sublime.Edit,
+        event: dict[str, Any] | None = None,
+        kind: int = 0,
+        index: int | None = None,
+    ) -> None: ...
     def input(self, args: dict) -> sublime_plugin.CommandInputHandler | None: ...
-    def handle_response_async(self, response: list[DocumentSymbol] | list[SymbolInformation] | None) -> None: ...
+    def handle_response_async(
+        self, response: list[DocumentSymbol] | list[SymbolInformation] | None
+    ) -> None: ...
     def handle_response_error(self, error: ResponseError) -> None: ...
-    def process_document_symbol_recursive(self, item: DocumentSymbol, hierarchy: str = '') -> list[sublime.ListInputItem]: ...
+    def process_document_symbol_recursive(
+        self, item: DocumentSymbol, hierarchy: str = ""
+    ) -> list[sublime.ListInputItem]: ...
 
 class DocumentSymbolsKindInputHandler(PreselectedListInputHandler):
-    view: Incomplete
-    items: Incomplete
-    old_selection: Incomplete
+    view: sublime.View
+    items: list[sublime.ListInputItem]
+    old_selection: list[sublime.Region]
     last_selected: int
-    def __init__(self, window: sublime.Window, initial_value: sublime.ListInputItem, view: sublime.View, items: list[sublime.ListInputItem]) -> None: ...
+    def __init__(
+        self,
+        window: sublime.Window,
+        initial_value: sublime.ListInputItem,
+        view: sublime.View,
+        items: list[sublime.ListInputItem],
+    ) -> None: ...
     def name(self) -> str: ...
     def placeholder(self) -> str: ...
     def get_list_items(self) -> tuple[list[sublime.ListInputItem], int]: ...
@@ -71,14 +112,22 @@ class DocumentSymbolsKindInputHandler(PreselectedListInputHandler):
     def next_input(self, args: dict) -> sublime_plugin.CommandInputHandler | None: ...
 
 class DocumentSymbolsInputHandler(sublime_plugin.ListInputHandler):
-    view: Incomplete
-    kind: Incomplete
-    items: Incomplete
-    old_selection: Incomplete
-    def __init__(self, view: sublime.View, kind: int, items: list[sublime.ListInputItem], old_selection: list[sublime.Region]) -> None: ...
+    view: sublime.View
+    kind: int
+    items: list[sublime.ListInputItem]
+    old_selection: list[sublime.Region]
+    def __init__(
+        self,
+        view: sublime.View,
+        kind: int,
+        items: list[sublime.ListInputItem],
+        old_selection: list[sublime.Region],
+    ) -> None: ...
     def name(self) -> str: ...
     def list_items(self) -> tuple[list[sublime.ListInputItem], int]: ...
-    def preview(self, text: DocumentSymbolValue | None) -> str | sublime.Html | None: ...
+    def preview(
+        self, text: DocumentSymbolValue | None
+    ) -> str | sublime.Html | None: ...
     def cancel(self) -> None: ...
 
 class LspWorkspaceSymbolsCommand(LspWindowCommand):
@@ -89,6 +138,8 @@ class LspWorkspaceSymbolsCommand(LspWindowCommand):
 class WorkspaceSymbolsInputHandler(DynamicListInputHandler):
     def name(self) -> str: ...
     def placeholder(self) -> str: ...
-    def preview(self, text: WorkspaceSymbolValue | None) -> str | sublime.Html | None: ...
-    command: Incomplete
+    def preview(
+        self, text: WorkspaceSymbolValue | None
+    ) -> str | sublime.Html | None: ...
+    command: LspWindowCommand
     def on_modified(self, text: str) -> None: ...

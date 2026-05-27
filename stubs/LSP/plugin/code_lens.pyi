@@ -2,34 +2,42 @@ import sublime
 from ..protocol import CodeLens, Command as Command, Range
 from .core.constants import CODE_LENS_ENABLED_KEY as CODE_LENS_ENABLED_KEY
 from .core.protocol import Error as Error, ResolvedCodeLens as ResolvedCodeLens
-from .core.registry import LspTextCommand as LspTextCommand, LspWindowCommand as LspWindowCommand, windows as windows
+from .core.registry import (
+    LspTextCommand as LspTextCommand,
+    LspWindowCommand as LspWindowCommand,
+    windows as windows,
+)
 from .core.views import range_to_region as range_to_region
-from _typeshed import Incomplete
 from typing_extensions import TypeGuard
+from typing import Any
 
-def is_resolved(code_lens: CodeLens | ResolvedCodeLens) -> TypeGuard[ResolvedCodeLens]: ...
+def is_resolved(
+    code_lens: CodeLens | ResolvedCodeLens,
+) -> TypeGuard[ResolvedCodeLens]: ...
 
 class HashableRange:
-    data: Incomplete
+    data: tuple[Any, Any, Any, Any]
     def __init__(self, r: Range, /) -> None: ...
-    def __hash__(self): ...
+    def __hash__(self) -> int: ...
     def __eq__(self, rhs: object) -> bool: ...
     def __lt__(self, rhs: HashableRange) -> bool: ...
 
 class CachedCodeLens:
-    data: Incomplete
-    range: Incomplete
-    cached_command: Incomplete
+    data: CodeLens | ResolvedCodeLens
+    range: HashableRange
+    cached_command: Any
     def __init__(self, data: CodeLens) -> None: ...
     def on_resolve(self, response: CodeLens | Error) -> None: ...
 
 class CodeLensCache:
-    code_lenses: Incomplete
+    code_lenses: dict[HashableRange, list[CachedCodeLens]]
     def __init__(self) -> None: ...
     def handle_response_async(self, code_lenses: list[CodeLens]) -> None: ...
-    def unresolved_visible_code_lenses(self, view: sublime.View) -> list[CachedCodeLens]: ...
+    def unresolved_visible_code_lenses(
+        self, view: sublime.View
+    ) -> list[CachedCodeLens]: ...
     def code_lenses_with_command(self) -> list[ResolvedCodeLens]:
-        """ Returns only the code lenses that are either resolved, or have a cached command. """
+        """Returns only the code lenses that are either resolved, or have a cached command."""
 
 class LspToggleCodeLensesCommand(LspWindowCommand):
     capability: str

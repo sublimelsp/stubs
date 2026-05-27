@@ -1,4 +1,15 @@
-from sublime import Buffer, CompletionItem as CompletionItem, CompletionList, Edit, Html, ListInputItem as ListInputItem, Settings, TextChange as TextChange, View, Window
+from sublime import (
+    Buffer,
+    CompletionItem as CompletionItem,
+    CompletionList,
+    Edit,
+    Html,
+    ListInputItem as ListInputItem,
+    Settings,
+    TextChange as TextChange,
+    View,
+    Window,
+)
 from typing import Any
 
 view_event_listeners: dict[int, list[ViewEventListener]]
@@ -75,7 +86,16 @@ class ListInputHandler(CommandInputHandler):
     For an input handler to be shown to the user, the command returning the input handler MUST be made available in the
     Command Palette by adding the command to a `Default.sublime-commands` file.
     """
-    def list_items(self) -> list[str] | tuple[list[str], int] | list[tuple[str, Any]] | tuple[list[tuple[str, Any]], int] | list[ListInputItem] | tuple[list[ListInputItem], int]:
+    def list_items(
+        self,
+    ) -> (
+        list[str]
+        | tuple[list[str], int]
+        | list[tuple[str, Any]]
+        | tuple[list[tuple[str, Any]], int]
+        | list[ListInputItem]
+        | tuple[list[ListInputItem], int]
+    ):
         """
         This method should return the items to show in the list.
 
@@ -110,10 +130,10 @@ class Command:
         arguments. The default implementation always returns `True`.
         """
     def is_checked(self, **kwargs: dict[str, Any]) -> bool:
-        '''
+        """
         Return whether a checkbox should be shown next to the menu item. Command arguments are passed as keyword
         arguments. The `.sublime-menu` file must have the `"checkbox"` key set to `true` for this to be used.
-        '''
+        """
     def description(self, **kwargs: dict[str, Any]) -> str | None:
         """
         Return a description of the command with the given arguments. Command arguments are passed as keyword arguments.
@@ -149,6 +169,7 @@ class WindowCommand(Command):
     """
     A `Command` instantiated once per window. The `Window` object may be retrieved via `self.window`.
     """
+
     window: Window
     def __init__(self, window: Window) -> None: ...
 
@@ -157,6 +178,7 @@ class TextCommand(Command):
     A `Command` instantiated once per `View`. The `View` object may be retrieved
     via `self.view <view>`.
     """
+
     view: View
     def __init__(self, view: View) -> None: ...
     def run(self, edit: Edit, **kwargs: dict[str, Any]) -> None:
@@ -302,7 +324,9 @@ class EventListener:
             based on the value of `hover_zone`.
         - `hover_zone` - Which element in Sublime Text the mouse has hovered over.
         """
-    def on_query_context(self, view: View, key: str, operator: int, operand: str, match_all: bool) -> bool | None:
+    def on_query_context(
+        self, view: View, key: str, operator: int, operand: str, match_all: bool
+    ) -> bool | None:
         """
         Called when determining to trigger a key binding with the given context key. If the plugin knows how to respond
         to the context, it should return either `True` of `False`. If the context is unknown, it should return `None`.
@@ -313,7 +337,18 @@ class EventListener:
         - `match_all` - This should be used if the context relates to the selections: does every selection have to
             match (`True`), or is at least one matching enough (`False`)?
         """
-    def on_query_completions(self, view: View, prefix: str, locations: list[int]) -> list[str] | tuple[list[str], int] | list[tuple[str, str]] | tuple[list[tuple[str, str]], int] | list[CompletionItem] | tuple[list[CompletionItem], int] | CompletionList | None:
+    def on_query_completions(
+        self, view: View, prefix: str, locations: list[int]
+    ) -> (
+        list[str]
+        | tuple[list[str], int]
+        | list[tuple[str, str]]
+        | tuple[list[tuple[str, str]], int]
+        | list[CompletionItem]
+        | tuple[list[CompletionItem], int]
+        | CompletionList
+        | None
+    ):
         """
         Called whenever completions are to be presented to the user.
 
@@ -324,21 +359,29 @@ class EventListener:
 
         Returns a list of completions in one of the valid formats or `None` if no completions are provided.
         """
-    def on_text_command(self, view: View, command_name: str, args: dict[str, Any]) -> tuple[str, dict[str, Any]] | None:
+    def on_text_command(
+        self, view: View, command_name: str, args: dict[str, Any]
+    ) -> tuple[str, dict[str, Any]] | None:
         """
         Called when a text command is issued. The listener may return a (command, arguments) tuple to rewrite the
         command, or `None` to run the command unmodified.
         """
-    def on_window_command(self, window: Window, command_name: str, args: dict[str, Any]) -> tuple[str, dict[str, Any]] | None:
+    def on_window_command(
+        self, window: Window, command_name: str, args: dict[str, Any]
+    ) -> tuple[str, dict[str, Any]] | None:
         """
         Called when a window command is issued. The listener may return a (command, arguments) tuple to rewrite the
         command, or `None` to run the command unmodified.
         """
-    def on_post_text_command(self, view: View, command_name: str, args: dict[str, Any]) -> None:
+    def on_post_text_command(
+        self, view: View, command_name: str, args: dict[str, Any]
+    ) -> None:
         """
         Called after a text command has been executed.
         """
-    def on_post_window_command(self, window: Window, command_name: str, args: dict[str, Any]) -> None:
+    def on_post_window_command(
+        self, window: Window, command_name: str, args: dict[str, Any]
+    ) -> None:
         """
         Called after a window command has been executed.
         """
@@ -396,6 +439,7 @@ class ViewEventListener:
     A class that provides similar event handling to `EventListener`, but bound to a specific view. Provides class
     method-based filtering to control what views objects are created for.
     """
+
     view: View
     @classmethod
     def is_applicable(cls, settings: Settings) -> bool:
@@ -509,7 +553,9 @@ class ViewEventListener:
             based on the value of `hover_zone`.
         - `hover_zone` - Which element in Sublime Text the mouse has hovered over.
         """
-    def on_query_context(self, key: str, operator: int, operand: str, match_all: bool) -> bool | None:
+    def on_query_context(
+        self, key: str, operator: int, operand: str, match_all: bool
+    ) -> bool | None:
         """
         Called when determining to trigger a key binding with the given context key. If the plugin knows how to respond
         to the context, it should return either `True` of `False`. If the context is unknown, it should return `None`.
@@ -520,7 +566,18 @@ class ViewEventListener:
         - `match_all` - This should be used if the context relates to the selections: does every selection have to match
             (`True`), or is at least one matching enough (`False`)?
         """
-    def on_query_completions(self, prefix: str, locations: list[int]) -> list[str] | tuple[list[str], int] | list[tuple[str, str]] | tuple[list[tuple[str, str]], int] | list[CompletionItem] | tuple[list[CompletionItem], int] | CompletionList | None:
+    def on_query_completions(
+        self, prefix: str, locations: list[int]
+    ) -> (
+        list[str]
+        | tuple[list[str], int]
+        | list[tuple[str, str]]
+        | tuple[list[tuple[str, str]], int]
+        | list[CompletionItem]
+        | tuple[list[CompletionItem], int]
+        | CompletionList
+        | None
+    ):
         """
         Called whenever completions are to be presented to the user.
 
@@ -531,7 +588,9 @@ class ViewEventListener:
 
         Returns a list of completions in one of the valid formats or `None` if no completions are provided.
         """
-    def on_text_command(self, command_name: str, args: dict[str, Any]) -> tuple[str, dict[str, Any]] | None:
+    def on_text_command(
+        self, command_name: str, args: dict[str, Any]
+    ) -> tuple[str, dict[str, Any]] | None:
         """
         Called when a text command is issued. The listener may return a `(command, arguments)` tuple to rewrite the
         command, or `None` to run the command unmodified.
@@ -546,6 +605,7 @@ class TextChangeListener:
     A class that provides event handling about text changes made to a specific `Buffer`. Is separate from
     `ViewEventListener` since multiple views can share a single buffer.
     """
+
     buffer: Buffer
     @classmethod
     def is_applicable(cls, buffer: Buffer) -> bool:

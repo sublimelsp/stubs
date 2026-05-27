@@ -1,21 +1,24 @@
-from _typeshed import Incomplete
 from typing import Callable, Generic, Protocol, TypeVar
+from typing import Tuple
+from typing import Union
+import threading
 
-T = TypeVar('T')
-S = TypeVar('S')
-TExecutor = TypeVar('TExecutor')
-T_contra = TypeVar('T_contra', contravariant=True)
-TResult = TypeVar('TResult')
+T = TypeVar("T")
+S = TypeVar("S")
+TExecutor = TypeVar("TExecutor")
+T_contra = TypeVar("T_contra", contravariant=True)
+TResult = TypeVar("TResult")
 
 class ResolveFunc(Protocol[T_contra]):
     def __call__(self, resolve_value: T_contra) -> None: ...
 
-FullfillFunc: Incomplete
+FullfillFunc = Callable[[T], Union[TResult, "Promise[TResult]"]]
 ExecutorFunc = Callable[[ResolveFunc[T]], None]
-PackagedTask: Incomplete
+PackagedTask = Tuple["Promise[T]", ResolveFunc[T]]
 
 class Promise(Generic[T]):
-    '''A simple implementation of the Promise specification.
+    """
+    A simple implementation of the Promise specification.
 
     See: https://promisesaplus.com
 
@@ -57,10 +60,11 @@ class Promise(Generic[T]):
             assert value === 222
 
         Promise(do_work_async_1).then(do_more_work_async).then(process_value)
-    '''
+    """
     @staticmethod
     def resolve(resolve_value: S) -> Promise[S]:
-        """Immediately resolves a Promise.
+        """
+        Immediately resolves a Promise.
 
         Convenience function for creating a Promise that gets immediately
         resolved with the specified value.
@@ -68,7 +72,7 @@ class Promise(Generic[T]):
         Arguments:
             resolve_value: The value to resolve the promise with.
         """
-    resolver: Incomplete
+    resolver: ResolveFunc[TExecutor] | None
     @staticmethod
     def packaged_task() -> PackagedTask[S]: ...
     @staticmethod
@@ -83,18 +87,20 @@ class Promise(Generic[T]):
                     Gets passed a list with all resolved values.
         """
     resolved: bool
-    mutex: Incomplete
-    callbacks: Incomplete
+    mutex: threading.Lock
+    callbacks: list[ResolveFunc[T]]
     def __init__(self, executor_func: ExecutorFunc[T]) -> None:
-        '''Initialize Promise object.
+        """
+        Initialize Promise object.
 
         Arguments:
             executor_func: A function that is executed immediately by this Promise.
             It gets passed a "resolve" function. The "resolve" function, when
             called, resolves the Promise with the value passed to it.
-        '''
+        """
     def then(self, onfullfilled: FullfillFunc[T, TResult]) -> Promise[TResult]:
-        """Create a new promise and chain it with this promise.
+        """
+        Create a new promise and chain it with this promise.
 
         When this promise gets resolved, the callback will be called with the
         value that this promise resolved with.

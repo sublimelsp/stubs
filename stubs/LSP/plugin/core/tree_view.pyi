@@ -3,12 +3,11 @@ from .constants import SublimeKind as SublimeKind
 from .css import css as css
 from .promise import Promise as Promise
 from .registry import LspWindowCommand as LspWindowCommand, windows as windows
-from _typeshed import Incomplete
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from enum import IntEnum
 from typing import TypeVar
 
-T = TypeVar('T')
+T = TypeVar("T")
 KIND_CLASS_NAMES: dict[int, str]
 
 class TreeItemCollapsibleState(IntEnum):
@@ -17,57 +16,87 @@ class TreeItemCollapsibleState(IntEnum):
     EXPANDED: int
 
 class TreeItem:
-    label: Incomplete
-    kind: Incomplete
-    description: Incomplete
-    tooltip: Incomplete
-    command_url: Incomplete
-    collapsible_state: Incomplete
-    id: Incomplete
-    def __init__(self, label: str, kind: SublimeKind = ..., description: str = '', tooltip: str = '', command_url: str = '') -> None: ...
+    label: str
+    kind: SublimeKind
+    description: str
+    tooltip: str
+    command_url: str
+    collapsible_state: int
+    id: str
+    def __init__(
+        self,
+        label: str,
+        kind: SublimeKind = ...,
+        description: str = "",
+        tooltip: str = "",
+        command_url: str = "",
+    ) -> None: ...
     def html(self, sheet_name: str, indent_level: int) -> str: ...
 
 class Node:
-    element: Incomplete
-    tree_item: Incomplete
-    indent_level: Incomplete
-    child_ids: Incomplete
+    element: T
+    tree_item: TreeItem
+    indent_level: int
+    child_ids: list[str]
     is_resolved: bool
-    def __init__(self, element: T, tree_item: TreeItem, indent_level: int = 0) -> None: ...
+    def __init__(
+        self, element: T, tree_item: TreeItem, indent_level: int = 0
+    ) -> None: ...
 
-class TreeDataProvider(metaclass=ABCMeta):
+class TreeDataProvider(ABC):
     @abstractmethod
     def get_children(self, element: T | None) -> Promise[list[T]]:
-        """ Implement this to return the children for the given element or root (if no element is passed). """
+        """Implement this to return the children for the given element or root (if no element is passed)."""
     @abstractmethod
     def get_tree_item(self, element: T) -> TreeItem:
-        """ Implement this to return the UI representation (TreeItem) of the element that gets displayed in the
-        TreeViewSheet. """
+        """
+        Implement this to return the UI representation (TreeItem) of the element that gets displayed in the
+        TreeViewSheet.
+        """
 
 class TreeViewSheet(sublime.HtmlSheet):
-    """ A special HtmlSheet which can render interactive tree data structures. """
-    nodes: Incomplete
-    root_nodes: Incomplete
-    name: Incomplete
-    data_provider: Incomplete
-    header: Incomplete
-    def __init__(self, id: int, name: str, data_provider: TreeDataProvider, header: str = '') -> None: ...
-    def set_provider(self, data_provider: TreeDataProvider, header: str = '') -> None:
-        """ Use this method if you want to render an entire new tree. This allows to reuse a single HtmlSheet, e.g. when
-        using a feature consecutively on different symbols. """
-    def expand_item(self, id: str) -> None: ...
-    def collapse_item(self, id: str) -> None: ...
+    """A special HtmlSheet which can render interactive tree data structures."""
 
-def new_tree_view_sheet(window: sublime.Window, name: str, data_provider: TreeDataProvider, header: str = '', flags: sublime.NewFileFlags = ..., group: int = -1) -> TreeViewSheet | None:
+    nodes: dict[str, Node]
+    root_nodes: list[str]
+    name: str
+    data_provider: TreeDataProvider
+    header: str
+    def __init__(
+        self,
+        sheet_id: int,
+        name: str,
+        data_provider: TreeDataProvider,
+        header: str = "",
+    ) -> None: ...
+    def set_provider(self, data_provider: TreeDataProvider, header: str = "") -> None:
+        """
+        Use this method if you want to render an entire new tree. This allows to reuse a single HtmlSheet, e.g. when
+        using a feature consecutively on different symbols.
+        """
+    def expand_item(self, node_id: str) -> None: ...
+    def collapse_item(self, node_id: str) -> None: ...
+
+def new_tree_view_sheet(
+    window: sublime.Window,
+    name: str,
+    data_provider: TreeDataProvider,
+    header: str = "",
+    flags: sublime.NewFileFlags = ...,
+    group: int = -1,
+) -> TreeViewSheet | None:
     """
     Use this function to create a new TreeView in form of a special HtmlSheet (TreeViewSheet). Only one TreeViewSheet
     with the given name is allowed per window. If there already exists a TreeViewSheet with the same name, its content
     will be replaced with the new data. The header argument is allowed to contain minihtml markup.
     """
-def toggle_tree_item(window: sublime.Window, name: str, id: str, expand: bool) -> None: ...
+
+def toggle_tree_item(
+    window: sublime.Window, name: str, node_id: str, expand: bool
+) -> None: ...
 
 class LspExpandTreeItemCommand(LspWindowCommand):
-    def run(self, name: str, id: str) -> None: ...
+    def run(self, name: str, node_id: str) -> None: ...
 
 class LspCollapseTreeItemCommand(LspWindowCommand):
-    def run(self, name: str, id: str) -> None: ...
+    def run(self, name: str, node_id: str) -> None: ...
