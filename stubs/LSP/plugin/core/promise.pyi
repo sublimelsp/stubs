@@ -1,4 +1,3 @@
-from _typeshed import Incomplete
 from typing import Callable, Generic, Protocol, TypeVar
 from typing import Tuple
 from typing import Union
@@ -73,7 +72,7 @@ class Promise(Generic[T]):
         Arguments:
             resolve_value: The value to resolve the promise with.
         """
-    resolver: Incomplete
+    resolver: ResolveFunc[TExecutor] | None
     @staticmethod
     def packaged_task() -> PackagedTask[S]: ...
     @staticmethod

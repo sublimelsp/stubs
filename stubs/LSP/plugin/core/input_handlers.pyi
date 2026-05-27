@@ -1,7 +1,6 @@
 import sublime
 import sublime_plugin
 from .constants import ST_VERSION as ST_VERSION
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from typing import Any, Callable
 from typing_extensions import ParamSpec
@@ -71,7 +70,7 @@ class DynamicListInputHandler(sublime_plugin.ListInputHandler, ABC):
 
     command: sublime_plugin.WindowCommand
     args: dict[str, Any]
-    text: Incomplete
+    text: str
     listener: sublime_plugin.TextChangeListener | None
     input_view: sublime.View | None
     def __init__(

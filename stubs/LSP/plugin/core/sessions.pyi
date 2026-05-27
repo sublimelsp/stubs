@@ -155,7 +155,6 @@ from .workspace import (
     WorkspaceFolder as WorkspaceFolder,
     is_subpath_of as is_subpath_of,
 )
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from enum import IntFlag
 from typing import Any, Callable, Generator, Literal, Protocol, TypeVar, overload
@@ -462,7 +461,7 @@ class Session(APIHandler, TransportCallbacks):
     config: ClientConfig
     config_status_message: str
     manager: ref[Manager]
-    window: Incomplete
+    window: sublime.Window
     state: ClientStates
     capabilities: Capabilities
     diagnostics: DiagnosticsStorage

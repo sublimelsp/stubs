@@ -1,15 +1,15 @@
 import argparse
-from _typeshed import Incomplete
+from typing import Any
 
 PACKAGE_PATH: str
 MESSAGE_DIR: str
 MESSAGE_PATH: str
-CONFIGURATION: Incomplete
-RELEASE_BRANCH: Incomplete
-GITHUB_REPO: Incomplete
-RELEASE_VERSION_PREFIX: Incomplete
+CONFIGURATION: Any
+RELEASE_BRANCH: Any
+GITHUB_REPO: Any
+RELEASE_VERSION_PREFIX: str
 SETTINGS: str
-PYTHON_VERSION_PATH: Incomplete
+PYTHON_VERSION_PATH: Any
 
 def get_message(fname: str) -> str: ...
 def put_message(fname: str, text: str) -> None: ...

@@ -175,6 +175,14 @@ def infer_type_from_value(value_node, enum_classes):
             and f.attr == "compile"
         ):
             return "re.Pattern[str]"
+        # json.loads(...) -> Any  (parsed JSON has no static type)
+        if (
+            isinstance(f, ast.Attribute)
+            and isinstance(f.value, ast.Name)
+            and f.value.id == "json"
+            and f.attr == "loads"
+        ):
+            return "Any"
         # logging.getLogger(...) -> logging.Logger
         if (
             isinstance(f, ast.Attribute)
@@ -183,6 +191,12 @@ def infer_type_from_value(value_node, enum_classes):
             and f.attr == "getLogger"
         ):
             return "logging.Logger"
+        # getattr(obj, attr, default) -> type of default
+        if isinstance(f, ast.Name) and f.id == "getattr" and len(value_node.args) >= 3:
+            return infer_type_from_value(value_node.args[2], enum_classes)
+        # obj.get(key, default) -> type of default
+        if isinstance(f, ast.Attribute) and f.attr == "get" and len(value_node.args) >= 2:
+            return infer_type_from_value(value_node.args[1], enum_classes)
         # module.ClassName(...) -> module.ClassName (e.g. threading.Lock())
         if (
             isinstance(f, ast.Attribute)
@@ -301,7 +315,23 @@ def infer_type_from_value(value_node, enum_classes):
         ot = infer_type_from_value(value_node.orelse, enum_classes)
         if isinstance(bt, str) and bt == ot:
             return bt
+        # T if cond else None  ->  T | None
+        if (
+            isinstance(bt, str)
+            and isinstance(value_node.orelse, ast.Constant)
+            and value_node.orelse.value is None
+        ):
+            return f"{bt} | None"
         return None
+
+    if isinstance(value_node, ast.BoolOp) and isinstance(value_node.op, ast.Or):
+        # x or y: if all values share a type return it; otherwise fall back to last value's type
+        inferred_types = [infer_type_from_value(v, enum_classes) for v in value_node.values]
+        str_types = [t for t in inferred_types if isinstance(t, str)]
+        if str_types and all(t == str_types[0] for t in str_types) and len(str_types) == len(inferred_types):
+            return str_types[0]
+        if str_types and isinstance(inferred_types[-1], str):
+            return inferred_types[-1]
 
     if isinstance(value_node, ast.BinOp) and isinstance(value_node.op, ast.BitOr):
         # WatchKind.A | WatchKind.B  ->  WatchKind
@@ -474,6 +504,20 @@ def collect_source_info(src_path):
                                 and val.values[0].id in init_params
                             ):
                                 ca[attr] = init_params[val.values[0].id]
+                            # Pattern F: self.attr = param.some_attr (attribute of typed param)
+                            elif (
+                                isinstance(val, ast.Attribute)
+                                and isinstance(val.value, ast.Name)
+                                and val.value.id in init_params
+                            ):
+                                param_type = init_params[val.value.id]
+                                attr_type = (
+                                    info.get("class_attrs", {})
+                                    .get(param_type, {})
+                                    .get(val.attr)
+                                )
+                                if attr_type:
+                                    ca[attr] = attr_type
                             # Pattern D: self.attr = literal (str, int, bool, etc.)
                             else:
                                 lit_type = infer_type_from_value(val, enum_classes)
@@ -481,6 +525,46 @@ def collect_source_info(src_path):
                                     ca[attr] = lit_type
                 else:
                     cm[item.name] = stub
+                    # @property → also record return type as a class attribute
+                    is_property = any(
+                        isinstance(d, ast.Name) and d.id == "property"
+                        for d in item.decorator_list
+                    )
+                    if is_property and item.returns and item.name not in ca:
+                        ca[item.name] = unparse(item.returns)
+                    # Scan non-__init__ methods for typed self-attribute assignments
+                    for body_node in ast.walk(item):
+                        if (
+                            isinstance(body_node, ast.AnnAssign)
+                            and isinstance(body_node.target, ast.Attribute)
+                            and isinstance(body_node.target.value, ast.Name)
+                            and body_node.target.value.id == "self"
+                        ):
+                            attr = body_node.target.attr
+                            if attr not in ca:
+                                ca[attr] = unparse(body_node.annotation)
+                        elif (
+                            isinstance(body_node, ast.Assign)
+                            and len(body_node.targets) == 1
+                            and isinstance(body_node.targets[0], ast.Attribute)
+                            and isinstance(body_node.targets[0].value, ast.Name)
+                            and body_node.targets[0].value.id == "self"
+                        ):
+                            attr = body_node.targets[0].attr
+                            if attr not in ca:
+                                val = body_node.value
+                                # self.attr = cast(Type, ...) -> Type
+                                if (
+                                    isinstance(val, ast.Call)
+                                    and isinstance(val.func, ast.Name)
+                                    and val.func.id == "cast"
+                                    and len(val.args) >= 1
+                                ):
+                                    first = val.args[0]
+                                    if isinstance(first, ast.Constant) and isinstance(first.value, str):
+                                        ca[attr] = first.value
+                                    elif isinstance(first, (ast.Name, ast.Subscript, ast.Attribute)):
+                                        ca[attr] = unparse(first)
         if ca:
             info["class_attrs"][class_node.name] = ca
         if cm:
@@ -535,7 +619,46 @@ def collect_source_info(src_path):
         elif isinstance(node, (ast.Import, ast.ImportFrom)):
             info["import_nodes"].append(node)
 
-    # Phase 4.5: resolve dependent types using collected annotations
+    # Phase 4.5a: propagate Any through subscripts/gets on Any-typed module-level vars
+    # e.g. CONFIGURATION: Any -> RELEASE_BRANCH = CONFIGURATION['key'] -> Any
+    any_vars = {k for k, v in info["annotations"].items() if v == "Any"}
+    if any_vars:
+        for node in ast.iter_child_nodes(tree):
+            if not isinstance(node, ast.Assign):
+                continue
+            for target in node.targets:
+                if not isinstance(target, ast.Name) or target.id in info["annotations"]:
+                    continue
+                val = node.value
+                # ANY_VAR['key'] -> Any
+                if (
+                    isinstance(val, ast.Subscript)
+                    and isinstance(val.value, ast.Name)
+                    and val.value.id in any_vars
+                ):
+                    info["annotations"][target.id] = "Any"
+                # ANY_VAR.get(key, ...) -> Any
+                elif (
+                    isinstance(val, ast.Call)
+                    and isinstance(val.func, ast.Attribute)
+                    and isinstance(val.func.value, ast.Name)
+                    and val.func.value.id in any_vars
+                    and val.func.attr == "get"
+                ):
+                    info["annotations"][target.id] = "Any"
+                # ANY_VAR['key'] or default -> type of default or Any
+                elif (
+                    isinstance(val, ast.BoolOp)
+                    and isinstance(val.op, ast.Or)
+                    and val.values
+                    and isinstance(val.values[0], ast.Subscript)
+                    and isinstance(val.values[0].value, ast.Name)
+                    and val.values[0].value.id in any_vars
+                ):
+                    last_type = infer_type_from_value(val.values[-1], enum_classes)
+                    info["annotations"][target.id] = last_type if isinstance(last_type, str) else "Any"
+
+    # Phase 4.5b: resolve dependent types using collected annotations
     # e.g. SUPPORTED_DIAGNOSTIC_TAGS = list(DIAGNOSTIC_TAG_SCOPES)
     #      DIAGNOSTIC_TAG_SCOPES: dict[DiagnosticTag, str] -> list[DiagnosticTag]
     for node in ast.iter_child_nodes(tree):
@@ -678,23 +801,19 @@ def apply_fixes(txt, info):
 
 
 def _get_imported_names(txt):
-    """Return set of all names imported in the stub text."""
+    """Return set of all names imported in the stub text (handles multi-line imports)."""
+    try:
+        tree = ast.parse(txt)
+    except SyntaxError:
+        return set()
     names = set()
-    for line in txt.split("\n"):
-        line = line.strip()
-        if line.startswith("import ") and not line.startswith("import_"):
-            # import foo, bar
-            rest = line[7:]
-            for part in rest.split(","):
-                part = part.strip().split()[0]  # handle 'import foo as bar'
-                names.add(part.split()[0])
-        elif line.startswith("from ") and " import " in line:
-            # from foo import bar, baz
-            imp_part = line.split(" import ", 1)[1]
-            for part in imp_part.split(","):
-                part = part.strip()
-                alias = part.split(" as ")
-                names.add(alias[0].strip())
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                names.add(alias.asname or alias.name.split(".")[0])
+        elif isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                names.add(alias.asname or alias.name)
     return names
 
 
@@ -764,6 +883,30 @@ def add_missing_imports(txt, info):
     return txt
 
 
+def ensure_any_import(txt):
+    """Add 'from typing import Any' if Any is used as a type but not yet imported."""
+    if not re.search(r"(?<![\"'\w])Any(?!\w)", txt):
+        return txt
+    if re.search(r"from typing import\b.*\bAny\b", txt):
+        return txt
+    lines = txt.split("\n")
+    # Try to extend an existing 'from typing import ...' line
+    for i, line in enumerate(lines):
+        if line.startswith("from typing import "):
+            names = [n.strip() for n in line[len("from typing import "):].split(",")]
+            if "Any" not in names:
+                lines[i] = "from typing import " + ", ".join(sorted(names + ["Any"]))
+            return "\n".join(lines)
+    # Insert after the last import line
+    last_import_idx = -1
+    for i, line in enumerate(lines):
+        if line.startswith(("import ", "from ")):
+            last_import_idx = i
+    insert_at = last_import_idx + 1 if last_import_idx >= 0 else 0
+    lines.insert(insert_at, "from typing import Any")
+    return "\n".join(lines)
+
+
 def cleanup_incomplete_import(txt):
     """Remove _typeshed import if no Incomplete markers remain."""
     if ": Incomplete" not in txt:
@@ -819,6 +962,7 @@ for pyi in sorted(out.rglob("*.pyi")):
         if info:
             txt = apply_fixes(txt, info)
             txt = add_missing_imports(txt, info)
+            txt = ensure_any_import(txt)
             txt = cleanup_incomplete_import(txt)
 
     pyi.write_bytes(txt.encode("utf-8"))

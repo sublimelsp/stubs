@@ -30,7 +30,6 @@ from .core.views import (
     range_to_region as range_to_region,
     text_document_identifier as text_document_identifier,
 )
-from _typeshed import Incomplete
 from typing import Any, TypedDict
 from typing_extensions import NotRequired, TypeGuard
 
@@ -142,5 +141,5 @@ class WorkspaceSymbolsInputHandler(DynamicListInputHandler):
     def preview(
         self, text: WorkspaceSymbolValue | None
     ) -> str | sublime.Html | None: ...
-    command: Incomplete
+    command: LspWindowCommand
     def on_modified(self, text: str) -> None: ...

@@ -24,7 +24,6 @@ from .core.workspace import (
     sorted_workspace_folders as sorted_workspace_folders,
 )
 from .session_buffer import SessionBuffer as SessionBuffer
-from _typeshed import Incomplete
 from typing import Any, Callable
 
 class BasePackageNameInputHandler(sublime_plugin.TextInputHandler):
@@ -49,7 +48,7 @@ class LspTroubleshootServerCommand(sublime_plugin.WindowCommand):
         configs: list[ClientConfig],
         active_view: sublime.View,
     ) -> None: ...
-    test_runner: Incomplete
+    test_runner: ServerTestRunner | None
     def test_run_server_async(
         self,
         config: ClientConfig,

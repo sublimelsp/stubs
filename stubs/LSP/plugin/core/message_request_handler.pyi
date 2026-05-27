@@ -16,10 +16,10 @@ ICONS: dict[MessageType, str]
 
 class MessageRequestHandler:
     view: sublime.View
-    actions: Incomplete
+    actions: list
     action_titles: list
     message: Incomplete
-    message_type: Incomplete
+    message_type: int
     source: str
     def __init__(
         self, view: sublime.View, params: ShowMessageRequestParams, source: str
