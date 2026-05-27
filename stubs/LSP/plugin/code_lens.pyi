@@ -8,15 +8,15 @@ from .core.registry import (
     windows as windows,
 )
 from .core.views import range_to_region as range_to_region
-from _typeshed import Incomplete
 from typing_extensions import TypeGuard
+from typing import Any
 
 def is_resolved(
     code_lens: CodeLens | ResolvedCodeLens,
 ) -> TypeGuard[ResolvedCodeLens]: ...
 
 class HashableRange:
-    data: tuple
+    data: tuple[Any, Any, Any, Any]
     def __init__(self, r: Range, /) -> None: ...
     def __hash__(self) -> int: ...
     def __eq__(self, rhs: object) -> bool: ...
@@ -25,7 +25,7 @@ class HashableRange:
 class CachedCodeLens:
     data: CodeLens | ResolvedCodeLens
     range: HashableRange
-    cached_command: Incomplete
+    cached_command: Any
     def __init__(self, data: CodeLens) -> None: ...
     def on_resolve(self, response: CodeLens | Error) -> None: ...
 

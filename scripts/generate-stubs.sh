@@ -97,7 +97,6 @@ cat >"$LSP_OUT/.version" <<EOF
 ref: $LSP_REF
 tag: $LSP_TAG
 commit: $LSP_COMMIT
-generated: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
 EOF
 
 log "Done."

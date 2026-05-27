@@ -197,6 +197,9 @@ def infer_type_from_value(value_node, enum_classes):
         # obj.get(key, default) -> type of default
         if isinstance(f, ast.Attribute) and f.attr == "get" and len(value_node.args) >= 2:
             return infer_type_from_value(value_node.args[1], enum_classes)
+        # obj.get(key) -> Any  (no default, could be None or the dict value type)
+        if isinstance(f, ast.Attribute) and f.attr == "get" and len(value_node.args) == 1:
+            return "Any"
         # module.ClassName(...) -> module.ClassName (e.g. threading.Lock())
         if (
             isinstance(f, ast.Attribute)
@@ -372,15 +375,32 @@ def infer_type_from_value(value_node, enum_classes):
         if lt == "int" and rt == "int":
             return "int"
 
-    # Subscript: List[int], Dict[str, Any] -> type alias.
-    # CONFIGURATION['key'] is a runtime subscript, not a type alias.
+    # Subscript: distinguish type expressions (list[int]) from runtime subscripts (func()[0]).
     if isinstance(value_node, ast.Subscript):
-        # String subscript (CONFIGURATION['key']) is runtime, not type
-        if isinstance(value_node.slice, ast.Constant) and isinstance(
-            value_node.slice.value, str
-        ):
-            return None
-        return {"type_alias": unparse(value_node)}
+        # func()[n] is always runtime
+        if isinstance(value_node.value, ast.Call):
+            return "Any"
+        # Name subscript: could be type (list[int]) or runtime (var[0])
+        if isinstance(value_node.value, ast.Name):
+            name = value_node.value.id
+            if name[0].isupper() or name in {"list", "dict", "set", "tuple", "type", "frozenset"}:
+                if isinstance(value_node.slice, ast.Constant) and isinstance(value_node.slice.value, str):
+                    return None  # TypeName['key'] is a runtime access, not a type expression
+                return {"type_alias": unparse(value_node)}
+            return "Any"  # lowercase name subscript is runtime
+        # Attribute subscript: typing.Dict[str, Any] vs self.attr[0] / module.attr[n]
+        if isinstance(value_node.value, ast.Attribute):
+            if isinstance(value_node.value.value, ast.Name) and value_node.value.value.id == "self":
+                return "Any"  # self.attr[n] is runtime
+            if value_node.value.attr[0].isupper():
+                if isinstance(value_node.slice, ast.Constant) and isinstance(value_node.slice.value, str):
+                    return None
+                return {"type_alias": unparse(value_node)}
+            return "Any"
+        # Nested subscript: generic[T, list[int]]
+        if isinstance(value_node.value, ast.Subscript):
+            return {"type_alias": unparse(value_node)}
+        return "Any"
 
     # NamedExpr (walrus operator) -> try inferring the value
     if isinstance(value_node, ast.NamedExpr):
@@ -394,7 +414,7 @@ def infer_type_from_value(value_node, enum_classes):
 # ---------------------------------------------------------------------------
 
 
-def collect_source_info(src_path):
+def collect_source_info(src_path, baseline=None):
     """Collect type-relevant info from a source file."""
     try:
         tree = ast.parse(
@@ -452,8 +472,8 @@ def collect_source_info(src_path):
                 if item.name == "__init__":
                     init_params = {}
                     for arg in item.args.args + item.args.kwonlyargs:
-                        if arg.arg != "self" and arg.annotation:
-                            init_params[arg.arg] = unparse(arg.annotation)
+                        if arg.arg != "self":
+                            init_params[arg.arg] = unparse(arg.annotation) if arg.annotation else "Any"
                     for body_node in ast.walk(item):
                         if (
                             isinstance(body_node, ast.AnnAssign)
@@ -531,6 +551,13 @@ def collect_source_info(src_path):
                                 )
                                 if attr_type:
                                     ca[attr] = attr_type
+                            # Pattern H: self.attr = param['key'] (subscript on typed init param)
+                            elif (
+                                isinstance(val, ast.Subscript)
+                                and isinstance(val.value, ast.Name)
+                                and val.value.id in init_params
+                            ):
+                                ca[attr] = "Any"
                             # Pattern D: self.attr = literal (str, int, bool, etc.)
                             else:
                                 lit_type = infer_type_from_value(val, enum_classes)
@@ -591,6 +618,34 @@ def collect_source_info(src_path):
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
             _collect_class_body(node, node.name in enum_classes, info)
+
+    # Phase 3.5: merge inherited class attrs from baseline (e.g. WindowCommand -> self.window)
+    if baseline:
+        baseline_class_attrs = baseline.get("class_attrs", {})
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ClassDef):
+                continue
+            for base in node.bases:
+                base_name = (
+                    base.id if isinstance(base, ast.Name)
+                    else base.attr if isinstance(base, ast.Attribute)
+                    else None
+                )
+                if base_name and base_name in baseline_class_attrs:
+                    inherited = baseline_class_attrs[base_name]
+                    existing = info.setdefault("class_attrs", {}).setdefault(node.name, {})
+                    for attr, attr_type in inherited.items():
+                        if attr not in existing:
+                            existing[attr] = attr_type
+        # Also merge all baseline class_attrs so Pattern F can resolve
+        # param.attr lookups on sublime types (e.g. sublime.Window).
+        for cls, attrs in baseline_class_attrs.items():
+            if cls not in info["class_attrs"]:
+                info["class_attrs"][cls] = dict(attrs)
+            else:
+                for attr, attr_type in attrs.items():
+                    if attr not in info["class_attrs"][cls]:
+                        info["class_attrs"][cls][attr] = attr_type
 
     # Phase 4: collect module-level info (imports, annotations, aliases)
     for node in ast.iter_child_nodes(tree):
@@ -951,9 +1006,46 @@ def cleanup_incomplete_import(txt):
     return txt
 
 
+# ---------------------------------------------------------------------------
+# Sublime Text libs baseline
+# ---------------------------------------------------------------------------
+
+def _load_sublime_baseline(sublime_libs_dir):
+    """Load class_attrs from sublime-text-libs as a baseline for cross-module resolution."""
+    baseline = {"class_attrs": {}, "class_methods": {}}
+    for py_file in sorted(sublime_libs_dir.rglob("*.py")):
+        info = collect_source_info(py_file)
+        if info:
+            for cls, attrs in info.get("class_attrs", {}).items():
+                if cls not in baseline["class_attrs"]:
+                    baseline["class_attrs"][cls] = {}
+                baseline["class_attrs"][cls].update(attrs)
+            for cls, methods in info.get("class_methods", {}).items():
+                if cls not in baseline["class_methods"]:
+                    baseline["class_methods"][cls] = {}
+                baseline["class_methods"][cls].update(methods)
+    return baseline
+
+
+SUBLIME_BASELINE: dict | None = None
+
+
+def get_sublime_baseline(sublime_libs_dir):
+    """Lazy-load the sublime baseline once."""
+    global SUBLIME_BASELINE
+    if SUBLIME_BASELINE is None:
+        SUBLIME_BASELINE = _load_sublime_baseline(sublime_libs_dir)
+    return SUBLIME_BASELINE
+
+
 # ---- Main ----
+SCRIPT_DIR = pathlib.Path(__file__).parent
 out = pathlib.Path(os.environ["LSP_OUT"])
 lsp_src = pathlib.Path(os.environ["LSP_SRC"])
+
+# Pre-load sublime-text-libs as a type baseline for cross-module resolution
+sublime_libs_dir = SCRIPT_DIR.parent / "sublime-text-libs" / "python38"
+baseline = get_sublime_baseline(sublime_libs_dir) if sublime_libs_dir.is_dir() else None
 
 for pyi in sorted(out.rglob("*.pyi")):
     txt = pyi.read_bytes().decode("utf-8").replace("\r\n", "\n")
@@ -979,7 +1071,7 @@ for pyi in sorted(out.rglob("*.pyi")):
                 src = found
                 break
 
-    info = collect_source_info(src) if src else None
+    info = collect_source_info(src, baseline) if src else None
 
     needs_fix = (
         ": Incomplete" in txt

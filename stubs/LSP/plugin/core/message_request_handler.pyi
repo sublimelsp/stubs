@@ -10,15 +10,15 @@ from .promise import (
     ResolveFunc as ResolveFunc,
 )
 from .views import show_lsp_popup as show_lsp_popup, text2html as text2html
-from _typeshed import Incomplete
+from typing import Any
 
 ICONS: dict[MessageType, str]
 
 class MessageRequestHandler:
     view: sublime.View
     actions: list
-    action_titles: list
-    message: Incomplete
+    action_titles: list[Any]
+    message: Any
     message_type: int
     source: str
     def __init__(

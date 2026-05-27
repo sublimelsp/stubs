@@ -30,7 +30,6 @@ from .locationpicker import (
     LocationPicker as LocationPicker,
     open_location_async as open_location_async,
 )
-from _typeshed import Incomplete
 from typing import Any, TypedDict
 
 class LspGotoCommand(LspTextCommand):
@@ -68,23 +67,23 @@ class LspGotoCommand(LspTextCommand):
 
 class LspSymbolDefinitionCommand(LspGotoCommand):
     method: str
-    capability: Incomplete
+    capability: Any
     placeholder_text: str
     fallback_command: str
 
 class LspSymbolTypeDefinitionCommand(LspGotoCommand):
     method: str
-    capability: Incomplete
+    capability: Any
     placeholder_text: str
 
 class LspSymbolDeclarationCommand(LspGotoCommand):
     method: str
-    capability: Incomplete
+    capability: Any
     placeholder_text: str
 
 class LspSymbolImplementationCommand(LspGotoCommand):
     method: str
-    capability: Incomplete
+    capability: Any
     placeholder_text: str
 
 class DiagnosticData(TypedDict):
