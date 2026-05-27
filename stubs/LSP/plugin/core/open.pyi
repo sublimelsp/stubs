@@ -10,12 +10,12 @@ from .promise import Promise as Promise, ResolveFunc as ResolveFunc
 from .protocol import UINT_MAX as UINT_MAX
 from .url import parse_uri as parse_uri
 from .views import range_to_region as range_to_region
-from _typeshed import Incomplete
+import re
 
 g_opening_files: dict[
     str, tuple[Promise[sublime.View | None], ResolveFunc[sublime.View | None]]
 ]
-FRAGMENT_PATTERN: Incomplete
+FRAGMENT_PATTERN: re.Pattern[str]
 
 def lsp_range_from_uri_fragment(fragment: str) -> Range | None: ...
 def open_file_uri(

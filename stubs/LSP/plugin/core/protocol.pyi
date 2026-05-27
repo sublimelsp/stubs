@@ -1,11 +1,11 @@
 from ...protocol import *
 import sublime
-from _typeshed import Incomplete
 from plugin.api import PostResponseCallback as PostResponseCallback
 from typing import Any, Callable, Generic, Literal, TypeVar, TypedDict
 from typing_extensions import NotRequired, TypeAlias
+from typing import Union
 
-INT_MAX: Incomplete
+INT_MAX: int
 UINT_MAX = INT_MAX
 P = TypeVar("P", bound=LSPAny)
 R = TypeVar("R", bound=LSPAny)
@@ -574,8 +574,79 @@ class WorkspaceSymbolResolveRequest(TypedDict):
     method: Literal["workspaceSymbol/resolve"]
     params: WorkspaceSymbol
 
-ClientRequest: TypeAlias
-ServerRequest: TypeAlias
+ClientRequest: TypeAlias = Union[
+    CallHierarchyIncomingCallsRequest,
+    CallHierarchyOutgoingCallsRequest,
+    CallHierarchyPrepareRequest,
+    CodeActionRequest,
+    CodeActionResolveRequest,
+    CodeLensRequest,
+    CodeLensResolveRequest,
+    ColorPresentationRequest,
+    CompletionRequest,
+    CompletionResolveRequest,
+    DeclarationRequest,
+    DefinitionRequest,
+    DocumentColorRequest,
+    DocumentDiagnosticRequest,
+    DocumentFormattingRequest,
+    DocumentHighlightRequest,
+    DocumentLinkRequest,
+    DocumentLinkResolveRequest,
+    DocumentOnTypeFormattingRequest,
+    DocumentRangeFormattingRequest,
+    DocumentRangesFormattingRequest,
+    DocumentSymbolRequest,
+    ExecuteCommandRequest,
+    FoldingRangeRequest,
+    HoverRequest,
+    ImplementationRequest,
+    InitializeRequest,
+    InlayHintRequest,
+    InlayHintResolveRequest,
+    InlineCompletionRequest,
+    InlineValueRequest,
+    LinkedEditingRangeRequest,
+    MonikerRequest,
+    PrepareRenameRequest,
+    ReferencesRequest,
+    RenameRequest,
+    SelectionRangeRequest,
+    SemanticTokensDeltaRequest,
+    SemanticTokensRangeRequest,
+    SemanticTokensRequest,
+    ShutdownRequest,
+    SignatureHelpRequest,
+    TextDocumentContentRequest,
+    TypeDefinitionRequest,
+    TypeHierarchyPrepareRequest,
+    TypeHierarchySubtypesRequest,
+    TypeHierarchySupertypesRequest,
+    WillCreateFilesRequest,
+    WillDeleteFilesRequest,
+    WillRenameFilesRequest,
+    WillSaveTextDocumentWaitUntilRequest,
+    WorkspaceDiagnosticRequest,
+    WorkspaceSymbolRequest,
+    WorkspaceSymbolResolveRequest,
+]
+ServerRequest: TypeAlias = Union[
+    ApplyWorkspaceEditRequest,
+    CodeLensRefreshRequest,
+    ConfigurationRequest,
+    DiagnosticRefreshRequest,
+    FoldingRangeRefreshRequest,
+    InlayHintRefreshRequest,
+    InlineValueRefreshRequest,
+    RegistrationRequest,
+    SemanticTokensRefreshRequest,
+    ShowDocumentRequest,
+    ShowMessageRequest,
+    TextDocumentContentRefreshRequest,
+    UnregistrationRequest,
+    WorkDoneProgressCreateRequest,
+    WorkspaceFoldersRequest,
+]
 
 class ApplyWorkspaceEditResponse(TypedDict):
     method: Literal["workspace/applyEdit"]
@@ -868,8 +939,79 @@ class WorkspaceSymbolResolveResponse(TypedDict):
     method: Literal["workspaceSymbol/resolve"]
     result: WorkspaceSymbol
 
-ServerResponse: TypeAlias
-ClientResponse: TypeAlias
+ServerResponse: TypeAlias = Union[
+    CallHierarchyIncomingCallsResponse,
+    CallHierarchyOutgoingCallsResponse,
+    CallHierarchyPrepareResponse,
+    CodeActionResponse,
+    CodeActionResolveResponse,
+    CodeLensResponse,
+    CodeLensResolveResponse,
+    ColorPresentationResponse,
+    CompletionResponse,
+    CompletionResolveResponse,
+    DeclarationResponse,
+    DefinitionResponse,
+    DocumentColorResponse,
+    DocumentDiagnosticResponse,
+    DocumentFormattingResponse,
+    DocumentHighlightResponse,
+    DocumentLinkResponse,
+    DocumentLinkResolveResponse,
+    DocumentOnTypeFormattingResponse,
+    DocumentRangeFormattingResponse,
+    DocumentRangesFormattingResponse,
+    DocumentSymbolResponse,
+    ExecuteCommandResponse,
+    FoldingRangeResponse,
+    HoverResponse,
+    ImplementationResponse,
+    InitializeResponse,
+    InlayHintResponse,
+    InlayHintResolveResponse,
+    InlineCompletionResponse,
+    InlineValueResponse,
+    LinkedEditingRangeResponse,
+    MonikerResponse,
+    PrepareRenameResponse,
+    ReferencesResponse,
+    RenameResponse,
+    SelectionRangeResponse,
+    SemanticTokensDeltaResponse,
+    SemanticTokensRangeResponse,
+    SemanticTokensResponse,
+    ShutdownResponse,
+    SignatureHelpResponse,
+    TextDocumentContentResponse,
+    TypeDefinitionResponse,
+    TypeHierarchyPrepareResponse,
+    TypeHierarchySubtypesResponse,
+    TypeHierarchySupertypesResponse,
+    WillCreateFilesResponse,
+    WillDeleteFilesResponse,
+    WillRenameFilesResponse,
+    WillSaveTextDocumentWaitUntilResponse,
+    WorkspaceDiagnosticResponse,
+    WorkspaceSymbolResponse,
+    WorkspaceSymbolResolveResponse,
+]
+ClientResponse: TypeAlias = Union[
+    ApplyWorkspaceEditResponse,
+    CodeLensRefreshResponse,
+    ConfigurationResponse,
+    DiagnosticRefreshResponse,
+    FoldingRangeRefreshResponse,
+    InlayHintRefreshResponse,
+    InlineValueRefreshResponse,
+    RegistrationResponse,
+    SemanticTokensRefreshResponse,
+    ShowDocumentResponse,
+    ShowMessageResponse,
+    TextDocumentContentRefreshResponse,
+    UnregistrationResponse,
+    WorkDoneProgressCreateResponse,
+    WorkspaceFoldersResponse,
+]
 
 class CancelNotification(TypedDict):
     method: Literal["$/cancelRequest"]
@@ -975,5 +1117,35 @@ class WorkDoneProgressCancelNotification(TypedDict):
     method: Literal["window/workDoneProgress/cancel"]
     params: WorkDoneProgressCancelParams
 
-ClientNotification: TypeAlias
-ServerNotification: TypeAlias
+ClientNotification: TypeAlias = Union[
+    CancelNotification,
+    DidChangeConfigurationNotification,
+    DidChangeNotebookDocumentNotification,
+    DidChangeTextDocumentNotification,
+    DidChangeWatchedFilesNotification,
+    DidChangeWorkspaceFoldersNotification,
+    DidCloseNotebookDocumentNotification,
+    DidCloseTextDocumentNotification,
+    DidCreateFilesNotification,
+    DidDeleteFilesNotification,
+    DidOpenNotebookDocumentNotification,
+    DidOpenTextDocumentNotification,
+    DidRenameFilesNotification,
+    DidSaveNotebookDocumentNotification,
+    DidSaveTextDocumentNotification,
+    ExitNotification,
+    InitializedNotification,
+    ProgressNotification,
+    SetTraceNotification,
+    WillSaveTextDocumentNotification,
+    WorkDoneProgressCancelNotification,
+]
+ServerNotification: TypeAlias = Union[
+    CancelNotification,
+    LogMessageNotification,
+    LogTraceNotification,
+    ProgressNotification,
+    PublishDiagnosticsNotification,
+    ShowMessageNotification,
+    TelemetryEventNotification,
+]

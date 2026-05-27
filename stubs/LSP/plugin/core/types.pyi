@@ -23,7 +23,6 @@ from .transports import (
 )
 from .url import filename_to_uri as filename_to_uri, parse_uri as parse_uri
 from .workspace import WorkspaceFolder as WorkspaceFolder
-from _typeshed import Incomplete
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, Generator, Iterable, TypeVar, TypedDict
@@ -127,50 +126,50 @@ def read_list_setting(
 ) -> list: ...
 
 class Settings:
-    completion_insert_mode: Incomplete
-    diagnostics_additional_delay_auto_complete_ms: Incomplete
-    diagnostics_delay_ms: Incomplete
-    diagnostics_gutter_marker: Incomplete
-    diagnostics_highlight_style: Incomplete
-    diagnostics_panel_include_severity_level: Incomplete
-    disabled_capabilities: Incomplete
-    document_highlight_style: Incomplete
-    format_on_type: Incomplete
-    hover_highlight_style: Incomplete
-    inhibit_snippet_completions: Incomplete
-    inhibit_word_completions: Incomplete
-    initially_folded: Incomplete
-    inlay_hints_max_length: Incomplete
-    link_highlight_style: Incomplete
-    log_debug: Incomplete
-    log_max_size: Incomplete
-    log_server: Incomplete
-    lsp_code_actions_on_format: Incomplete
-    lsp_code_actions_on_save: Incomplete
-    lsp_format_on_paste: Incomplete
-    lsp_format_on_save: Incomplete
-    on_save_task_timeout_ms: Incomplete
-    only_show_lsp_completions: Incomplete
-    popup_max_characters_height: Incomplete
-    popup_max_characters_width: Incomplete
-    refactoring_auto_save: Incomplete
-    semantic_highlighting: Incomplete
-    show_code_actions: Incomplete
-    show_code_actions_in_hover: Incomplete
-    show_code_lens: Incomplete
-    show_diagnostics_annotations_severity_level: Incomplete
-    show_diagnostics_count_in_view_status: Incomplete
-    show_diagnostics_in_hover: Incomplete
-    show_diagnostics_in_view_status: Incomplete
-    show_diagnostics_panel_on_save: Incomplete
-    show_diagnostics_severity_level: Incomplete
-    show_inlay_hints: Incomplete
-    show_multiline_diagnostics_highlights: Incomplete
-    show_multiline_document_highlights: Incomplete
-    show_references_in_quick_panel: Incomplete
-    show_signature_help: Incomplete
-    show_symbol_action_links: Incomplete
-    show_view_status: Incomplete
+    completion_insert_mode: str
+    diagnostics_additional_delay_auto_complete_ms: int
+    diagnostics_delay_ms: int
+    diagnostics_gutter_marker: str
+    diagnostics_highlight_style: str | dict[str, str]
+    diagnostics_panel_include_severity_level: int
+    disabled_capabilities: list[str]
+    document_highlight_style: str
+    format_on_type: bool
+    hover_highlight_style: str
+    inhibit_snippet_completions: bool
+    inhibit_word_completions: bool
+    initially_folded: list[str]
+    inlay_hints_max_length: int
+    link_highlight_style: str
+    log_debug: bool
+    log_max_size: int
+    log_server: list[str]
+    lsp_code_actions_on_format: dict[str, bool]
+    lsp_code_actions_on_save: dict[str, bool]
+    lsp_format_on_paste: bool
+    lsp_format_on_save: bool
+    on_save_task_timeout_ms: int
+    only_show_lsp_completions: bool
+    popup_max_characters_height: int
+    popup_max_characters_width: int
+    refactoring_auto_save: str
+    semantic_highlighting: bool
+    show_code_actions: str
+    show_code_actions_in_hover: bool
+    show_code_lens: str
+    show_diagnostics_annotations_severity_level: int
+    show_diagnostics_count_in_view_status: bool
+    show_diagnostics_in_hover: bool
+    show_diagnostics_in_view_status: bool
+    show_diagnostics_panel_on_save: int
+    show_diagnostics_severity_level: int
+    show_inlay_hints: bool
+    show_multiline_diagnostics_highlights: bool
+    show_multiline_document_highlights: bool
+    show_references_in_quick_panel: bool
+    show_signature_help: bool
+    show_symbol_action_links: bool
+    show_view_status: bool
     def __init__(self, s: sublime.Settings) -> None: ...
     def update(self, s: sublime.Settings) -> None: ...
     def highlight_style_region_flags(
@@ -222,7 +221,7 @@ class DocumentSelectorMatcher:
     filters matches against the view.
     """
 
-    filters: Incomplete
+    filters: list[DocumentFilterMatcher]
     def __init__(self, document_selector: DocumentSelector) -> None: ...
     def __bool__(self) -> bool: ...
     def matches(self, view: sublime.View) -> bool:
@@ -302,22 +301,22 @@ class ClientConfig:
     file) are accessible through attribute access (`.foo`).
     """
 
-    name: Incomplete
-    selector: Incomplete
-    priority_selector: Incomplete
+    name: str
+    selector: str
+    priority_selector: str | None
     schemes: list[str]
-    command: Incomplete
-    tcp_port: Incomplete
-    auto_complete_selector: Incomplete
-    initialization_options: Incomplete
-    settings: Incomplete
-    env: Incomplete
-    experimental_capabilities: Incomplete
-    disabled_capabilities: Incomplete
-    file_watcher: Incomplete
-    path_maps: Incomplete
-    semantic_tokens: Incomplete
-    diagnostics_mode: Incomplete
+    command: list[str] | None
+    tcp_port: int | None
+    auto_complete_selector: str | None
+    initialization_options: DottedDict | None
+    settings: DottedDict | None
+    env: dict[str, str] | None
+    experimental_capabilities: dict[str, Any] | None
+    disabled_capabilities: DottedDict | None
+    file_watcher: FileWatcherConfig | None
+    path_maps: list[PathMap] | None
+    semantic_tokens: dict[str, str] | None
+    diagnostics_mode: str
     resolved_markdown_language_map: MarkdownLangMap | None
     def __init__(
         self,

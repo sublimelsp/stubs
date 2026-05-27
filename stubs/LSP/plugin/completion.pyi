@@ -30,11 +30,16 @@ from .core.views import (
 )
 from typing import Any, Callable
 from typing_extensions import TypeAlias, TypeGuard
+from ..protocol import CompletionList
+from typing import List
+from typing import Tuple
+from typing import Union
+import weakref
 
-SessionName: TypeAlias
-CompletionResponse: TypeAlias
-ResolvedCompletions: TypeAlias
-CompletionsStore: TypeAlias
+SessionName: TypeAlias = str
+CompletionResponse: TypeAlias = Union[List[CompletionItem], CompletionList, Error, None]
+ResolvedCompletions: TypeAlias = Tuple[CompletionResponse, "weakref.ref[Session]"]
+CompletionsStore: TypeAlias = Tuple[List[CompletionItem], CompletionItemDefaults]
 
 def format_details(detail: str, cutoff_length: int = 80) -> str: ...
 def format_completion(

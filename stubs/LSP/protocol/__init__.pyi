@@ -2,6 +2,11 @@ from ..plugin.core.typing import StrEnum
 from enum import IntEnum, IntFlag
 from typing import Literal, TypedDict
 from typing_extensions import NotRequired, TypeAlias
+from typing import Any
+from typing import List
+from typing import Mapping
+from typing import Sequence
+from typing import Union
 
 URI = str
 DocumentUri = str
@@ -499,28 +504,49 @@ class PrepareSupportDefaultBehavior(IntEnum):
 class TokenFormat(StrEnum):
     Relative: str
 
-Definition: TypeAlias
-DefinitionLink: TypeAlias
-LSPArray: TypeAlias
-LSPAny: TypeAlias
-Declaration: TypeAlias
-DeclarationLink: TypeAlias
-InlineValue: TypeAlias
-DocumentDiagnosticReport: TypeAlias
-PrepareRenameResult: TypeAlias
-DocumentSelector: TypeAlias
-ProgressToken: TypeAlias
-ChangeAnnotationIdentifier: TypeAlias
-WorkspaceDocumentDiagnosticReport: TypeAlias
-TextDocumentContentChangeEvent: TypeAlias
-MarkedString: TypeAlias
-DocumentFilter: TypeAlias
-LSPObject: TypeAlias
-GlobPattern: TypeAlias
-TextDocumentFilter: TypeAlias
-NotebookDocumentFilter: TypeAlias
-Pattern: TypeAlias
-RegularExpressionEngineKind: TypeAlias
+Definition: TypeAlias = Union["Location", List["Location"]]
+DefinitionLink: TypeAlias = "LocationLink"
+LSPArray: TypeAlias = Sequence["LSPAny"]
+LSPAny: TypeAlias = Union["LSPObject", LSPArray, str, int, Uint, float, bool, None]
+Declaration: TypeAlias = Union["Location", List["Location"]]
+DeclarationLink: TypeAlias = "LocationLink"
+InlineValue: TypeAlias = Union[
+    "InlineValueText", "InlineValueVariableLookup", "InlineValueEvaluatableExpression"
+]
+DocumentDiagnosticReport: TypeAlias = Union[
+    "RelatedFullDocumentDiagnosticReport", "RelatedUnchangedDocumentDiagnosticReport"
+]
+PrepareRenameResult: TypeAlias = Union[
+    "Range", "PrepareRenamePlaceholder", "PrepareRenameDefaultBehavior"
+]
+DocumentSelector: TypeAlias = List["DocumentFilter"]
+ProgressToken: TypeAlias = Union[int, str]
+ChangeAnnotationIdentifier: TypeAlias = str
+WorkspaceDocumentDiagnosticReport: TypeAlias = Union[
+    "WorkspaceFullDocumentDiagnosticReport",
+    "WorkspaceUnchangedDocumentDiagnosticReport",
+]
+TextDocumentContentChangeEvent: TypeAlias = Union[
+    "TextDocumentContentChangePartial", "TextDocumentContentChangeWholeDocument"
+]
+MarkedString: TypeAlias = Union[str, "MarkedStringWithLanguage"]
+DocumentFilter: TypeAlias = Union[
+    "TextDocumentFilter", "NotebookCellTextDocumentFilter"
+]
+LSPObject: TypeAlias = Mapping[str, Any]
+GlobPattern: TypeAlias = Union["Pattern", "RelativePattern"]
+TextDocumentFilter: TypeAlias = Union[
+    "TextDocumentFilterLanguage",
+    "TextDocumentFilterScheme",
+    "TextDocumentFilterPattern",
+]
+NotebookDocumentFilter: TypeAlias = Union[
+    "NotebookDocumentFilterNotebookType",
+    "NotebookDocumentFilterScheme",
+    "NotebookDocumentFilterPattern",
+]
+Pattern: TypeAlias = str
+RegularExpressionEngineKind: TypeAlias = str
 
 class ImplementationParams(TypedDict):
     textDocument: TextDocumentIdentifier

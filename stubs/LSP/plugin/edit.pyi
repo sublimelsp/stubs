@@ -16,8 +16,8 @@ from .core.sessions import Session as Session
 from .core.url import parse_uri as parse_uri
 from .core.views import get_line as get_line
 from .core.windows import WindowManager as WindowManager
-from _typeshed import Incomplete
 from typing import Any, Callable, Generator
+import re
 
 TextEditTuple = tuple[tuple[int, int], tuple[int, int], str]
 g_workspace_edit_panel_resolvers: dict[int, Callable[[bool], None]]
@@ -47,7 +47,7 @@ class LspApplyTextDocumentEditCommand(sublime_plugin.TextCommand):
     ) -> None: ...
 
 class LspApplyDocumentEditCommand(sublime_plugin.TextCommand):
-    re_placeholder: Incomplete
+    re_placeholder: re.Pattern[str]
     def description(self, **kwargs: dict[str, Any]) -> str | None: ...
     def run(
         self,

@@ -26,13 +26,12 @@ from .core.views import (
 )
 from .diagnostics import DiagnosticsAnnotationsView as DiagnosticsAnnotationsView
 from .session_buffer import SessionBuffer as SessionBuffer
-from _typeshed import Incomplete
 from typing import Any
 from weakref import ref
 
 class TagData:
     key: str
-    regions: Incomplete
+    regions: list[sublime.Region] | None
     scope: str
     def __init__(
         self, key: str, regions: list[sublime.Region] | None = None, scope: str = ""

@@ -17,7 +17,7 @@ ICONS: dict[MessageType, str]
 class MessageRequestHandler:
     view: sublime.View
     actions: Incomplete
-    action_titles: Incomplete
+    action_titles: list
     message: Incomplete
     message_type: Incomplete
     source: str

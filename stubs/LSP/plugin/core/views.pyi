@@ -57,10 +57,10 @@ from .url import (
     parse_uri as parse_uri,
 )
 from .workspace import is_subpath_of as is_subpath_of
-from _typeshed import Incomplete
 from dataclasses import dataclass
 from typing import Any, Callable, Generator, Iterable, Sequence
 import linecache
+import re
 
 @dataclass
 class DiagnosticStyle:
@@ -232,9 +232,9 @@ def minihtml(
     :returns: Formatted string
     """
 
-REPLACEMENT_MAP: dict
-PATTERNS: Incomplete
-REPLACEMENT_RE: Incomplete
+REPLACEMENT_MAP: dict[str, str]
+PATTERNS: list[str]
+REPLACEMENT_RE: re.Pattern[str]
 
 def text2html(content: str) -> str: ...
 def make_link(

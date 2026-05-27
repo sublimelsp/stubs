@@ -163,7 +163,7 @@ from typing_extensions import TypeAlias, TypeGuard
 from weakref import WeakSet
 from ...protocol import WorkspaceFolder as LspWorkspaceFolder
 
-InitCallback: TypeAlias
+InitCallback: TypeAlias = Callable[["Session", bool], None]
 P = TypeVar("P", bound=LSPAny)
 R = TypeVar("R", bound=LSPAny)
 
@@ -348,7 +348,7 @@ class SessionBufferProtocol(Protocol):
 
 class AbstractViewListener(ABC):
     TOTAL_ERRORS_AND_WARNINGS_STATUS_KEY: str
-    view: Incomplete
+    view: sublime.View
     hover_provider_count: int
     lightbulb_color: str
     @abstractmethod

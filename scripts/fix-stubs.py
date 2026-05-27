@@ -87,12 +87,32 @@ def infer_type_from_value(value_node, enum_classes):
         # Generic ClassName.MEMBER -> ClassName (for enums, constants etc.)
         if isinstance(value_node.value, ast.Name) and value_node.value.id[0].isupper():
             return value_node.value.id
+        # module.ClassName.MEMBER -> module.ClassName (e.g. sublime.RegionFlags.X)
+        if (
+            isinstance(value_node.value, ast.Attribute)
+            and isinstance(value_node.value.value, ast.Name)
+            and value_node.value.attr[0].isupper()
+        ):
+            return f"{value_node.value.value.id}.{value_node.value.attr}"
 
     if isinstance(value_node, ast.Call):
         f = value_node.func
         # str(x), repr(x), format(x) -> str
         if isinstance(f, ast.Name) and f.id in ("str", "repr", "format"):
             return "str"
+        # cast("TypeName", value) or cast(TypeName, value) -> TypeName
+        if isinstance(f, ast.Name) and f.id == "cast" and len(value_node.args) >= 1:
+            first = value_node.args[0]
+            if isinstance(first, ast.Constant) and isinstance(first.value, str):
+                return first.value
+            if isinstance(first, (ast.Name, ast.Subscript, ast.Attribute)):
+                return unparse(first)
+        # "str".method(...) -> str (format, join, strip, etc.)
+        if isinstance(f, ast.Attribute) and isinstance(f.value, ast.Constant) and isinstance(f.value.value, str):
+            if f.attr in ("format", "join", "strip", "lstrip", "rstrip", "upper", "lower", "replace", "format_map"):
+                return "str"
+            if f.attr == "encode":
+                return "bytes"
         # int(x) -> int
         if isinstance(f, ast.Name) and f.id == "int":
             return "int"
@@ -108,6 +128,11 @@ def infer_type_from_value(value_node, enum_classes):
         # list() -> list, dict() -> dict, set() -> set, tuple() -> tuple
         if isinstance(f, ast.Name) and f.id in ("list", "dict", "set", "tuple"):
             return f.id
+        # Bare os.path functions imported directly: join(), dirname(), etc. -> str
+        if isinstance(f, ast.Name) and f.id in (
+            "join", "dirname", "basename", "abspath", "realpath",
+        ):
+            return "str"
         # os.path.join/dirname/etc -> str
         if (
             isinstance(f, ast.Attribute)
@@ -130,14 +155,41 @@ def infer_type_from_value(value_node, enum_classes):
                 "isdir",
             ):
                 return "str"
-        # sublime.load_resource(...) -> str
+        # sublime.*() calls -> str
         if (
             isinstance(f, ast.Attribute)
             and isinstance(f.value, ast.Name)
             and f.value.id == "sublime"
-            and f.attr in ("load_resource", "load_settings", "get_clipboard")
+            and f.attr in (
+                "load_resource", "load_settings", "get_clipboard",
+                "cache_path", "packages_path", "installed_packages_path",
+                "platform", "version", "executable_path", "executable_hash",
+            )
         ):
             return "str"
+        # re.compile(...) -> re.Pattern[str]
+        if (
+            isinstance(f, ast.Attribute)
+            and isinstance(f.value, ast.Name)
+            and f.value.id == "re"
+            and f.attr == "compile"
+        ):
+            return "re.Pattern[str]"
+        # logging.getLogger(...) -> logging.Logger
+        if (
+            isinstance(f, ast.Attribute)
+            and isinstance(f.value, ast.Name)
+            and f.value.id == "logging"
+            and f.attr == "getLogger"
+        ):
+            return "logging.Logger"
+        # module.ClassName(...) -> module.ClassName (e.g. threading.Lock())
+        if (
+            isinstance(f, ast.Attribute)
+            and isinstance(f.value, ast.Name)
+            and f.attr[0].isupper()
+        ):
+            return f"{f.value.id}.{f.attr}"
         # Callable[[...], ...] -> type alias
         if isinstance(f, ast.Name) and f.id == "Callable":
             return {"type_alias": unparse(value_node)}
@@ -175,7 +227,73 @@ def infer_type_from_value(value_node, enum_classes):
         return "str"
 
     if isinstance(value_node, ast.Dict):
+        if not value_node.keys:
+            return "dict"
+        key_types = set()
+        val_types = set()
+        for k, v in zip(value_node.keys, value_node.values):
+            if k is None:  # dict unpacking **other
+                return "dict"
+            kt = infer_type_from_value(k, enum_classes)
+            vt = infer_type_from_value(v, enum_classes)
+            key_types.add(kt if isinstance(kt, str) else None)
+            val_types.add(vt if isinstance(vt, str) else None)
+        k_unified = next(iter(key_types)) if len(key_types) == 1 and None not in key_types else None
+        v_unified = next(iter(val_types)) if len(val_types) == 1 and None not in val_types else None
+        if k_unified and v_unified:
+            return f"dict[{k_unified}, {v_unified}]"
         return "dict"
+
+    if isinstance(value_node, ast.List):
+        if not value_node.elts:
+            return "list"
+        elt_types = set()
+        for e in value_node.elts:
+            et = infer_type_from_value(e, enum_classes)
+            elt_types.add(et if isinstance(et, str) else None)
+        if len(elt_types) == 1 and None not in elt_types:
+            return f"list[{next(iter(elt_types))}]"
+        return "list"
+
+    if isinstance(value_node, ast.Set):
+        if not value_node.elts:
+            return "set"
+        elt_types = set()
+        for e in value_node.elts:
+            et = infer_type_from_value(e, enum_classes)
+            elt_types.add(et if isinstance(et, str) else None)
+        if len(elt_types) == 1 and None not in elt_types:
+            return f"set[{next(iter(elt_types))}]"
+        return "set"
+
+    if isinstance(value_node, ast.ListComp):
+        elt_type = infer_type_from_value(value_node.elt, enum_classes)
+        if isinstance(elt_type, str):
+            return f"list[{elt_type}]"
+        return "list"
+
+    if isinstance(value_node, ast.SetComp):
+        elt_type = infer_type_from_value(value_node.elt, enum_classes)
+        if isinstance(elt_type, str):
+            return f"set[{elt_type}]"
+        return "set"
+
+    if isinstance(value_node, ast.DictComp):
+        k_type = infer_type_from_value(value_node.key, enum_classes)
+        v_type = infer_type_from_value(value_node.value, enum_classes)
+        if isinstance(k_type, str) and isinstance(v_type, str):
+            return f"dict[{k_type}, {v_type}]"
+        return "dict"
+
+    if isinstance(value_node, ast.Tuple):
+        if not value_node.elts:
+            return "tuple[()]"
+        elt_types_list = [
+            infer_type_from_value(e, enum_classes) for e in value_node.elts
+        ]
+        if all(isinstance(t, str) for t in elt_types_list):
+            return f"tuple[{', '.join(elt_types_list)}]"  # type: ignore[arg-type]
+        return "tuple"
 
     if isinstance(value_node, ast.IfExp):
         # 10000 if CI else 2000  ->  int
@@ -206,6 +324,23 @@ def infer_type_from_value(value_node, enum_classes):
         rt = infer_type_from_value(value_node.right, enum_classes)
         if lt is not None and lt == rt and isinstance(lt, str):
             return lt
+
+    if isinstance(value_node, ast.BinOp) and isinstance(value_node.op, ast.Mult):
+        lt = infer_type_from_value(value_node.left, enum_classes)
+        rt = infer_type_from_value(value_node.right, enum_classes)
+        # "str" * int or int * "str" -> str
+        if (lt == "str" and rt == "int") or (lt == "int" and rt == "str"):
+            return "str"
+        if lt == "int" and rt == "int":
+            return "int"
+
+    if isinstance(value_node, ast.BinOp) and isinstance(
+        value_node.op, (ast.Sub, ast.Pow, ast.FloorDiv, ast.Mod)
+    ):
+        lt = infer_type_from_value(value_node.left, enum_classes)
+        rt = infer_type_from_value(value_node.right, enum_classes)
+        if lt == "int" and rt == "int":
+            return "int"
 
     # Subscript: List[int], Dict[str, Any] -> type alias.
     # CONFIGURATION['key'] is a runtime subscript, not a type alias.
@@ -240,8 +375,9 @@ def collect_source_info(src_path):
 
     info = {
         "annotations": {},  # name -> type_str
-        "type_aliases": {},  # name -> " = expr"
-        "type_aliases_line": {},  # name -> "name = expr"
+        "type_aliases": {},  # name -> " = expr"  (from plain assignments)
+        "type_aliases_line": {},  # name -> "name = expr"  (from plain assignments)
+        "annotated_type_aliases": {},  # name -> value_str  (from `Name: TypeAlias = ...`)
         "class_attrs": {},  # class -> {attr: type_str} (from AnnAssign + __init__)
         "class_methods": {},  # class -> {method: stub_sig}
         "enum_member_names": {},  # class -> {member: True}
@@ -284,7 +420,7 @@ def collect_source_info(src_path):
                 stub = sig_from_funcdef(item)
                 if item.name == "__init__":
                     init_params = {}
-                    for arg in item.args.args:
+                    for arg in item.args.args + item.args.kwonlyargs:
                         if arg.arg != "self" and arg.annotation:
                             init_params[arg.arg] = unparse(arg.annotation)
                     for body_node in ast.walk(item):
@@ -329,6 +465,15 @@ def collect_source_info(src_path):
                                 and val.args[0].id in init_params
                             ):
                                 ca[attr] = f"ref[{init_params[val.args[0].id]}]"
+                            # Pattern E: self.attr = param or default
+                            elif (
+                                isinstance(val, ast.BoolOp)
+                                and isinstance(val.op, ast.Or)
+                                and val.values
+                                and isinstance(val.values[0], ast.Name)
+                                and val.values[0].id in init_params
+                            ):
+                                ca[attr] = init_params[val.values[0].id]
                             # Pattern D: self.attr = literal (str, int, bool, etc.)
                             else:
                                 lit_type = infer_type_from_value(val, enum_classes)
@@ -352,7 +497,22 @@ def collect_source_info(src_path):
     for node in ast.iter_child_nodes(tree):
         # Module-level annotation
         if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
-            info["annotations"][node.target.id] = unparse(node.annotation)
+            ann = node.annotation
+            is_type_alias_ann = (isinstance(ann, ast.Name) and ann.id == "TypeAlias") or (
+                isinstance(ann, ast.Attribute) and ann.attr == "TypeAlias"
+            )
+            if is_type_alias_ann and node.value is not None:
+                # `Name: TypeAlias = <value>` — store value so stubs can be completed
+                info["annotated_type_aliases"][node.target.id] = unparse(node.value)
+            else:
+                ann_str = unparse(ann)
+                # If the source annotation is a bare collection type but a value is
+                # available, try to infer a more specific parameterized type from it.
+                if ann_str in ("dict", "list", "set", "tuple") and node.value is not None:
+                    inferred = infer_type_from_value(node.value, enum_classes)
+                    if isinstance(inferred, str) and inferred.startswith(ann_str + "["):
+                        ann_str = inferred
+                info["annotations"][node.target.id] = ann_str
 
         # Module-level assignment (candidates: type alias or inferred type)
         elif isinstance(node, ast.Assign):
@@ -375,10 +535,28 @@ def collect_source_info(src_path):
         elif isinstance(node, (ast.Import, ast.ImportFrom)):
             info["import_nodes"].append(node)
 
-    # Phase 3: collect info from class definitions (all depths via ast.walk)
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef):
-            _collect_class_body(node, node.name in enum_classes, info)
+    # Phase 4.5: resolve dependent types using collected annotations
+    # e.g. SUPPORTED_DIAGNOSTIC_TAGS = list(DIAGNOSTIC_TAG_SCOPES)
+    #      DIAGNOSTIC_TAG_SCOPES: dict[DiagnosticTag, str] -> list[DiagnosticTag]
+    for node in ast.iter_child_nodes(tree):
+        if not isinstance(node, ast.Assign):
+            continue
+        for target in node.targets:
+            if not isinstance(target, ast.Name):
+                continue
+            if info["annotations"].get(target.id) != "list":
+                continue
+            if (
+                isinstance(node.value, ast.Call)
+                and isinstance(node.value.func, ast.Name)
+                and node.value.func.id == "list"
+                and len(node.value.args) == 1
+                and isinstance(node.value.args[0], ast.Name)
+            ):
+                arg_type = info["annotations"].get(node.value.args[0].id, "")
+                m = re.match(r"dict\[([^,\[\]]+),", arg_type)
+                if m:
+                    info["annotations"][target.id] = f"list[{m.group(1).strip()}]"
 
     return info
 
@@ -410,6 +588,29 @@ def apply_fixes(txt, info):
                 del class_at_indent[k]
             class_at_indent[cls_indent] = cls_name
             new_lines.append(raw)
+            continue
+
+        # Check for bare `Name: TypeAlias` (stubgen drops the value)
+        ta = re.match(r"^(\s*)([A-Za-z_]\w*): TypeAlias\s*$", raw)
+        if ta:
+            ta_indent = ta.group(1)
+            ta_name = ta.group(2)
+            if ta_indent == "" and ta_name in info.get("annotated_type_aliases", {}):
+                new_lines.append(f"{ta_name}: TypeAlias = {info['annotated_type_aliases'][ta_name]}")
+            else:
+                new_lines.append(raw)
+            continue
+
+        # Check for bare unparameterized collection types at module level
+        bare_coll = re.match(r"^([A-Za-z_]\w*): (dict|list|set|tuple)\s*$", raw)
+        if bare_coll:
+            bare_name = bare_coll.group(1)
+            bare_type = bare_coll.group(2)
+            inferred = info.get("annotations", {}).get(bare_name, "")
+            if inferred.startswith(bare_type + "["):
+                new_lines.append(f"{bare_name}: {inferred}")
+            else:
+                new_lines.append(raw)
             continue
 
         # Check for Incomplete pattern
@@ -584,7 +785,12 @@ lsp_src = pathlib.Path(os.environ["LSP_SRC"])
 for pyi in sorted(out.rglob("*.pyi")):
     txt = pyi.read_bytes().decode("utf-8").replace("\r\n", "\n")
 
-    if ": Incomplete" not in txt:
+    needs_fix = (
+        ": Incomplete" in txt
+        or bool(re.search(r"\w+: TypeAlias\s*$", txt, re.MULTILINE))
+        or bool(re.search(r"^\w+: (?:dict|list|set|tuple)\s*$", txt, re.MULTILINE))
+    )
+    if not needs_fix:
         continue
 
     # Locate source using relative path first, then fallbacks

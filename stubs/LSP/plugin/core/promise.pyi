@@ -2,6 +2,7 @@ from _typeshed import Incomplete
 from typing import Callable, Generic, Protocol, TypeVar
 from typing import Tuple
 from typing import Union
+import threading
 
 T = TypeVar("T")
 S = TypeVar("S")
@@ -87,7 +88,7 @@ class Promise(Generic[T]):
                     Gets passed a list with all resolved values.
         """
     resolved: bool
-    mutex: Incomplete
+    mutex: threading.Lock
     callbacks: list[ResolveFunc[T]]
     def __init__(self, executor_func: ExecutorFunc[T]) -> None:
         """

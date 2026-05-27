@@ -97,7 +97,7 @@ class LspDocumentSymbolsCommand(LspTextCommand):
 class DocumentSymbolsKindInputHandler(PreselectedListInputHandler):
     view: sublime.View
     items: list[sublime.ListInputItem]
-    old_selection: Incomplete
+    old_selection: list[sublime.Region]
     last_selected: int
     def __init__(
         self,

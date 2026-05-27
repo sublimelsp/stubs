@@ -49,7 +49,6 @@ from .core.views import (
     unpack_href_location as unpack_href_location,
     update_lsp_popup as update_lsp_popup,
 )
-from _typeshed import Incomplete
 
 SessionName = str
 ResolvedHover = Hover | Error
@@ -64,7 +63,7 @@ class LinkKind:
     ) -> None: ...
     def link(self, point: int, view: sublime.View) -> str: ...
 
-link_kinds: Incomplete
+link_kinds: list[LinkKind]
 
 class LspHoverCommand(LspTextCommand):
     def __init__(self, view: sublime.View) -> None: ...
