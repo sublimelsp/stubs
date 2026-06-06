@@ -20,7 +20,10 @@ from ...protocol import (
     DocumentLink,
     DocumentUri,
     ExecuteCommandParams,
+    FileCreate as FileCreate,
+    FileDelete as FileDelete,
     FileEvent as FileEvent,
+    FileRename as FileRename,
     FileSystemWatcher as FileSystemWatcher,
     InitializeParams,
     LSPAny,
@@ -245,6 +248,12 @@ class Manager(ABC):
     ) -> None: ...
     @abstractmethod
     def handle_stderr_log(self, config_name: str, message: str) -> None: ...
+    @abstractmethod
+    def notify_did_create_files(self, created_files: list[FileCreate]) -> None: ...
+    @abstractmethod
+    def notify_did_rename_files(self, renamed_files: list[FileRename]) -> None: ...
+    @abstractmethod
+    def notify_did_delete_files(self, deleted_files: list[FileDelete]) -> None: ...
 
 def get_initialize_params(
     variables: dict[str, str],

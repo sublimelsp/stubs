@@ -32,7 +32,10 @@ from .core.sessions import (
 from .core.settings import userprefs as userprefs
 from .core.url import (
     CODE_ACTION_SCHEME as CODE_ACTION_SCHEME,
+    DOCUMENT_LINK_SCHEME as DOCUMENT_LINK_SCHEME,
     decode_code_action_uri as decode_code_action_uri,
+    decode_document_link_uri as decode_document_link_uri,
+    encode_document_link_uri as encode_document_link_uri,
     parse_uri as parse_uri,
 )
 from .core.views import (
@@ -45,6 +48,7 @@ from .core.views import (
     minihtml as minihtml,
     range_to_region as range_to_region,
     show_lsp_popup as show_lsp_popup,
+    text_document_identifier as text_document_identifier,
     text_document_position_params as text_document_position_params,
     unpack_href_location as unpack_href_location,
     update_lsp_popup as update_lsp_popup,

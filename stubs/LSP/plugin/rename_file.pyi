@@ -6,11 +6,7 @@ from .core.edit import show_summary_message as show_summary_message
 from .core.logging import debug as debug
 from .core.open import open_file_uri as open_file_uri
 from .core.promise import Promise as Promise
-from .core.protocol import (
-    Error as Error,
-    Notification as Notification,
-    Request as Request,
-)
+from .core.protocol import Error as Error, Request as Request
 from .core.registry import LspWindowCommand as LspWindowCommand
 from .core.sessions import Session as Session
 from .core.types import match_file_operation_filters as match_file_operation_filters
@@ -76,7 +72,6 @@ class LspRenamePathCommand(LspWindowCommand):
         accepted: bool,
     ) -> Promise[bool]: ...
     def rename_path(self, old: str, new: str) -> Promise[bool]: ...
-    def notify_did_rename(self, file_rename: FileRename) -> None: ...
     def restore_view(
         self,
         selection: list[sublime.Region],

@@ -25,7 +25,7 @@ from .url import filename_to_uri as filename_to_uri, parse_uri as parse_uri
 from .workspace import WorkspaceFolder as WorkspaceFolder
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Callable, Generator, Iterable, TypeVar, TypedDict
+from typing import Any, Callable, Final, Generator, Iterable, TypeVar, TypedDict
 from typing_extensions import NotRequired
 from typing import List
 from typing_extensions import override
@@ -301,6 +301,7 @@ class ClientConfig:
     file) are accessible through attribute access (`.foo`).
     """
 
+    CONFIG_KEYS: Final[set[str]]
     name: str
     selector: str
     priority_selector: str
@@ -340,7 +341,7 @@ class ClientConfig:
         markdown_language_map: MarkdownLangMapJson | None = None,
         path_maps: list[PathMap] | None = None,
         settings_registration: SettingsRegistration | None = None,
-        all_settings: dict[str, Any] | None = None,
+        custom_config_keys: dict[str, Any] | None = None,
     ) -> None:
         """
         :param name: Unique identifier for this language server.
@@ -379,13 +380,14 @@ class ClientConfig:
             server (e.g. inside a container).
         :param settings_registration: The `SettingsRegistration` instance holding resource path and `Settings` instance
             for the plugin settings. Present only for `ClientConfig`s created through `from_sublime_settings()`.
-        :param all_settings: The complete raw settings dictionary. Used as a fallback for attribute/key access for
+        :param custom_config_keys: The complete raw settings dictionary. Used as a fallback for attribute/key access for
             settings not explicitly modelled above.
         """
     def __getattr__(self, name: str) -> Any:
         """Get property through attribute access (`.foo`) for properties that don't exist natively."""
     @property
-    def root_settings(self) -> dict[str, Any]: ...
+    def root_settings(self) -> dict[str, Any]:
+        """Provides access to server configuration keys that are not explicitly exposed on ClientConfig."""
     @property
     def init_options(self) -> DottedDict: ...
     @property
@@ -426,7 +428,7 @@ class ClientConfig:
 
         Values present in `override` take precedence over those in `src_config`. Structured
         values (`initialization_options`, `settings`) are deep-merged rather than replaced wholesale. The raw
-        `_all_settings` dict is shallow-merged.
+        `_custom_config_keys` dict is shallow-merged.
 
         :param src_config: The base configuration to start from.
         :param override: Dictionary of values to override.

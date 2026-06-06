@@ -256,9 +256,17 @@ class Notification(Generic[P]):
         cls, params: DidCloseTextDocumentParams
     ) -> Notification[DidCloseTextDocumentParams]: ...
     @classmethod
+    def didCreateFiles(
+        cls, params: CreateFilesParams
+    ) -> Notification[CreateFilesParams]: ...
+    @classmethod
     def didRenameFiles(
         cls, params: RenameFilesParams
     ) -> Notification[RenameFilesParams]: ...
+    @classmethod
+    def didDeleteFiles(
+        cls, params: DeleteFilesParams
+    ) -> Notification[DeleteFilesParams]: ...
     @classmethod
     def didChangeConfiguration(
         cls, params: DidChangeConfigurationParams

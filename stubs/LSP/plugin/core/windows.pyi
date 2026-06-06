@@ -2,6 +2,9 @@ import sublime
 from ...protocol import (
     Diagnostic as Diagnostic,
     DocumentUri,
+    FileCreate as FileCreate,
+    FileDelete as FileDelete,
+    FileRename as FileRename,
     LogMessageParams,
     MessageActionItem as MessageActionItem,
     ShowMessageParams,
@@ -15,7 +18,6 @@ from ..api import (
     PluginStartError as PluginStartError,
     get_plugin as get_plugin,
 )
-from .collections import DottedDict as DottedDict
 from .configurations import (
     RETRY_COUNT_TIMEDELTA as RETRY_COUNT_TIMEDELTA,
     RETRY_MAX_COUNT as RETRY_MAX_COUNT,
@@ -33,7 +35,7 @@ from .panels import (
     PanelName as PanelName,
 )
 from .promise import Promise as Promise
-from .protocol import Error as Error, Point as Point
+from .protocol import Error as Error, Notification as Notification, Point as Point
 from .sessions import (
     AbstractViewListener as AbstractViewListener,
     Logger as Logger,
@@ -49,6 +51,7 @@ from .tree_view import TreeViewSheet as TreeViewSheet
 from .types import (
     ClientConfig as ClientConfig,
     ViewStatusHandler as ViewStatusHandler,
+    match_file_operation_filters as match_file_operation_filters,
     matches_pattern as matches_pattern,
     sublime_pattern_to_glob as sublime_pattern_to_glob,
 )
@@ -135,7 +138,11 @@ class WindowManager(Manager, WindowConfigChangeListener, ViewStatusHandler):
     ) -> None: ...
     def on_diagnostics_updated(self) -> None: ...
     def update_diagnostics_panel_async(self) -> None: ...
+    def notify_did_create_files(self, created_files: list[FileCreate]) -> None: ...
+    def notify_did_rename_files(self, renamed_files: list[FileRename]) -> None: ...
+    def notify_did_delete_files(self, deleted_files: list[FileDelete]) -> None: ...
     def on_configs_changed(self, configs: list[ClientConfig]) -> None: ...
+    def on_server_settings_changed(self, configs: list[ClientConfig]) -> None: ...
     def on_view_status_changed(
         self, config_name: str, view: sublime.View, status: str | None
     ) -> None: ...
@@ -148,9 +155,6 @@ class WindowRegistry(LspSettingsChangeListener):
     def listener_for_view(self, view: sublime.View) -> AbstractViewListener | None: ...
     def discard(self, window: sublime.Window) -> None: ...
     def on_client_config_updated(self, config_name: str | None = None) -> None: ...
-    def on_server_settings_changed(
-        self, config_name: str, settings: DottedDict
-    ) -> None: ...
     def on_userprefs_updated(self) -> None: ...
 
 class RequestTimeTracker:

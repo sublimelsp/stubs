@@ -1,5 +1,5 @@
 import sublime
-from .logging import debug as debug, exception_log as exception_log, printf as printf
+from .logging import exception_log as exception_log, printf as printf
 from .types import ClientConfig as ClientConfig
 from .url import parse_uri as parse_uri
 from .workspace import (
@@ -10,13 +10,19 @@ from .workspace import (
 from abc import ABC, abstractmethod
 from typing import Generator
 from datetime import timedelta
+from typing import Literal
 
 RETRY_MAX_COUNT: int
 RETRY_COUNT_TIMEDELTA: timedelta
+ConfigChangeType = Literal[
+    "added", "removed", "root_changed", "settings_changed", "unchanged"
+]
 
 class WindowConfigChangeListener(ABC):
     @abstractmethod
     def on_configs_changed(self, configs: list[ClientConfig]) -> None: ...
+    @abstractmethod
+    def on_server_settings_changed(self, configs: list[ClientConfig]) -> None: ...
 
 class WindowConfigManager:
     all: dict[str, ClientConfig]

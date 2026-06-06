@@ -11,7 +11,7 @@ from ...protocol import (
     TextEdit,
     WorkspaceEdit,
 )
-from .logging import debug as debug
+from .logging import debug as debug, printf as printf
 from .promise import Promise as Promise
 from .protocol import UINT_MAX as UINT_MAX
 from typing import Sequence, TypedDict
