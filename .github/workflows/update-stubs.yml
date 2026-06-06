@@ -1,0 +1,46 @@
+name: Update LSP stubs
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-stubs
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8.2.0
+
+      - name: Generate stubs
+        run: bash scripts/generate-stubs.sh
+
+      - name: Detect stub changes (ignoring .version)
+        id: check
+        run: |
+          if [ -n "$(git status --porcelain -- ':!stubs/LSP/.version')" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "[INFO] No stub changes beyond .version; skipping commit."
+          fi
+
+      - name: Commit and push
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          lsp_tag="$(awk '/^tag:/ {print $2}' stubs/LSP/.version)"
+          git add -A
+          git commit -m "chore(stubs): sync stubs to LSP ${lsp_tag}"
+          git push
