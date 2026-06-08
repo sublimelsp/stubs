@@ -87,7 +87,8 @@ mkdir -p "$LSP_OUT"
 # Fix Incomplete placeholder types, class attribute types, and normalize to LF.
 # Uses Python's AST module to infer types from source without executing code.
 log "Post-processing stubs..."
-LSP_OUT="$LSP_OUT" LSP_SRC="$LSP_SRC" uv run python "${SCRIPT_DIR}/fix-stubs.py"
+# ast.unparse requires python >= 3.9
+LSP_OUT="$LSP_OUT" LSP_SRC="$LSP_SRC" uv run --python=3.14 python "${SCRIPT_DIR}/fix-stubs.py"
 
 # Format stubs with ruff
 uvx --from ruff ruff format "${LSP_OUT}"
