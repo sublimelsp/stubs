@@ -5,6 +5,7 @@ from .types import (
     ClientConfig as ClientConfig,
     Settings as Settings,
     SettingsRegistration as SettingsRegistration,
+    SettingsStore as SettingsStore,
     debounced as debounced,
     read_dict_setting as read_dict_setting,
 )
@@ -21,6 +22,7 @@ class LspSettingsChangeListener(ABC):
 class ClientConfigs:
     all: dict[str, ClientConfig]
     external: dict[str, ClientConfig]
+    external_settings_registrations: dict[str, SettingsRegistration]
     def __init__(self) -> None: ...
     def add_for_testing(self, config: ClientConfig) -> None: ...
     def remove_for_testing(self, config: ClientConfig) -> None: ...

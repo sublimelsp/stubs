@@ -81,16 +81,17 @@ def debounced(
                                main thread
     """
 
-class SettingsRegistration:
+@dataclass
+class SettingsStore:
     settings: sublime.Settings
     settings_path: str
+
+class SettingsRegistration:
+    settings: sublime.Settings
     def __init__(
-        self,
-        settings: sublime.Settings,
-        settings_path: str,
-        on_change: Callable[[SettingsRegistration], None],
+        self, settings: sublime.Settings, on_change: Callable[[], None]
     ) -> None: ...
-    def __del__(self) -> None: ...
+    def unregister(self) -> None: ...
 
 class DebouncerNonThreadSafe:
     """
@@ -340,7 +341,7 @@ class ClientConfig:
         diagnostics_mode: str = "all_files",
         markdown_language_map: MarkdownLangMapJson | None = None,
         path_maps: list[PathMap] | None = None,
-        settings_registration: SettingsRegistration | None = None,
+        settings_store: SettingsStore | None = None,
         custom_config_keys: dict[str, Any] | None = None,
     ) -> None:
         """
@@ -378,7 +379,7 @@ class ClientConfig:
             applies no extra mapping.
         :param path_maps: List of :class:`PathMap` entries for translating paths between the local machine and a remote
             server (e.g. inside a container).
-        :param settings_registration: The `SettingsRegistration` instance holding resource path and `Settings` instance
+        :param settings_store: The `SettingsStore` instance holding resource path and `Settings` instance
             for the plugin settings. Present only for `ClientConfig`s created through `from_sublime_settings()`.
         :param custom_config_keys: The complete raw settings dictionary. Used as a fallback for attribute/key access for
             settings not explicitly modelled above.
@@ -400,7 +401,7 @@ class ClientConfig:
     def markdown_language_map(self, lang_map: MarkdownLangMapJson | None) -> None: ...
     @classmethod
     def from_sublime_settings(
-        cls, name: str, settings_registration: SettingsRegistration
+        cls, name: str, settings_store: SettingsStore
     ) -> ClientConfig:
         """
         Create a ClientConfig from a Sublime Text `Settings` object.
@@ -409,7 +410,7 @@ class ClientConfig:
         overrides are layered on top from `Settings`.
 
         :param name: Unique server name.
-        :param settings_registration: The `SettingsRegistration` object for this client.
+        :param settings_store: The `SettingsStore` object for this client.
         """
     @classmethod
     def from_dict(cls, name: str, d: dict[str, Any]) -> ClientConfig:
