@@ -1,8 +1,10 @@
 import sublime
 from ...protocol import (
+    DocumentFilter,
     DocumentSelector,
     DocumentUri,
     FileOperationFilter,
+    NotebookCellTextDocumentFilter as NotebookCellTextDocumentFilter,
     ServerCapabilities,
     TextDocumentSyncKind,
     TextDocumentSyncOptions,
@@ -26,7 +28,7 @@ from .workspace import WorkspaceFolder as WorkspaceFolder
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, Final, Generator, Iterable, TypeVar, TypedDict
-from typing_extensions import NotRequired
+from typing_extensions import NotRequired, TypeGuard
 from typing import List
 from typing_extensions import override
 import os
@@ -189,6 +191,10 @@ class ClientStates:
     STARTING: int
     READY: int
     STOPPING: int
+
+def is_notebook_cell_text_document_filter(
+    document_filter: DocumentFilter,
+) -> TypeGuard[NotebookCellTextDocumentFilter]: ...
 
 class DocumentFilterMatcher:
     """
