@@ -326,6 +326,7 @@ class ClientConfig:
     semantic_tokens: dict[str, str] | None
     diagnostics_mode: str
     resolved_markdown_language_map: MarkdownLangMap | None
+    syntax_map: dict[str, str]
     def __init__(
         self,
         *,
@@ -346,6 +347,7 @@ class ClientConfig:
         semantic_tokens: dict[str, str] | None = None,
         diagnostics_mode: str = "all_files",
         markdown_language_map: MarkdownLangMapJson | None = None,
+        syntax_map: dict[str, str] | None = None,
         path_maps: list[PathMap] | None = None,
         settings_store: SettingsStore | None = None,
         custom_config_keys: dict[str, Any] | None = None,
@@ -383,6 +385,8 @@ class ClientConfig:
             language tag. Each value is a two-element tuple: aliases and syntax paths or `scope:BASE_SCOPE`
             selectors. Follows the format of mdpopups\' `sublime_user_lang_map` setting. `None` (the default)
             applies no extra mapping.
+        :param syntax_map: Optional mapping of custom URI schemes to Sublime Text syntaxes, used when fetching dynamic
+            document content from the server via `workspace/textDocumentContent` request.
         :param path_maps: List of :class:`PathMap` entries for translating paths between the local machine and a remote
             server (e.g. inside a container).
         :param settings_store: The `SettingsStore` instance holding resource path and `Settings` instance
