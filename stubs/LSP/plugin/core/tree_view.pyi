@@ -1,13 +1,18 @@
 import sublime
+import sublime_plugin
 from .constants import SublimeKind as SublimeKind
 from .css import css as css
 from .promise import Promise as Promise
-from .registry import LspWindowCommand as LspWindowCommand, windows as windows
+from .registry import windows as windows
 from abc import ABC, abstractmethod
 from enum import IntEnum
-from typing import TypeVar
+from typing import Any, TypeVar
+from typing import Literal
 
 T = TypeVar("T")
+TreeViewAction = Literal[
+    "move_up", "move_right", "move_down", "move_left", "close", "activate"
+]
 KIND_CLASS_NAMES: dict[int, str]
 
 class TreeItemCollapsibleState(IntEnum):
@@ -20,7 +25,7 @@ class TreeItem:
     kind: SublimeKind
     description: str
     tooltip: str
-    command_url: str
+    action_command: tuple[str, dict[str, Any]] | None
     collapsible_state: int
     id: str
     def __init__(
@@ -29,18 +34,25 @@ class TreeItem:
         kind: SublimeKind = ...,
         description: str = "",
         tooltip: str = "",
-        command_url: str = "",
+        action_command: tuple[str, dict[str, Any]] | None = None,
     ) -> None: ...
-    def html(self, sheet_name: str, indent_level: int) -> str: ...
+    def html(
+        self, sheet_name: str, indent_level: int, *, has_focus: bool = False
+    ) -> str: ...
 
 class Node:
     element: T
     tree_item: TreeItem
+    parent_node_id: str | None
     indent_level: int
     child_ids: list[str]
     is_resolved: bool
     def __init__(
-        self, element: T, tree_item: TreeItem, indent_level: int = 0
+        self,
+        element: T,
+        tree_item: TreeItem,
+        parent_node_id: str | None,
+        indent_level: int = 0,
     ) -> None: ...
 
 class TreeDataProvider(ABC):
@@ -58,6 +70,8 @@ class TreeViewSheet(sublime.HtmlSheet):
     """A special HtmlSheet which can render interactive tree data structures."""
 
     nodes: dict[str, Node]
+    selected_node_id: str | None
+    ordered_node_ids: list[str]
     root_nodes: list[str]
     name: str
     data_provider: TreeDataProvider
@@ -74,8 +88,11 @@ class TreeViewSheet(sublime.HtmlSheet):
         Use this method if you want to render an entire new tree. This allows to reuse a single HtmlSheet, e.g. when
         using a feature consecutively on different symbols.
         """
+    def handle_action(self, action: TreeViewAction) -> None: ...
     def expand_item(self, node_id: str) -> None: ...
     def collapse_item(self, node_id: str) -> None: ...
+    def select_item(self, node_id: str) -> None: ...
+    def activate_item(self, node_id: str) -> None: ...
 
 def new_tree_view_sheet(
     window: sublime.Window,
@@ -95,8 +112,14 @@ def toggle_tree_item(
     window: sublime.Window, name: str, node_id: str, expand: bool
 ) -> None: ...
 
-class LspExpandTreeItemCommand(LspWindowCommand):
+class LspExpandTreeItemCommand(sublime_plugin.WindowCommand):
     def run(self, name: str, node_id: str) -> None: ...
 
-class LspCollapseTreeItemCommand(LspWindowCommand):
+class LspCollapseTreeItemCommand(sublime_plugin.WindowCommand):
     def run(self, name: str, node_id: str) -> None: ...
+
+class LspActivateTreeItemCommand(sublime_plugin.WindowCommand):
+    def run(self, name: str, node_id: str) -> None: ...
+
+class LspHandleTreeViewActionCommand(sublime_plugin.WindowCommand):
+    def run(self, action: TreeViewAction) -> None: ...

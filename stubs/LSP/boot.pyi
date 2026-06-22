@@ -33,8 +33,10 @@ from .plugin.core.signature_help import (
     LspSignatureHelpShowCommand as LspSignatureHelpShowCommand,
 )
 from .plugin.core.tree_view import (
+    LspActivateTreeItemCommand as LspActivateTreeItemCommand,
     LspCollapseTreeItemCommand as LspCollapseTreeItemCommand,
     LspExpandTreeItemCommand as LspExpandTreeItemCommand,
+    LspHandleTreeViewActionCommand as LspHandleTreeViewActionCommand,
 )
 from .plugin.core.views import (
     LspRunTextCommandHelperCommand as LspRunTextCommandHelperCommand,
