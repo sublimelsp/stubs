@@ -306,7 +306,7 @@ def html_wrapper(content: str, *, class_name: str | None = None) -> str:
     The `content` is NOT escaped.
     """
 
-def lightbulb_html(color: str, star: bool) -> str: ...
+def lightbulb_html(color: str, is_preferred: bool, llm_generated: bool) -> str: ...
 def format_diagnostics_for_html(
     view: sublime.View,
     diagnostics_by_config: Sequence[tuple[SessionBufferProtocol, Sequence[Diagnostic]]],
