@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 from ...protocol import Diagnostic as Diagnostic, Location, LocationLink
 from .sessions import AbstractViewListener as AbstractViewListener, Session as Session
+from .settings import userprefs as userprefs
 from .views import (
     MissingUriError as MissingUriError,
     first_selection_region as first_selection_region,
@@ -83,13 +84,27 @@ class LspCheckApplicableCommand(sublime_plugin.TextCommand):
     def run(self, edit: sublime.Edit, session_name: str) -> None: ...
 
 def navigate_diagnostics(
-    view: sublime.View, point: int | None, forward: bool = True
+    view: sublime.View,
+    point: int | None,
+    severity_level: int | None,
+    *,
+    forward: bool = True,
 ) -> None: ...
 
 class LspNextDiagnosticCommand(LspTextCommand):
-    def run(self, edit: sublime.Edit, point: int | None = None) -> None: ...
+    def run(
+        self,
+        edit: sublime.Edit,
+        point: int | None = None,
+        severity_level: int | None = None,
+    ) -> None: ...
     def want_event(self) -> bool: ...
 
 class LspPrevDiagnosticCommand(LspTextCommand):
-    def run(self, edit: sublime.Edit, point: int | None = None) -> None: ...
+    def run(
+        self,
+        edit: sublime.Edit,
+        point: int | None = None,
+        severity_level: int | None = None,
+    ) -> None: ...
     def want_event(self) -> bool: ...
