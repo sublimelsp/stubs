@@ -57,7 +57,7 @@ class Request(Generic[P, R]):
     ) -> Request[SignatureHelpParams, SignatureHelp | None]: ...
     @classmethod
     def codeAction(
-        cls, params: CodeActionParams, view: sublime.View
+        cls, params: CodeActionParams, view: sublime.View, progress: bool = False
     ) -> Request[CodeActionParams, list[Command | CodeAction] | None]: ...
     @classmethod
     def documentColor(

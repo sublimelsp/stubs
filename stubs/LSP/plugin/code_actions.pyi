@@ -59,7 +59,9 @@ class CodeActionsManager:
             tuple[SessionBufferProtocol, list[Diagnostic]]
         ],
         only_kinds: list[str | CodeActionKind] | None = None,
+        *,
         manual: bool = False,
+        progress: bool = False,
     ) -> Promise[list[CodeActionsByConfigName]]:
         """
         Requests code actions with provided diagnostics and specified region. If there are
