@@ -26,7 +26,7 @@ from ...protocol import (
     FileRename as FileRename,
     FileSystemWatcher as FileSystemWatcher,
     InitializeParams,
-    LSPAny,
+    LSPAny as LSPAny,
     LSPObject as LSPObject,
     Location,
     LocationLink,
@@ -113,7 +113,9 @@ from .protocol import (
     Error as Error,
     JSONRPCMessage as JSONRPCMessage,
     Notification as Notification,
+    P_contra as P_contra,
     Point as Point,
+    R as R,
     Request as Request,
     ResolvedCodeLens as ResolvedCodeLens,
     Response as Response,
@@ -160,13 +162,11 @@ from .workspace import (
 )
 from abc import ABC, abstractmethod
 from enum import IntFlag
-from typing import Any, Callable, Generator, Literal, Protocol, TypeVar, overload
+from typing import Any, Callable, Generator, Literal, Protocol, overload
 from typing_extensions import TypeAlias, TypeGuard
 from weakref import WeakSet
 
 InitCallback: TypeAlias = Callable[["Session", bool], None]
-P = TypeVar("P", bound=LSPAny)
-R = TypeVar("R", bound=LSPAny)
 
 class ViewStateActions(IntFlag):
     NONE: int
@@ -692,25 +692,27 @@ class Session(APIHandler, TransportCallbacks):
     ) -> None: ...
     def send_request_async(
         self,
-        request: Request[P, R],
+        request: Request[P_contra, R],
         on_result: Callable[[R], None],
         on_error: Callable[[ResponseError], None] | None = None,
     ) -> int:
         """You must call this method from Sublime's worker thread. Callbacks will run in Sublime's worker thread."""
     def send_request(
         self,
-        request: Request[P, R],
+        request: Request[P_contra, R],
         on_result: Callable[[R], None],
         on_error: Callable[[ResponseError], None] | None = None,
     ) -> None:
         """You can call this method from any thread. Callbacks will run in Sublime's worker thread."""
-    def send_request_task(self, request: Request[P, R]) -> Promise[R | Error]: ...
+    def send_request_task(
+        self, request: Request[P_contra, R]
+    ) -> Promise[R | Error]: ...
     def send_request_task_2(
-        self, request: Request[P, R]
+        self, request: Request[P_contra, R]
     ) -> tuple[Promise[R | Error], int]: ...
     def cancel_request_async(self, request_id: int) -> None: ...
-    def send_notification(self, notification: Notification[P]) -> None: ...
-    def send_response(self, response: Response[P]) -> None: ...
+    def send_notification(self, notification: Notification[P_contra]) -> None: ...
+    def send_response(self, response: Response[R]) -> None: ...
     def send_error_response(self, request_id: int | str, error: Error) -> None: ...
     def exit(self) -> None: ...
     def send_payload(self, payload: JSONRPCMessage) -> None: ...

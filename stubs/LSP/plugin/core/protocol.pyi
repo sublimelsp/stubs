@@ -7,7 +7,7 @@ from typing import Union
 
 INT_MAX: int
 UINT_MAX = INT_MAX
-P = TypeVar("P", bound=LSPAny)
+P_contra = TypeVar("P_contra", bound=LSPAny, contravariant=True)
 R = TypeVar("R", bound=LSPAny)
 
 class RequestMessage(TypedDict):
@@ -29,16 +29,16 @@ class NotificationMessage(TypedDict):
 
 JSONRPCMessage = RequestMessage | ResponseMessage | NotificationMessage
 
-class Request(Generic[P, R]):
+class Request(Generic[P_contra, R]):
     method: str
-    params: P
+    params: P_contra
     view: sublime.View | None
     progress: bool | str
     on_partial_result: Callable[[R], None] | None
     def __init__(
         self,
         method: str,
-        params: P = None,
+        params: P_contra = None,
         view: sublime.View | None = None,
         progress: bool = False,
         on_partial_result: Callable[[R], None] | None = None,
@@ -208,31 +208,33 @@ class Request(Generic[P, R]):
     def to_payload(self, request_id: int) -> RequestMessage: ...
 
 class Error(Exception):
-    code: int
-    data: Any
     def __init__(self, code: int, message: str, data: Any = None) -> None: ...
+    @property
+    def code(self) -> int: ...
+    @property
+    def data(self) -> Any: ...
     @classmethod
     def from_lsp(cls, params: ResponseError) -> Error: ...
     def to_lsp(self) -> ResponseError: ...
     @classmethod
     def from_exception(cls, ex: Exception) -> Error: ...
 
-class Response(Generic[P]):
+class Response(Generic[R]):
     request_id: str | int
-    result: P
+    result: R
     post_response_callback: PostResponseCallback | None
     def __init__(
         self,
         request_id: str | int,
-        result: P,
+        result: R,
         post_response_callback: PostResponseCallback | None = None,
     ) -> None: ...
     def to_payload(self) -> ResponseMessage: ...
 
-class Notification(Generic[P]):
+class Notification(Generic[P_contra]):
     method: str
-    params: P
-    def __init__(self, method: str, params: P = None) -> None: ...
+    params: P_contra
+    def __init__(self, method: str, params: P_contra = None) -> None: ...
     @classmethod
     def initialized(cls) -> Notification[InitializedParams]: ...
     @classmethod
