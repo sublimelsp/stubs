@@ -756,7 +756,7 @@ class Window:
         """
     def new_html_sheet(
         self, name: str, contents: str, flags: NewFileFlags = ..., group: int = ...
-    ) -> Sheet:
+    ) -> HtmlSheet:
         """
         Construct a sheet with HTML contents rendered using minihtml.
 
