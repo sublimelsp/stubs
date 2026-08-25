@@ -663,7 +663,7 @@ class Session(APIHandler, TransportCallbacks):
         uri: DocumentUri,
         identifier: DiagnosticsIdentifier,
         version: int | None,
-        diagnostics: list[Diagnostic],
+        diagnostics: list[Diagnostic] | None,
     ) -> None: ...
     def clear_diagnostics_for_uri(self, uri: DocumentUri) -> None: ...
     def on_client_register_capability(
