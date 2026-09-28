@@ -3,11 +3,11 @@ import sublime_plugin
 from ...protocol import Diagnostic as Diagnostic, Location, LocationLink
 from .sessions import AbstractViewListener as AbstractViewListener, Session as Session
 from .settings import userprefs as userprefs
+from .type_converters import position_to_offset as position_to_offset
 from .views import (
     MissingUriError as MissingUriError,
     first_selection_region as first_selection_region,
     get_uri_and_position_from_location as get_uri_and_position_from_location,
-    position_to_offset as position_to_offset,
     uri_from_view as uri_from_view,
 )
 from .windows import WindowManager as WindowManager, WindowRegistry as WindowRegistry

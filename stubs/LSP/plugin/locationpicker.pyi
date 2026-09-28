@@ -1,9 +1,6 @@
 import sublime
 from ..protocol import DocumentUri as DocumentUri, Location, LocationLink, Position
-from .core.constants import (
-    ST_PACKAGES_PATH as ST_PACKAGES_PATH,
-    SublimeKind as SublimeKind,
-)
+from .core.constants import ST_PACKAGES_PATH as ST_PACKAGES_PATH
 from .core.logging import debug as debug
 from .core.sessions import Session as Session
 from .core.views import (
@@ -11,6 +8,7 @@ from .core.views import (
     location_to_human_readable as location_to_human_readable,
     to_encoded_filename as to_encoded_filename,
 )
+from sublime_types import Kind
 
 def open_location_async(
     session: Session,
@@ -37,6 +35,6 @@ class LocationPicker:
         force_group: bool = True,
         group: int = -1,
         placeholder: str = "",
-        kind: SublimeKind = ...,
+        kind: Kind = ...,
         selected_index: int = -1,
     ) -> None: ...

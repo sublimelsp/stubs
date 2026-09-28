@@ -10,7 +10,7 @@ from .core.registry import (
 )
 from .core.sessions import Session as Session
 from .core.settings import userprefs as userprefs
-from .core.views import position_to_offset as position_to_offset
+from .core.type_converters import position_to_offset as position_to_offset
 
 class LspToggleInlayHintsCommand(LspWindowCommand):
     capability: str

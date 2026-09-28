@@ -1,11 +1,11 @@
 import sublime
 import sublime_plugin
-from .constants import SublimeKind as SublimeKind
 from .css import css as css
 from .promise import Promise as Promise
 from .registry import windows as windows
 from abc import ABC, abstractmethod
 from enum import IntEnum
+from sublime_types import Kind
 from typing import Any, TypeVar
 from typing import Literal
 
@@ -13,7 +13,7 @@ T = TypeVar("T")
 TreeViewAction = Literal[
     "move_up", "move_right", "move_down", "move_left", "close", "activate"
 ]
-KIND_CLASS_NAMES: dict[int, str]
+KIND_CLASS_NAMES: dict[sublime.KindId, str]
 
 class TreeItemCollapsibleState(IntEnum):
     NONE: int
@@ -22,7 +22,7 @@ class TreeItemCollapsibleState(IntEnum):
 
 class TreeItem:
     label: str
-    kind: SublimeKind
+    kind: Kind
     description: str
     tooltip: str
     action_command: tuple[str, dict[str, Any]] | None
@@ -31,7 +31,7 @@ class TreeItem:
     def __init__(
         self,
         label: str,
-        kind: SublimeKind = ...,
+        kind: Kind = ...,
         description: str = "",
         tooltip: str = "",
         action_command: tuple[str, dict[str, Any]] | None = None,

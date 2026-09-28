@@ -14,13 +14,13 @@ from .core.registry import (
 )
 from .core.sessions import Session as Session
 from .core.settings import userprefs as userprefs
+from .core.type_converters import position_to_offset as position_to_offset
 from .core.types import method_to_capability as method_to_capability
 from .core.url import parse_uri as parse_uri
 from .core.views import (
     diagnostic_severity as diagnostic_severity,
     first_selection_region as first_selection_region,
     get_symbol_kind_from_scope as get_symbol_kind_from_scope,
-    position_to_offset as position_to_offset,
     range_to_region as range_to_region,
     text_document_position_params as text_document_position_params,
     to_encoded_filename as to_encoded_filename,

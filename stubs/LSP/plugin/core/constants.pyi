@@ -9,10 +9,10 @@ from ...protocol import (
 )
 from .typing import StrEnum as StrEnum
 from enum import IntEnum, IntFlag
+from sublime_types import Kind as Kind
 import sublime
 
 MarkdownLangMap = dict[str, tuple[tuple[str, ...], tuple[str, ...]]]
-SublimeKind = tuple[int, str, str]
 ST_CACHE_PATH: str
 ST_INSTALLED_PACKAGES_PATH: str
 ST_PACKAGES_PATH: str
@@ -103,12 +103,12 @@ KIND_HINT: tuple[sublime.KindId, str, str]
 KIND_QUICKFIX: tuple[sublime.KindId, str, str]
 KIND_REFACTOR: tuple[sublime.KindId, str, str]
 KIND_SOURCE: tuple[sublime.KindId, str, str]
-COMPLETION_KINDS: dict[CompletionItemKind, SublimeKind]
-SYMBOL_KINDS: dict[SymbolKind, SublimeKind]
-DIAGNOSTIC_KINDS: dict[DiagnosticSeverity, SublimeKind]
-CODE_ACTION_KINDS: dict[CodeActionKind, SublimeKind]
+COMPLETION_KINDS: dict[CompletionItemKind, Kind]
+SYMBOL_KINDS: dict[SymbolKind, Kind]
+DIAGNOSTIC_KINDS: dict[DiagnosticSeverity, Kind]
+CODE_ACTION_KINDS: dict[CodeActionKind, Kind]
 MESSAGE_TYPE_LEVELS: dict[MessageType, str]
-SUBLIME_KIND_SCOPES: dict[SublimeKind, str]
+SUBLIME_KIND_SCOPES: dict[Kind, str]
 DIAGNOSTIC_SEVERITY_SCOPES: dict[DiagnosticSeverity, str]
 DIAGNOSTIC_TAG_SCOPES: dict[DiagnosticTag, str]
 SUPPORTED_DIAGNOSTIC_TAGS: list[DiagnosticTag]

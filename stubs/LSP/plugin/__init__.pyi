@@ -37,6 +37,7 @@ from .core.protocol import (
     ServerNotification as ServerNotification,
     ServerRequest as ServerRequest,
     ServerResponse as ServerResponse,
+    TextPosition as TextPosition,
 )
 from .core.registry import (
     LspTextCommand as LspTextCommand,
@@ -48,6 +49,10 @@ from .core.sessions import (
     SessionViewProtocol as SessionViewProtocol,
 )
 from .core.transports import TransportWrapper as TransportWrapper
+from .core.type_converters import (
+    point_to_offset as point_to_offset,
+    position_to_offset as position_to_offset,
+)
 from .core.types import (
     ClientConfig as ClientConfig,
     DebouncerNonThreadSafe as DebouncerNonThreadSafe,
@@ -59,5 +64,14 @@ from .core.url import (
     uri_to_filename as uri_to_filename,
 )
 from .core.version import __version__ as __version__
-from .core.views import uri_from_view as uri_from_view
+from .core.views import (
+    first_selection_region as first_selection_region,
+    offset_to_position as offset_to_position,
+    region_to_range as region_to_range,
+    text_document_identifier as text_document_identifier,
+    text_document_position_params as text_document_position_params,
+    uri_from_view as uri_from_view,
+)
 from .core.workspace import WorkspaceFolder as WorkspaceFolder
+from .execute_command import LspExecuteCommand as LspExecuteCommand
+from .locationpicker import LocationPicker as LocationPicker

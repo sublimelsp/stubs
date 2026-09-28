@@ -1,4 +1,5 @@
 from enum import IntEnum, IntFlag
+from sublime_types import Kind
 from typing import Any, Callable, Iterable, Iterator, Literal, Reversible, Sequence
 from typing import Optional
 
@@ -290,15 +291,15 @@ KIND_ID_COLOR_PURPLISH: int
 KIND_ID_COLOR_PINKISH: int
 KIND_ID_COLOR_DARK: int
 KIND_ID_COLOR_LIGHT: int
-KIND_AMBIGUOUS: tuple[int, str, str]
-KIND_KEYWORD: tuple[int, str, str]
-KIND_TYPE: tuple[int, str, str]
-KIND_FUNCTION: tuple[int, str, str]
-KIND_NAMESPACE: tuple[int, str, str]
-KIND_NAVIGATION: tuple[int, str, str]
-KIND_MARKUP: tuple[int, str, str]
-KIND_VARIABLE: tuple[int, str, str]
-KIND_SNIPPET: tuple[int, str, str]
+KIND_AMBIGUOUS: Kind
+KIND_KEYWORD: Kind
+KIND_TYPE: Kind
+KIND_FUNCTION: Kind
+KIND_NAMESPACE: Kind
+KIND_NAVIGATION: Kind
+KIND_MARKUP: Kind
+KIND_VARIABLE: Kind
+KIND_SNIPPET: Kind
 
 class SymbolSource(IntEnum):
     """
@@ -2238,7 +2239,7 @@ class CompletionItem:
     annotation: str
     completion: str
     completion_format: int
-    kind: tuple[int, str, str]
+    kind: Kind
     details: str
     flags: CompletionItemFlags
     def __init__(
@@ -2247,7 +2248,7 @@ class CompletionItem:
         annotation: str = ...,
         completion: str = ...,
         completion_format: CompletionFormat = ...,
-        kind: tuple[int, str, str] = ...,
+        kind: Kind = ...,
         details: str = ...,
         flags: CompletionItemFlags = ...,
     ) -> None: ...
@@ -2258,7 +2259,7 @@ class CompletionItem:
         trigger: str,
         snippet: str,
         annotation: str = ...,
-        kind: tuple[int, str, str] = ...,
+        kind: Kind = ...,
         details: str = ...,
     ) -> CompletionItem:
         """
@@ -2271,7 +2272,7 @@ class CompletionItem:
         command: str,
         args: dict[str, Any] = ...,
         annotation: str = ...,
-        kind: tuple[int, str, str] = ...,
+        kind: Kind = ...,
         details: str = ...,
     ) -> CompletionItem:
         """
@@ -2332,13 +2333,13 @@ class QuickPanelItem:
     trigger: str
     details: str | list[str] | tuple[str]
     annotation: str
-    kind: tuple[int, str, str]
+    kind: Kind
     def __init__(
         self,
         trigger: str,
         details: str | Sequence[str] = ...,
         annotation: str = ...,
-        kind: tuple[int, str, str] = ...,
+        kind: Kind = ...,
     ) -> None: ...
 
 class ListInputItem:
@@ -2350,14 +2351,14 @@ class ListInputItem:
     value: Any
     details: str | list[str] | tuple[str]
     annotation: str
-    kind: tuple[int, str, str]
+    kind: Kind
     def __init__(
         self,
         text: str,
         value: bool | str | int | float | list[Any] | dict[str, Any] | None,
         details: str | Sequence[str] = ...,
         annotation: str = ...,
-        kind: tuple[int, str, str] = ...,
+        kind: Kind = ...,
     ) -> None: ...
 
 class SymbolRegion:
@@ -2369,14 +2370,9 @@ class SymbolRegion:
     region: Region
     syntax: str
     type: int
-    kind: tuple[int, str, str]
+    kind: Kind
     def __init__(
-        self,
-        name: str,
-        region: Region,
-        syntax: str,
-        type: int,
-        kind: tuple[int, str, str],
+        self, name: str, region: Region, syntax: str, type: int, kind: Kind
     ) -> None: ...
 
 class SymbolLocation:
@@ -2390,7 +2386,7 @@ class SymbolLocation:
     col: int
     syntax: str
     type: int
-    kind: tuple[int, str, str]
+    kind: Kind
     def __init__(
         self,
         path: str,
@@ -2399,6 +2395,6 @@ class SymbolLocation:
         col: int,
         syntax: str,
         type: int,
-        kind: tuple[int, str, str],
+        kind: Kind,
     ) -> None: ...
     def path_encoded_position(self) -> str: ...

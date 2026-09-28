@@ -1,0 +1,6 @@
+import sublime
+from ...protocol import Position
+from .protocol import TextPosition as TextPosition
+
+def point_to_offset(view: sublime.View, point: TextPosition) -> int: ...
+def position_to_offset(view: sublime.View, position: Position) -> int: ...
