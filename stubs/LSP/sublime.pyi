@@ -1,6 +1,15 @@
 from enum import IntEnum, IntFlag
 from sublime_types import Kind
-from typing import Any, Callable, Iterable, Iterator, Literal, Reversible, Sequence
+from typing import (
+    Any,
+    Callable,
+    Generic,
+    Iterable,
+    Iterator,
+    Literal,
+    Reversible,
+    Sequence,
+)
 from typing import Optional
 
 class HoverZone(IntEnum):
@@ -2342,20 +2351,20 @@ class QuickPanelItem:
         kind: Kind = ...,
     ) -> None: ...
 
-class ListInputItem:
+class ListInputItem(Generic[_T_Value]):
     """
     Represents a row shown via `ListInputHandler`.
     """
 
     text: str
-    value: Any
+    value: _T_Value
     details: str | list[str] | tuple[str]
     annotation: str
     kind: Kind
     def __init__(
         self,
         text: str,
-        value: bool | str | int | float | list[Any] | dict[str, Any] | None,
+        value: _T_Value,
         details: str | Sequence[str] = ...,
         annotation: str = ...,
         kind: Kind = ...,

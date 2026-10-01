@@ -30,7 +30,7 @@ from .core.views import (
     range_to_region as range_to_region,
     text_document_identifier as text_document_identifier,
 )
-from typing import Any, TypedDict
+from typing import Any, TypedDict, overload
 from typing_extensions import NotRequired, TypeGuard
 
 SUPPRESS_INPUT_SETTING_KEY: str
@@ -49,11 +49,16 @@ class WorkspaceSymbolValue(TypedDict):
     workspaceSymbol: NotRequired[WorkspaceSymbol]
 
 def is_document_symbol_value(val: Any) -> TypeGuard[DocumentSymbolValue]: ...
+@overload
 def symbol_to_list_input_item(
-    item: DocumentSymbol | WorkspaceSymbol | SymbolInformation,
+    item: DocumentSymbol | SymbolInformation,
     hierarchy: str = "",
-    session_name: str | None = None,
-) -> sublime.ListInputItem: ...
+    session_name: None = None,
+) -> sublime.ListInputItem[DocumentSymbolValue]: ...
+@overload
+def symbol_to_list_input_item(
+    item: WorkspaceSymbol | SymbolInformation, hierarchy: str = "", *, session_name: str
+) -> sublime.ListInputItem[WorkspaceSymbolValue]: ...
 
 class LspSelectionClearCommand(sublime_plugin.TextCommand):
     """
@@ -72,7 +77,7 @@ class LspSelectionSetCommand(sublime_plugin.TextCommand):
 
 class LspDocumentSymbolsCommand(LspTextCommand):
     capability: str
-    items: list[sublime.ListInputItem]
+    items: list[sublime.ListInputItem[DocumentSymbolValue]]
     kind: int
     cached: bool
     has_matching_symbols: bool
@@ -91,40 +96,42 @@ class LspDocumentSymbolsCommand(LspTextCommand):
     def handle_response_error(self, error: ResponseError) -> None: ...
     def process_document_symbol_recursive(
         self, item: DocumentSymbol, hierarchy: str = ""
-    ) -> list[sublime.ListInputItem]: ...
+    ) -> list[sublime.ListInputItem[DocumentSymbolValue]]: ...
 
 class DocumentSymbolsKindInputHandler(PreselectedListInputHandler):
     view: sublime.View
-    items: list[sublime.ListInputItem]
+    items: list[sublime.ListInputItem[DocumentSymbolValue]]
     old_selection: list[sublime.Region]
     last_selected: int
     def __init__(
         self,
         window: sublime.Window,
-        initial_value: sublime.ListInputItem,
+        initial_value: sublime.ListInputItem[int],
         view: sublime.View,
-        items: list[sublime.ListInputItem],
+        items: list[sublime.ListInputItem[DocumentSymbolValue]],
     ) -> None: ...
     def name(self) -> str: ...
     def placeholder(self) -> str: ...
-    def get_list_items(self) -> tuple[list[sublime.ListInputItem], int]: ...
+    def get_list_items(self) -> tuple[list[sublime.ListInputItem[int]], int]: ...
     def confirm(self, text: int) -> None: ...
     def next_input(self, args: dict) -> sublime_plugin.CommandInputHandler | None: ...
 
 class DocumentSymbolsInputHandler(sublime_plugin.ListInputHandler):
     view: sublime.View
     kind: int
-    items: list[sublime.ListInputItem]
+    items: list[sublime.ListInputItem[DocumentSymbolValue]]
     old_selection: list[sublime.Region]
     def __init__(
         self,
         view: sublime.View,
         kind: int,
-        items: list[sublime.ListInputItem],
+        items: list[sublime.ListInputItem[DocumentSymbolValue]],
         old_selection: list[sublime.Region],
     ) -> None: ...
     def name(self) -> str: ...
-    def list_items(self) -> tuple[list[sublime.ListInputItem], int]: ...
+    def list_items(
+        self,
+    ) -> tuple[list[sublime.ListInputItem[DocumentSymbolValue]], int]: ...
     def preview(
         self, text: DocumentSymbolValue | None
     ) -> str | sublime.Html | None: ...

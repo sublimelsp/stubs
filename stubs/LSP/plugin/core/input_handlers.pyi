@@ -42,7 +42,7 @@ class PreselectedListInputHandler(sublime_plugin.ListInputHandler, ABC):
     def __init__(
         self,
         window: sublime.Window,
-        initial_value: str | sublime.ListInputItem | None = None,
+        initial_value: str | sublime.ListInputItem[Any] | None = None,
     ) -> None: ...
     def list_items(self) -> ListItemsReturn: ...
     @abstractmethod
@@ -76,7 +76,7 @@ class DynamicListInputHandler(sublime_plugin.ListInputHandler, ABC):
     def __init__(
         self, command: sublime_plugin.WindowCommand, args: dict[str, Any]
     ) -> None: ...
-    def list_items(self) -> list[sublime.ListInputItem]: ...
+    def list_items(self) -> list[sublime.ListInputItem[Any]]: ...
     def initial_text(self) -> str: ...
     def initial_selection(self) -> list[tuple[int, int]]: ...
     def validate(self, text: str) -> bool: ...
@@ -84,9 +84,9 @@ class DynamicListInputHandler(sublime_plugin.ListInputHandler, ABC):
     def confirm(self, text: str) -> None: ...
     def on_modified(self, text: str) -> None:
         """Called after changes have been made to the input, with the text of the input field passed as argument."""
-    def get_list_items(self) -> list[sublime.ListInputItem]:
+    def get_list_items(self) -> list[sublime.ListInputItem[Any]]:
         """The list items which are initially shown."""
-    def update(self, items: list[sublime.ListInputItem]) -> None:
+    def update(self, items: list[sublime.ListInputItem[Any]]) -> None:
         """Call this method to update the list items."""
 
 class InputListener(sublime_plugin.TextChangeListener):
