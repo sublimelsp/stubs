@@ -15,6 +15,7 @@ from .core.protocol import (
     Request as Request,
     Response as Response,
     ServerNotification as ServerNotification,
+    ServerRequest as ServerRequest,
     ServerResponse as ServerResponse,
 )
 from .core.sessions import (
@@ -362,6 +363,15 @@ class LspPlugin(APIHandler):
         Notifies about a notification that is about to be sent to the language server.
 
         :param    notification:  The notification object. The notification['params'] can be modified by the plugin.
+        """
+    def on_server_request_async(self, request: ServerRequest) -> None:
+        """
+        Notifies about a request message that has been received from the language server.
+
+        Called before the request is handled by the LSP package or by a `@request_handler`.
+
+        :param    request:  The request object. The request['params'] field can be modified by the plugin, before it
+                            gets further handled by the LSP package.
         """
     def on_server_response_async(self, response: ServerResponse) -> None:
         """

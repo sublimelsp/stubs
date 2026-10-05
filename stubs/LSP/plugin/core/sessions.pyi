@@ -121,6 +121,7 @@ from .protocol import (
     Response as Response,
     ResponseError as ResponseError,
     ServerNotification as ServerNotification,
+    ServerRequest as ServerRequest,
     ServerResponse as ServerResponse,
 )
 from .settings import globalprefs as globalprefs, userprefs as userprefs
