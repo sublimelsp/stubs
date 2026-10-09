@@ -9,10 +9,8 @@ from .core.registry import (
     get_position as get_position,
 )
 from .core.sessions import Session as Session
-from .core.views import (
-    range_to_region as range_to_region,
-    text_document_position_params as text_document_position_params,
-)
+from .core.type_converters import range_to_region as range_to_region
+from .core.views import text_document_position_params as text_document_position_params
 from .edit import prompt_for_workspace_edits as prompt_for_workspace_edits
 from typing_extensions import TypeGuard
 

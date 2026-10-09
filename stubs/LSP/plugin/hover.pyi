@@ -30,6 +30,7 @@ from .core.sessions import (
     SessionBufferProtocol as SessionBufferProtocol,
 )
 from .core.settings import userprefs as userprefs
+from .core.type_converters import range_to_region as range_to_region
 from .core.url import (
     CODE_ACTION_SCHEME as CODE_ACTION_SCHEME,
     DOCUMENT_LINK_SCHEME as DOCUMENT_LINK_SCHEME,
@@ -46,7 +47,6 @@ from .core.views import (
     is_location_href as is_location_href,
     make_command_link as make_command_link,
     minihtml as minihtml,
-    range_to_region as range_to_region,
     show_lsp_popup as show_lsp_popup,
     text_document_identifier as text_document_identifier,
     text_document_position_params as text_document_position_params,

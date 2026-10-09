@@ -2,10 +2,8 @@ import sublime
 from ..protocol import FoldingRange, Range
 from .core.protocol import Request as Request, UINT_MAX as UINT_MAX
 from .core.registry import LspTextCommand as LspTextCommand
-from .core.views import (
-    range_to_region as range_to_region,
-    text_document_identifier as text_document_identifier,
-)
+from .core.type_converters import range_to_region as range_to_region
+from .core.views import text_document_identifier as text_document_identifier
 
 def folding_range_to_range(folding_range: FoldingRange) -> Range: ...
 def sorted_folding_ranges(folding_ranges: list[FoldingRange]) -> list[FoldingRange]: ...

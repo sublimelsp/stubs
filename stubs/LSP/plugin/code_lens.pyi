@@ -7,7 +7,7 @@ from .core.registry import (
     LspWindowCommand as LspWindowCommand,
     windows as windows,
 )
-from .core.views import range_to_region as range_to_region
+from .core.type_converters import range_to_region as range_to_region
 from typing_extensions import TypeGuard
 from typing import Any
 

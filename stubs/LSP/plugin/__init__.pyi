@@ -52,6 +52,7 @@ from .core.transports import TransportWrapper as TransportWrapper
 from .core.type_converters import (
     point_to_offset as point_to_offset,
     position_to_offset as position_to_offset,
+    range_to_region as range_to_region,
 )
 from .core.types import (
     ClientConfig as ClientConfig,

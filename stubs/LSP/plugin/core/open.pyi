@@ -8,8 +8,8 @@ from .constants import (
 from .logging import exception_log as exception_log
 from .promise import Promise as Promise, ResolveFunc as ResolveFunc
 from .protocol import UINT_MAX as UINT_MAX
+from .type_converters import range_to_region as range_to_region
 from .url import parse_uri as parse_uri
-from .views import range_to_region as range_to_region
 import re
 
 g_opening_files: dict[

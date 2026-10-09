@@ -50,6 +50,7 @@ from .core.signature_help import (
     SigHelp as SigHelp,
     SignatureHelpStyle as SignatureHelpStyle,
 )
+from .core.type_converters import range_to_region as range_to_region
 from .core.types import (
     FEATURES_TIMEOUT as FEATURES_TIMEOUT,
     SettingsRegistration as SettingsRegistration,
@@ -69,7 +70,6 @@ from .core.views import (
     first_selection_region as first_selection_region,
     format_diagnostics_for_html as format_diagnostics_for_html,
     make_link as make_link,
-    range_to_region as range_to_region,
     show_lsp_popup as show_lsp_popup,
     text_document_identifier as text_document_identifier,
     text_document_position_params as text_document_position_params,

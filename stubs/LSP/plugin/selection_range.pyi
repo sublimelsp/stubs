@@ -5,10 +5,8 @@ from .core.registry import (
     LspTextCommand as LspTextCommand,
     get_position as get_position,
 )
-from .core.views import (
-    range_to_region as range_to_region,
-    selection_range_params as selection_range_params,
-)
+from .core.type_converters import range_to_region as range_to_region
+from .core.views import selection_range_params as selection_range_params
 from typing import Any
 
 class LspExpandSelectionCommand(LspTextCommand):

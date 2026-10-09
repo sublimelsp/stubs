@@ -10,11 +10,9 @@ from .core.registry import (
 )
 from .core.sessions import Session as Session
 from .core.settings import userprefs as userprefs
+from .core.type_converters import range_to_region as range_to_region
 from .core.url import parse_uri as parse_uri
-from .core.views import (
-    range_to_region as range_to_region,
-    text_document_identifier as text_document_identifier,
-)
+from .core.views import text_document_identifier as text_document_identifier
 
 class LspOpenLinkCommand(LspTextCommand):
     capability: str

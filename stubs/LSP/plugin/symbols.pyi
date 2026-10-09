@@ -25,9 +25,9 @@ from .core.registry import (
     LspWindowCommand as LspWindowCommand,
 )
 from .core.sessions import print_to_status_bar as print_to_status_bar
+from .core.type_converters import range_to_region as range_to_region
 from .core.views import (
     offset_to_point as offset_to_point,
-    range_to_region as range_to_region,
     text_document_identifier as text_document_identifier,
 )
 from typing import Any, TypedDict, overload

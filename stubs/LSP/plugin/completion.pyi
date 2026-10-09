@@ -19,12 +19,12 @@ from .core.protocol import Error as Error, Request as Request
 from .core.registry import LspTextCommand as LspTextCommand
 from .core.sessions import Session as Session
 from .core.settings import userprefs as userprefs
+from .core.type_converters import range_to_region as range_to_region
 from .core.views import (
     FORMAT_MARKUP_CONTENT as FORMAT_MARKUP_CONTENT,
     FORMAT_STRING as FORMAT_STRING,
     html_wrapper as html_wrapper,
     minihtml as minihtml,
-    range_to_region as range_to_region,
     show_lsp_popup as show_lsp_popup,
     text_document_position_params as text_document_position_params,
 )

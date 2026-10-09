@@ -50,6 +50,7 @@ from .core.sessions import (
     is_diagnostic_server_cancellation_data as is_diagnostic_server_cancellation_data,
 )
 from .core.settings import userprefs as userprefs
+from .core.type_converters import range_to_region as range_to_region
 from .core.types import (
     Capabilities as Capabilities,
     DebouncerNonThreadSafe as DebouncerNonThreadSafe,
@@ -71,7 +72,6 @@ from .core.views import (
     first_selection_region as first_selection_region,
     formatting_options as formatting_options,
     lsp_color_to_phantom as lsp_color_to_phantom,
-    range_to_region as range_to_region,
     region_to_range as region_to_range,
     text_document_identifier as text_document_identifier,
     text_document_position_params as text_document_position_params,
