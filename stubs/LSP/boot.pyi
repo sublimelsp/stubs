@@ -82,9 +82,11 @@ from .plugin.inlay_hint import (
 )
 from .plugin.panels import (
     LspClearLogPanelCommand as LspClearLogPanelCommand,
+    LspClearMessagesPanelCommand as LspClearMessagesPanelCommand,
     LspClearPanelCommand as LspClearPanelCommand,
     LspShowDiagnosticsPanelCommand as LspShowDiagnosticsPanelCommand,
     LspToggleLogPanelLinesLimitCommand as LspToggleLogPanelLinesLimitCommand,
+    LspToggleMessagesPanelCommand as LspToggleMessagesPanelCommand,
     LspToggleServerPanelCommand as LspToggleServerPanelCommand,
     LspUpdateLogPanelCommand as LspUpdateLogPanelCommand,
     LspUpdatePanelCommand as LspUpdatePanelCommand,

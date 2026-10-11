@@ -203,7 +203,7 @@ class Manager(ABC):
     @property
     @abstractmethod
     def window(self) -> sublime.Window:
-        """Get the window associated with this manager."""
+        """The window associated with this manager."""
     @abstractmethod
     def get_session(
         self, config_name: str, file_path: str | None = None
@@ -242,7 +242,7 @@ class Manager(ABC):
     @abstractmethod
     def handle_show_message(
         self, config_name: str, params: ShowMessageParams
-    ) -> Promise[MessageActionItem | None]: ...
+    ) -> None: ...
     @abstractmethod
     def handle_log_message(
         self, config_name: str, params: LogMessageParams

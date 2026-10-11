@@ -167,6 +167,7 @@ def command_handler(
 
     Intercepts a `workspace/executeCommand` request with the given command name when triggered by the client.
     The decorated method is called with the command's `arguments` list (or `None` if absent).
+    Decorated method is called on the async thread, regardless of which thread the command was executed from.
 
     Usage:
         ```py

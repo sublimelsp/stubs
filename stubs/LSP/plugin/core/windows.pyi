@@ -26,7 +26,7 @@ from .configurations import (
 )
 from .constants import MESSAGE_TYPE_LEVELS as MESSAGE_TYPE_LEVELS
 from .logging import debug as debug, exception_log as exception_log
-from .message_request_handler import MessageRequestHandler as MessageRequestHandler
+from .messages_panel import MessagesPanel as MessagesPanel
 from .panels import (
     LOG_LINES_LIMIT_SETTING_NAME as LOG_LINES_LIMIT_SETTING_NAME,
     MAX_LOG_LINES_LIMIT_OFF as MAX_LOG_LINES_LIMIT_OFF,
@@ -73,6 +73,7 @@ def set_diagnostics_count(view: sublime.View, errors: int, warnings: int) -> Non
 
 class WindowManager(Manager, WindowConfigChangeListener, ViewStatusHandler):
     panel_manager: PanelManager | None
+    messages_panel: MessagesPanel | None
     tree_view_sheets: dict[str, TreeViewSheet]
     formatters: dict[str, str]
     suppress_sessions_restart_on_project_update: bool

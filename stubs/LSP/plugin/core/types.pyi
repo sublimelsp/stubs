@@ -167,6 +167,7 @@ class Settings:
     show_diagnostics_panel_on_save: int
     show_diagnostics_severity_level: int
     show_inlay_hints: bool
+    show_messages_panel_level: int
     show_multiline_diagnostics_highlights: bool
     show_multiline_document_highlights: bool
     show_references_in_quick_panel: bool

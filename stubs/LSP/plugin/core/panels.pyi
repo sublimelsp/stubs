@@ -4,17 +4,31 @@ from .types import (
     PANEL_LINE_REGEX as PANEL_LINE_REGEX,
 )
 from typing import Iterable
+from typing import Literal
+from typing import Optional
+from typing import Tuple
 
 LOG_LINES_LIMIT_SETTING_NAME: str
 MAX_LOG_LINES_LIMIT_ON: int
 MAX_LOG_LINES_LIMIT_OFF: int
 OUTPUT_PANEL_SETTINGS: dict
+PanelButton = Tuple[str, str, Optional[Literal["primary", "secondary"]]]
+BUTTONS_TEMPLATE: str
+
+def buttons_html(buttons: Iterable[PanelButton]) -> str:
+    """
+    Render a row of buttons for a phantom in an output panel.
+
+    Each button is given as a tuple of the link target, the label and an optional style, which is either `primary` for
+    a highlighted button or `secondary` for a less prominent one.
+    """
 
 class PanelName:
     Diagnostics: str
     References: str
     WorkspaceEdit: str
     Log: str
+    Messages: str
 
 class PanelManager:
     def __init__(self, window: sublime.Window) -> None: ...
@@ -32,6 +46,7 @@ class PanelManager:
     ) -> sublime.View | None: ...
     def ensure_diagnostics_panel(self) -> sublime.View | None: ...
     def ensure_log_panel(self) -> sublime.View | None: ...
+    def ensure_messages_panel(self) -> sublime.View | None: ...
     def ensure_references_panel(self) -> sublime.View | None: ...
     def ensure_workspace_edit_panel(self) -> sublime.View | None: ...
     def get_panel(self, panel_name: str) -> sublime.View | None: ...

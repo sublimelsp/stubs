@@ -9,7 +9,7 @@ from .core.edit import (
     parse_workspace_edit as parse_workspace_edit,
 )
 from .core.logging import debug as debug
-from .core.panels import PanelName as PanelName
+from .core.panels import PanelName as PanelName, buttons_html as buttons_html
 from .core.promise import Promise as Promise
 from .core.registry import LspWindowCommand as LspWindowCommand, windows as windows
 from .core.sessions import Session as Session
@@ -22,7 +22,6 @@ import re
 TextEditTuple = tuple[tuple[int, int], tuple[int, int], str]
 g_workspace_edit_panel_resolvers: dict[int, Callable[[bool], None]]
 ROWCOL_PREFIX: str
-BUTTONS_TEMPLATE: str
 
 def temporary_setting(
     settings: sublime.Settings, key: str, val: Any

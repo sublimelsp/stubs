@@ -62,6 +62,7 @@ class LspTroubleshootServerCommand(sublime_plugin.WindowCommand):
         active_view: sublime.View | None,
         output_sheet: sublime.HtmlSheet,
         resolved_command: list[str],
+        cwd: str | None,
         server_output: str,
         exit_code: int,
     ) -> None: ...
@@ -70,6 +71,7 @@ class LspTroubleshootServerCommand(sublime_plugin.WindowCommand):
         config: ClientConfig,
         active_view: sublime.View | None,
         resolved_command: list[str],
+        cwd: str | None,
         server_output: str,
         exit_code: int,
     ) -> str: ...
@@ -101,7 +103,7 @@ class ServerTestRunner(TransportCallbacks):
         config: ClientConfig,
         window: sublime.Window,
         initiating_view: sublime.View,
-        on_close: Callable[[list[str], str, int], None],
+        on_close: Callable[[list[str], str | None, str, int], None],
     ) -> None: ...
     def force_close_transport(self) -> None: ...
     def on_payload(self, payload: dict[str, Any]) -> None: ...
