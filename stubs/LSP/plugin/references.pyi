@@ -12,7 +12,7 @@ from .core.settings import userprefs as userprefs
 from .core.type_converters import position_to_offset as position_to_offset
 from .core.types import ClientConfig as ClientConfig
 from .core.views import (
-    get_line as get_line,
+    get_file_lines as get_file_lines,
     get_symbol_kind_from_scope as get_symbol_kind_from_scope,
     get_uri_and_position_from_location as get_uri_and_position_from_location,
     text_document_position_params as text_document_position_params,

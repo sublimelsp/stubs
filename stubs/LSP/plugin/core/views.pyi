@@ -63,7 +63,6 @@ from .workspace import is_subpath_of as is_subpath_of
 from dataclasses import dataclass
 from sublime_types import Kind
 from typing import Any, Callable, Generator, Iterable, Sequence
-import linecache
 import re
 
 @dataclass
@@ -87,12 +86,14 @@ class InvalidUriSchemeError(Exception):
     def __init__(self, uri: str) -> None: ...
 
 def mutable(view: sublime.View) -> Generator: ...
-def get_line(
-    window: sublime.Window, file_name: str, row: int, strip: bool = True
-) -> str:
+def get_file_lines(
+    window: sublime.Window, file_name: str, rows: Iterable[int], strip: bool = True
+) -> list[str]:
     """
-    Get the line from the buffer if the view is open, else get line from linecache.
-    row - is 0 based. If you want to get the first line, you should pass 0.
+    Get the lines of a file at the given rows, in the same order. Rows are 0 based.
+
+    The lines are taken from the buffer if the file is open in the window, else from the file on disk, which is read
+    once. An empty string is returned for a line that can't be read.
     """
 
 def extract_variables(window: sublime.Window) -> dict[str, str]: ...

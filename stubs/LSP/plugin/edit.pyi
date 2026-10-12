@@ -14,7 +14,7 @@ from .core.promise import Promise as Promise
 from .core.registry import LspWindowCommand as LspWindowCommand, windows as windows
 from .core.sessions import Session as Session
 from .core.url import parse_uri as parse_uri
-from .core.views import get_line as get_line
+from .core.views import get_file_lines as get_file_lines
 from .core.windows import WindowManager as WindowManager
 from typing import Any, Callable, Generator
 import re
