@@ -15,7 +15,9 @@ SERVER_CONFIGS_FILENAME: str
 
 class LspSettingsChangeListener(ABC):
     @abstractmethod
-    def on_client_config_updated(self, config_name: str | None = None) -> None: ...
+    def on_client_config_updated(
+        self, config_names: set[str] | None = None
+    ) -> None: ...
     @abstractmethod
     def on_userprefs_updated(self) -> None: ...
 
