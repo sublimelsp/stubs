@@ -114,7 +114,6 @@ from .protocol import (
     JSONRPCMessage as JSONRPCMessage,
     Notification as Notification,
     P_contra as P_contra,
-    Point as Point,
     R as R,
     Request as Request,
     ResolvedCodeLens as ResolvedCodeLens,
@@ -123,6 +122,7 @@ from .protocol import (
     ServerNotification as ServerNotification,
     ServerRequest as ServerRequest,
     ServerResponse as ServerResponse,
+    TextPosition as TextPosition,
 )
 from .settings import globalprefs as globalprefs, userprefs as userprefs
 from .transports import (

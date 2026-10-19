@@ -1,18 +1,21 @@
 import argparse
+from _typeshed import Incomplete
+import re
 from typing import Any
 
-PACKAGE_PATH: str
+PACKAGE_PATH: Incomplete
 MESSAGE_DIR: str
-MESSAGE_PATH: str
+MESSAGE_PATH: Incomplete
+VERSION_PATH: Incomplete
 CONFIGURATION: Any
-RELEASE_BRANCH: Any
-GITHUB_REPO: Any
 RELEASE_VERSION_PREFIX: str
-SETTINGS: str
 PYTHON_VERSION_PATH: Any
+SECTIONS: dict[str, str]
+OTHER_SECTION: str
+COMMIT_PATTERN: re.Pattern[str]
+VERSION_PATTERN: re.Pattern[str]
+BUMPS: tuple[str, str, str]
 
-def get_message(fname: str) -> str: ...
-def put_message(fname: str, text: str) -> None: ...
 def build_messages_json(version_history: list[str]) -> None:
     """Write the version history to the messages.json file."""
 
@@ -23,14 +26,23 @@ def parse_version(version: str) -> tuple[int, int, int]:
     """Convert filename to version tuple (major, minor, patch)."""
 
 def get_version_with_prefix(version: str) -> str: ...
-def git(*args: str) -> str | None:
+def current_version() -> str: ...
+def next_version(current: str, target: str) -> str:
+    """Return the version for `target`, which is either a bump type or an exact version."""
+
+def git(*args: str) -> str:
     """Run git command within current package path."""
 
-def commit_release(version: str) -> None:
-    """Create a 'Cut <version>' commit and tag."""
+def draft_message(version: str, previous_tag: str) -> str:
+    """Draft the release message from the commits since `previous_tag`, grouped by conventional commit type."""
 
-def build_release(_: argparse.Namespace) -> None:
-    """Build the new release locally."""
+def prepare_release(args: argparse.Namespace) -> None:
+    """Bump the version files and draft the release message for the new version."""
 
-def publish_release(args: argparse.Namespace) -> None:
-    """Publish the new release."""
+def print_tag(_: argparse.Namespace) -> None:
+    """Print the git tag name of the current version."""
+
+def print_notes(_: argparse.Namespace) -> None:
+    """Print the GitHub release notes of the current version."""
+
+def fail(message: str) -> None: ...

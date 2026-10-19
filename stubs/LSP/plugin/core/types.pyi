@@ -247,6 +247,7 @@ def method_to_capability(method: str) -> tuple[str, str]:
         textDocument/definition --> (definitionProvider, definitionProvider.id)
         textDocument/references --> (referencesProvider, referencesProvider.id)
         textDocument/didOpen --> (textDocumentSync.didOpen, textDocumentSync.didOpen.id)
+        textDocument/semanticTokens --> (semanticTokensProvider, semanticTokensProvider.id)
     """
 
 def normalize_text_sync(
