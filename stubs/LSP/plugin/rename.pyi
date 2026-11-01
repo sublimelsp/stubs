@@ -1,9 +1,9 @@
 import sublime
 import sublime_plugin
-import weakref
-from ..protocol import PrepareRenameResult, Range as Range, WorkspaceEdit
+from ..protocol import PrepareRenameResult, Range as Range
+from .core.aio import run_coroutine as run_coroutine
 from .core.edit import show_summary_message as show_summary_message
-from .core.protocol import Request as Request
+from .core.protocol import Error as Error, Request as Request
 from .core.registry import (
     LspTextCommand as LspTextCommand,
     get_position as get_position,
@@ -37,12 +37,6 @@ class LspSymbolRenameCommand(LspTextCommand):
         session_name: str | None = None,
         event: dict | None = None,
         point: int | None = None,
-    ) -> None: ...
-    def on_prompt_for_workspace_edits_concluded(
-        self,
-        weak_session: weakref.ref[Session],
-        response: WorkspaceEdit,
-        accepted: bool,
     ) -> None: ...
 
 class RenameSymbolInputHandler(sublime_plugin.TextInputHandler):

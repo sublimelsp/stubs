@@ -8,6 +8,7 @@ from ..protocol import (
     SymbolKind,
     WorkspaceSymbol,
 )
+from .core.aio import run_coroutine as run_coroutine
 from .core.constants import SYMBOL_KINDS as SYMBOL_KINDS
 from .core.input_handlers import (
     DynamicListInputHandler as DynamicListInputHandler,

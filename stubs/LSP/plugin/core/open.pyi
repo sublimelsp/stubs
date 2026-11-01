@@ -1,38 +1,37 @@
+import asyncio
 import sublime
 from ...protocol import DocumentUri, Range
+from .aio import run_on_main_thread as run_on_main_thread
 from .constants import (
     ST_PACKAGES_PATH as ST_PACKAGES_PATH,
     ST_PLATFORM as ST_PLATFORM,
     ST_VERSION as ST_VERSION,
 )
 from .logging import exception_log as exception_log
-from .promise import Promise as Promise, ResolveFunc as ResolveFunc
 from .protocol import UINT_MAX as UINT_MAX
 from .type_converters import range_to_region as range_to_region
 from .url import parse_uri as parse_uri
 import re
 
-g_opening_files: dict[
-    str, tuple[Promise[sublime.View | None], ResolveFunc[sublime.View | None]]
-]
+g_opening_files: dict[str, asyncio.Future[sublime.View | None]]
+g_opening_files_lock: asyncio.Lock | None
 FRAGMENT_PATTERN: re.Pattern[str]
 
 def lsp_range_from_uri_fragment(fragment: str) -> Range | None: ...
-def open_file_uri(
+async def open_file_uri(
     window: sublime.Window,
     uri: DocumentUri,
     flags: sublime.NewFileFlags = ...,
     group: int = -1,
-) -> Promise[sublime.View | None]: ...
-def open_file(
+) -> sublime.View | None: ...
+async def open_file(
     window: sublime.Window,
     uri: DocumentUri,
     flags: sublime.NewFileFlags = ...,
     group: int = -1,
-) -> Promise[sublime.View | None]:
+) -> sublime.View | None:
     """
-    Open a file asynchronously.
-    It is only safe to call this function from the UI thread.
+    Open a file and wait for it to be done loading.
     The provided uri MUST be a file URI.
     """
 

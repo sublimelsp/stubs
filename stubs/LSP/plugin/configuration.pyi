@@ -1,4 +1,5 @@
 import sublime_plugin
+from .core.aio import run_on_asyncio_thread as run_on_asyncio_thread
 from .core.registry import windows as windows
 from .core.settings import client_configs as client_configs
 from .core.windows import WindowManager as WindowManager

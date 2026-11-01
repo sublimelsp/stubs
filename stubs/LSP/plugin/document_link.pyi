@@ -1,9 +1,11 @@
 import sublime
+from .core.aio import run_coroutine as run_coroutine
+from .core.logging import exception_log as exception_log
 from .core.open import (
     open_file_uri as open_file_uri,
     open_in_browser as open_in_browser,
 )
-from .core.protocol import Request as Request
+from .core.protocol import Error as Error, Request as Request
 from .core.registry import (
     LspTextCommand as LspTextCommand,
     get_position as get_position,

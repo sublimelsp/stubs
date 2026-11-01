@@ -1,12 +1,16 @@
 import sublime
 from ..protocol import TextEdit
 from .code_actions import CodeActionsOnFormatTask as CodeActionsOnFormatTask
+from .core.aio import run_coroutine as run_coroutine
 from .core.collections import DottedDict as DottedDict
 from .core.edit import apply_text_edits as apply_text_edits
-from .core.promise import Promise as Promise
+from .core.logging import exception_log as exception_log
 from .core.protocol import Error as Error
 from .core.registry import LspTextCommand as LspTextCommand, windows as windows
-from .core.sessions import Session as Session
+from .core.sessions import (
+    AbstractViewListener as AbstractViewListener,
+    Session as Session,
+)
 from .core.settings import userprefs as userprefs
 from .core.views import (
     entire_content_region as entire_content_region,
@@ -21,37 +25,35 @@ from .lsp_task import (
     LspTask as LspTask,
     LspTextCommandWithTasks as LspTextCommandWithTasks,
 )
-from typing import Any, Callable
+from typing import Any
 
-FormatResponse = list[TextEdit] | None | Error
+FormatResponse = list[TextEdit] | Error | None
 
 def get_formatter(window: sublime.Window | None, base_scope: str) -> str | None: ...
-def format_document(
+async def format_document(
     text_command: LspTextCommand, formatter: str | None = None
-) -> Promise[FormatResponse]: ...
+) -> FormatResponse: ...
+async def format_selection(listener: AbstractViewListener | None) -> Error | bool: ...
 
 class WillSaveWaitTask(LspTask):
     @classmethod
     def is_applicable(cls, view: sublime.View) -> bool: ...
-    def __init__(
-        self, task_runner: LspTextCommand, on_complete: Callable[[], None]
-    ) -> None: ...
-    def run_async(self) -> None: ...
+    async def run(self) -> None: ...
 
 class FormatOnSaveTask(LspTask):
     @classmethod
     def is_applicable(cls, view: sublime.View) -> bool: ...
-    def run_async(self) -> None: ...
+    async def run(self) -> None: ...
 
 class LspFormatDocumentCommand(LspTextCommandWithTasks):
     capability: str
+    label: str
     @property
     def tasks(self) -> list[type[LspTask]]: ...
     def is_enabled(self, event: dict | None = None, select: bool = False) -> bool: ...
-    def on_tasks_completed(
+    async def on_tasks_completed(
         self, *, select: bool = False, **kwargs: dict[str, Any]
     ) -> None: ...
-    def on_result_async(self, result: FormatResponse) -> None: ...
     def select_formatter(self, base_scope: str, session_names: list[str]) -> None: ...
     def on_select_formatter(
         self, base_scope: str, session_names: list[str], index: int

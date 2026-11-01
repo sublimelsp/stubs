@@ -1,9 +1,10 @@
+import asyncio
 import sublime
 import weakref
 from ...protocol import (
     AnnotatedTextEdit as AnnotatedTextEdit,
     ApplyWorkspaceEditParams,
-    ApplyWorkspaceEditResult as ApplyWorkspaceEditResult,
+    ApplyWorkspaceEditResult,
     ChangeAnnotation as ChangeAnnotation,
     ChangeAnnotationIdentifier as ChangeAnnotationIdentifier,
     CodeAction,
@@ -26,12 +27,13 @@ from ...protocol import (
     FileRename as FileRename,
     FileSystemWatcher as FileSystemWatcher,
     InitializeParams,
-    LSPAny as LSPAny,
+    InitializeResult,
+    LSPAny,
     LSPObject as LSPObject,
     Location,
     LocationLink,
     LogMessageParams,
-    MessageActionItem as MessageActionItem,
+    MessageActionItem,
     PreviousResultId as PreviousResultId,
     ProgressParams,
     PublishDiagnosticsParams,
@@ -73,6 +75,13 @@ from ..diagnostics import (
 )
 from ..locationpicker import LocationPicker as LocationPicker
 from .active_request import ActiveRequest as ActiveRequest
+from .aio import (
+    TaskContainer as TaskContainer,
+    gather_and_flatten_exceptions as gather_and_flatten_exceptions,
+    run_on_asyncio_thread as run_on_asyncio_thread,
+    run_on_main_thread as run_on_main_thread,
+    tick as tick,
+)
 from .collections import DottedDict as DottedDict
 from .constants import (
     ChangeEventAction as ChangeEventAction,
@@ -97,7 +106,12 @@ from .file_watcher import (
     get_file_watcher_implementation as get_file_watcher_implementation,
     lsp_watch_kind_to_file_watcher_event_types as lsp_watch_kind_to_file_watcher_event_types,
 )
-from .logging import debug as debug, exception_log as exception_log, printf as printf
+from .logging import (
+    debug as debug,
+    exception_log as exception_log,
+    exceptions_log as exceptions_log,
+    printf as printf,
+)
 from .open import (
     center_selection as center_selection,
     open_externally as open_externally,
@@ -132,10 +146,8 @@ from .transports import (
 from .types import (
     Capabilities as Capabilities,
     ClientConfig as ClientConfig,
-    ClientStates as ClientStates,
     DocumentSelectorMatcher as DocumentSelectorMatcher,
     SemanticToken as SemanticToken,
-    debounced as debounced,
     diff as diff,
     method2attr as method2attr,
     method_to_capability as method_to_capability,
@@ -163,10 +175,21 @@ from .workspace import (
 )
 from abc import ABC, abstractmethod
 from enum import IntFlag
-from typing import Any, Callable, Generator, Literal, Protocol, overload
+from typing import (
+    Any,
+    Callable,
+    Coroutine,
+    Generator,
+    Generic,
+    Literal,
+    Protocol,
+    TypeVar,
+    overload,
+)
 from typing_extensions import TypeAlias, TypeGuard
 from weakref import WeakSet
 
+T = TypeVar("T")
 InitCallback: TypeAlias = Callable[["Session", bool], None]
 
 class ViewStateActions(IntFlag):
@@ -218,27 +241,26 @@ class Manager(ABC):
     ) -> str | None:
         """Should the diagnostics for this URI be shown in the view? Return a reason why not."""
     @abstractmethod
-    def start_async(
-        self, configuration: ClientConfig, initiating_view: sublime.View
-    ) -> None:
+    async def start(
+        self, config: ClientConfig, listener: AbstractViewListener
+    ) -> Session | None:
         """
-        Start a new Session with the given configuration. The initiating view is the view that caused this method to
+        Start a new Session with the given configuration. The listener is the listener that caused this method to
         be called.
 
-        A normal flow of calls would be start -> on_post_initialize -> do language server things -> on_post_exit.
-        However, it is possible that the subprocess cannot start, in which case on_post_initialize will never be called.
+        Returns the initialized Session object, or None if nothing was started.
         """
     @abstractmethod
     def on_diagnostics_updated(self) -> None: ...
     @abstractmethod
-    def on_post_exit_async(
+    async def on_post_exit(
         self, session: Session, exit_code: int, exception: Exception | None
     ) -> None:
         """The given Session has stopped with the given exit code."""
     @abstractmethod
-    def handle_message_request(
+    async def handle_message_request(
         self, config_name: str, params: ShowMessageRequestParams
-    ) -> Promise[MessageActionItem | None]: ...
+    ) -> MessageActionItem | None: ...
     @abstractmethod
     def handle_show_message(
         self, config_name: str, params: ShowMessageParams
@@ -280,13 +302,13 @@ class SessionViewProtocol(Protocol):
         self, registration_id: str, capability_path: str, options: dict[str, Any]
     ) -> None: ...
     def on_capability_removed_async(
-        self, registration_id: str, discarded_capabilities: dict[str, Any]
+        self, registration_id: str, capability_path: str
     ) -> None: ...
     def has_capability_async(self, capability_path: str) -> bool: ...
-    def shutdown_async(self) -> None: ...
+    async def shutdown(self) -> list[Exception]: ...
     def present_diagnostics_async(self, is_view_visible: bool) -> None: ...
     def on_request_started_async(
-        self, request_id: int, request: Request[Any, Any]
+        self, controller: RequestController, request: Request[Any, Any]
     ) -> None: ...
     def on_request_finished_async(self, request_id: int) -> None: ...
     def on_request_progress(self, request_id: int, params: dict[str, Any]) -> None: ...
@@ -299,6 +321,9 @@ class SessionViewProtocol(Protocol):
     def get_request_flags(self) -> RequestFlags: ...
 
 class SessionBufferProtocol(Protocol):
+    def create_task(
+        self, coro: Coroutine[object, object, T], *, name: str | None = None
+    ) -> asyncio.Task[T] | None: ...
     @property
     def session(self) -> Session: ...
     @property
@@ -334,13 +359,13 @@ class SessionBufferProtocol(Protocol):
         self, view: sublime.View, point: int
     ) -> DocumentLink | None: ...
     def update_document_link(self, new_link: DocumentLink) -> None: ...
-    def do_semantic_tokens_async(self, view: sublime.View) -> None: ...
+    async def do_semantic_tokens(self, view: sublime.View) -> None: ...
     def get_semantic_tokens(self) -> list[SemanticToken]: ...
     def on_color_scheme_changed(self, view: sublime.View) -> None: ...
-    def do_inlay_hints_async(self, view: sublime.View) -> None: ...
+    async def do_inlay_hints(self, view: sublime.View) -> None: ...
     def remove_inlay_hint_phantom(self, phantom_uuid: str) -> None: ...
     def remove_all_inlay_hints(self) -> None: ...
-    def do_document_diagnostic_async(
+    async def do_document_diagnostic(
         self, view: sublime.View, version: int, *, forced_update: bool = ...
     ) -> None: ...
     def request_code_actions_async(
@@ -353,7 +378,15 @@ class SessionBufferProtocol(Protocol):
         *,
         progress: bool = False,
     ) -> Promise[list[Command | CodeAction] | Error | None]: ...
-    def do_code_lenses_async(self, view: sublime.View) -> None: ...
+    async def request_code_actions(
+        self,
+        view: sublime.View,
+        region: sublime.Region,
+        diagnostics: list[Diagnostic],
+        kinds: list[str | CodeActionKind] | None = ...,
+        trigger_kind: CodeActionTriggerKind = ...,
+    ) -> list[Command | CodeAction] | Error | None: ...
+    async def do_code_lenses(self, view: sublime.View) -> None: ...
     def set_pending_refresh(self, flags: RequestFlags) -> None: ...
 
 class AbstractViewListener(ABC):
@@ -374,13 +407,15 @@ class AbstractViewListener(ABC):
     @abstractmethod
     def session_views_async(self) -> list[SessionViewProtocol]: ...
     @abstractmethod
+    async def purge_changes(self) -> list[BaseException | None]: ...
+    @abstractmethod
     def purge_changes_async(self) -> None: ...
     @abstractmethod
-    def trigger_on_pre_save_async(self) -> None: ...
+    async def trigger_on_pre_save(self) -> list[BaseException | None]: ...
     @abstractmethod
     def on_session_initialized_async(self, session: Session) -> None: ...
     @abstractmethod
-    def on_session_shutdown_async(self, session: Session) -> None: ...
+    async def on_session_shutdown(self, session: Session) -> list[Exception]: ...
     @abstractmethod
     def get_diagnostics_async(
         self, location: sublime.Region | int, max_diagnostic_severity_level: int = ...
@@ -394,13 +429,13 @@ class AbstractViewListener(ABC):
     @abstractmethod
     def get_uri(self) -> DocumentUri: ...
     @overload
-    def do_signature_help_async(
+    async def do_signature_help(
         self,
         trigger_kind: Literal[SignatureHelpTriggerKind.TriggerCharacter],
         trigger_char: str,
     ) -> None: ...
     @overload
-    def do_signature_help_async(
+    async def do_signature_help(
         self,
         trigger_kind: Literal[
             SignatureHelpTriggerKind.Invoked, SignatureHelpTriggerKind.ContentChange
@@ -444,6 +479,41 @@ class Logger(ABC):
         self, method: str, params: Any, unhandled: bool
     ) -> None: ...
 
+class RequestController:
+    """Controller for a pending request."""
+    def __init__(self, req_id: int, session: Session) -> None: ...
+    async def cancel(self) -> int | None:
+        """Cancel this request. Return the request ID."""
+    @property
+    def id(self) -> int:
+        """The request ID. If the request was cancelled, raises asyncio.CancelledError."""
+    @property
+    def cancelled(self) -> bool:
+        """Whether the request was cancelled."""
+
+class CancellableRequest(RequestController, Generic[R]):
+    """A request that is in flight. The result can be awaited."""
+    def __init__(
+        self, future: asyncio.Future[R | Error], req_id: int, session: Session
+    ) -> None:
+        """
+        Create a new instance of this class.
+
+        Instances should never be created manually. The factory method for creating these objects is Session.request.
+        """
+    def add_done_callback(
+        self, f: Callable[[asyncio.Future[R | Error]], object]
+    ) -> None:
+        """Add a callback to be run when the request completes."""
+    def __await__(self) -> Generator[Any, None, R | Error]:
+        """
+        You can `await` the response of an in-flight request.
+        However, note that immediately awaiting this object prevents you from ever canceling it.
+        When the language server replies with an error, an object of type protocol.Error is returned.
+        When the coroutine awaiting the request is cancelled (using task.cancel() or something similar),
+        the cancellation is held off for a bit in order to cancel the request server-side.
+        """
+
 def print_to_status_bar(error: ResponseError) -> None: ...
 
 class _RegistrationData:
@@ -465,7 +535,7 @@ class _RegistrationData:
         self, sb: SessionBufferProtocol, *, suppress_requests: bool = False
     ) -> None: ...
 
-class Session(APIHandler, TransportCallbacks):
+class Session(APIHandler, TransportCallbacks, TaskContainer):
     transport: TransportWrapper | None
     working_directory: str | None
     request_id: int
@@ -473,11 +543,12 @@ class Session(APIHandler, TransportCallbacks):
     config_status_message: str
     manager: ref[Manager]
     window: sublime.Window
-    state: ClientStates
     capabilities: Capabilities
     diagnostics: DiagnosticsStorage
     diagnostics_result_ids: dict[tuple[DocumentUri, DiagnosticsIdentifier], str | None]
-    workspace_diagnostics_pending_responses: dict[DiagnosticsIdentifier, int | None]
+    workspace_diagnostics_pending_responses: dict[
+        DiagnosticsIdentifier, RequestController | None
+    ]
     exiting: bool
     def __init__(
         self,
@@ -491,11 +562,9 @@ class Session(APIHandler, TransportCallbacks):
     @property
     def plugin(self) -> AbstractPlugin | LspPlugin | None: ...
     def register_session_view_async(self, sv: SessionViewProtocol) -> None: ...
-    def unregister_session_view_async(self, sv: SessionViewProtocol) -> None: ...
-    def end_async_if_unused(self) -> None:
-        """End the session after a short delay, unless a view is registered with the session before then."""
+    async def unregister_session_view(self, sv: SessionViewProtocol) -> None: ...
     def session_views_async(self) -> Generator[SessionViewProtocol, None, None]:
-        """It is only safe to iterate over this in the async thread."""
+        """It is only safe to iterate over this in the asyncio thread."""
     def session_view_for_view_async(
         self, view: sublime.View
     ) -> SessionViewProtocol | None: ...
@@ -508,17 +577,10 @@ class Session(APIHandler, TransportCallbacks):
     def register_session_buffer_async(self, sb: SessionBufferProtocol) -> None: ...
     def unregister_session_buffer_async(self, sb: SessionBufferProtocol) -> None: ...
     def session_buffers_async(self) -> Generator[SessionBufferProtocol, None, None]:
-        """It is only safe to iterate over this in the async thread."""
+        """It is only safe to iterate over this in the asyncio thread."""
     def get_session_buffer_for_uri_async(
         self, uri: DocumentUri
     ) -> SessionBufferProtocol | None: ...
-    def can_handle(
-        self,
-        view: sublime.View,
-        scheme: str,
-        capability: str | None,
-        inside_workspace: bool,
-    ) -> bool: ...
     def has_capability(self, capability: str, *, check_views: bool = False) -> bool:
         """
         Check whether this `Session` has the given `capability`. If `check_views` is set to `True`, this includes
@@ -538,14 +600,22 @@ class Session(APIHandler, TransportCallbacks):
     def markdown_language_id_to_st_syntax_map(self) -> MarkdownLangMap | None: ...
     def handles_path(self, file_path: str | None, inside_workspace: bool) -> bool: ...
     def update_folders(self, folders: list[WorkspaceFolder]) -> None: ...
-    def initialize_async(
+    async def initialize(
         self,
         variables: dict[str, str],
         working_directory: str | None,
         transport: TransportWrapper,
-        init_callback: InitCallback,
-    ) -> None: ...
+    ) -> InitializeResult | Error: ...
     def on_stderr_message(self, message: str) -> None: ...
+    async def run_command(
+        self,
+        command: ExecuteCommandParams,
+        *,
+        progress: bool = False,
+        view: sublime.View | None = None,
+        is_refactoring: bool = False,
+    ) -> LSPAny | Error:
+        """Run a [command](https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_executeCommand) from the asyncio thread."""
     def execute_command(
         self,
         command: ExecuteCommandParams,
@@ -553,29 +623,32 @@ class Session(APIHandler, TransportCallbacks):
         progress: bool = False,
         view: sublime.View | None = None,
         is_refactoring: bool = False,
-    ) -> Promise[R | Error | None]:
-        """Run a command from any thread. Your .then() continuations will run in Sublime's worker thread."""
+    ) -> Promise[LSPAny | Error]: ...
     def check_log_unsupported_command(self, command: str) -> None: ...
-    def run_code_action_async(
+    async def run_code_action(
         self,
         code_action: Command | CodeAction,
         progress: bool,
         view: sublime.View | None = None,
-    ) -> Promise[None]: ...
-    def try_open_uri_async(
+    ) -> LSPAny | Error: ...
+    async def open_uri(
         self,
         uri: DocumentUri,
         r: Range | None = None,
         flags: sublime.NewFileFlags = ...,
         group: int = -1,
-    ) -> Promise[sublime.View | None] | None: ...
-    def open_uri_async(
-        self,
-        uri: DocumentUri,
-        r: Range | None = None,
-        flags: sublime.NewFileFlags = ...,
-        group: int = -1,
-    ) -> Promise[sublime.View | None]: ...
+    ) -> sublime.View | Literal[False] | None:
+        """
+        Try to open a URI.
+
+        - If the URI has the file: scheme, opens the file in a tab.
+        - Otherwise, if the URI has the res: scheme, opens the Sublime resource file in a tab.
+        - Otherwise, if the URI has the untitled: scheme, opens a scratch tab.
+        - Otherwise, if the URI has a scheme supported by the language server, then asks the language server for the
+          content.
+        - Otherwise, if there's a plugin attached, delegates to the plugin.
+        - If the plugin cannot handle the scheme, or an error occurred, returns the literal False.
+        """
     def open_scratch_buffer(
         self,
         title: str,
@@ -583,36 +656,61 @@ class Session(APIHandler, TransportCallbacks):
         syntax: str,
         flags: sublime.NewFileFlags = ...,
         group: int = -1,
-    ) -> Promise[sublime.View]: ...
+    ) -> Promise[sublime.View]:
+        """
+        Open a read-only scratch buffer with the given content.
+
+        The returned Promise can be awaited or chained with `.then()` (for backwards-compatibility).
+        """
+    async def open_location(
+        self,
+        location: Location | LocationLink,
+        flags: sublime.NewFileFlags = ...,
+        group: int = -1,
+    ) -> sublime.View | Literal[False] | None: ...
+    def open_uri_async(
+        self,
+        uri: DocumentUri,
+        r: Range | None = None,
+        flags: sublime.NewFileFlags = ...,
+        group: int = -1,
+    ) -> Promise[sublime.View | None]: ...
     def open_location_async(
         self,
         location: Location | LocationLink,
         flags: sublime.NewFileFlags = ...,
         group: int = -1,
     ) -> Promise[sublime.View | None]: ...
-    def notify_plugin_on_session_buffer_change(
+    async def notify_plugin_on_session_buffer_change(
         self, session_buffer: SessionBufferProtocol
     ) -> None: ...
-    def apply_document_changes_async(
+    async def apply_document_changes(
         self,
         document_changes: list[TextDocumentEdit | CreateFile | RenameFile | DeleteFile],
         change_annotations: dict[ChangeAnnotationIdentifier, ChangeAnnotation],
         *,
         label: str | None = None,
         is_refactoring: bool = False,
-    ) -> Promise[ApplyWorkspaceEditResult]: ...
+    ) -> ApplyWorkspaceEditResult: ...
+    async def apply_workspace_edit(
+        self,
+        edit: WorkspaceEdit,
+        *,
+        label: str | None = None,
+        is_refactoring: bool = False,
+    ) -> tuple[ApplyWorkspaceEditResult, WorkspaceEditSummary]:
+        """
+        Apply a WorkspaceEdit.
+
+        Returns the ApplyWorkspaceEditResult and a summary of the changes in the WorkspaceEdit.
+        """
     def apply_workspace_edit_async(
         self,
         edit: WorkspaceEdit,
         *,
         label: str | None = None,
         is_refactoring: bool = False,
-    ) -> Promise[tuple[ApplyWorkspaceEditResult, WorkspaceEditSummary]]:
-        """
-        Apply a WorkspaceEdit, and return a promise that resolves on the async thread again after the edits have been
-        applied. The resolved promise contains the ApplyWorkspaceEditResult and a summary of the changes in the
-        WorkspaceEdit.
-        """
+    ) -> Promise[tuple[ApplyWorkspaceEditResult, WorkspaceEditSummary]]: ...
     def decode_semantic_token(
         self,
         types_legend: tuple[str, ...],
@@ -629,35 +727,35 @@ class Session(APIHandler, TransportCallbacks):
     def visible_session_views(self) -> set[SessionViewProtocol]: ...
     def do_workspace_diagnostics_async(self) -> None: ...
     def on_server_settings_changed(self, settings: DottedDict) -> None: ...
-    def on_window_show_message_request(
+    async def on_window_show_message_request(
         self, params: ShowMessageRequestParams
-    ) -> Promise[MessageActionItem | None]: ...
+    ) -> MessageActionItem | None: ...
     def on_window_show_message(self, params: ShowMessageParams) -> None: ...
     def on_window_log_message(self, params: LogMessageParams) -> None: ...
-    def on_workspace_workspace_folders(
+    async def on_workspace_workspace_folders(
         self, _: None
-    ) -> Promise[list[LspWorkspaceFolder]]: ...
-    def on_workspace_configuration(
+    ) -> list[LspWorkspaceFolder]: ...
+    async def on_workspace_configuration(
         self, params: ConfigurationParams
-    ) -> Promise[list[LSPAny]]: ...
-    def on_workspace_apply_edit(
+    ) -> list[LSPAny]: ...
+    async def on_workspace_apply_edit(
         self, params: ApplyWorkspaceEditParams
-    ) -> Promise[ApplyWorkspaceEditResult]: ...
-    def on_workspace_code_lens_refresh(
+    ) -> ApplyWorkspaceEditResult: ...
+    async def on_workspace_code_lens_refresh(
         self, _: None
-    ) -> tuple[Promise[None], PostResponseCallback]: ...
-    def on_workspace_semantic_tokens_refresh(
+    ) -> tuple[None, PostResponseCallback]: ...
+    async def on_workspace_semantic_tokens_refresh(
         self, _: None
-    ) -> tuple[Promise[None], PostResponseCallback]: ...
-    def on_workspace_inlay_hint_refresh(
+    ) -> tuple[None, PostResponseCallback]: ...
+    async def on_workspace_inlay_hint_refresh(
         self, _: None
-    ) -> tuple[Promise[None], PostResponseCallback]: ...
-    def on_workspace_diagnostic_refresh(
+    ) -> tuple[None, PostResponseCallback]: ...
+    async def on_workspace_diagnostic_refresh(
         self, _: None
-    ) -> tuple[Promise[None], PostResponseCallback]: ...
-    def on_workspace_text_document_content_refresh(
+    ) -> tuple[None, PostResponseCallback]: ...
+    async def on_workspace_text_document_content_refresh(
         self, params: TextDocumentContentRefreshParams
-    ) -> Promise[None]: ...
+    ) -> tuple[None, PostResponseCallback]: ...
     def on_text_document_publish_diagnostics(
         self, params: PublishDiagnosticsParams
     ) -> None: ...
@@ -669,60 +767,81 @@ class Session(APIHandler, TransportCallbacks):
         diagnostics: list[Diagnostic] | None,
     ) -> None: ...
     def clear_diagnostics_for_uri(self, uri: DocumentUri) -> None: ...
-    def on_client_register_capability(
+    async def on_client_register_capability(
         self, params: RegistrationParams
-    ) -> tuple[Promise[None], PostResponseCallback]: ...
-    def on_client_unregister_capability(
+    ) -> tuple[None, PostResponseCallback]: ...
+    async def on_client_unregister_capability(
         self, params: UnregistrationParams
-    ) -> Promise[None]: ...
+    ) -> None: ...
     def register_file_system_watchers(
         self, registration_id: str, watchers: list[FileSystemWatcher]
     ) -> None: ...
     def unregister_file_system_watchers(self, registration_id: str) -> None: ...
-    def on_window_show_document(
+    async def on_window_show_document(
         self, params: ShowDocumentParams
-    ) -> Promise[ShowDocumentResult]: ...
-    def on_window_work_done_progress_create(
+    ) -> ShowDocumentResult: ...
+    async def on_window_work_done_progress_create(
         self, params: WorkDoneProgressCreateParams
-    ) -> Promise[None]: ...
-    def on_progress(self, params: ProgressParams) -> None: ...
-    def end_async(self) -> None: ...
-    def shutdown_session_view_async(
-        self, session_view: SessionViewProtocol
     ) -> None: ...
-    def on_transport_close(
+    def on_progress(self, params: ProgressParams) -> None: ...
+    async def end(self) -> None: ...
+    async def shutdown_session_view(
+        self, session_view: SessionViewProtocol
+    ) -> list[Exception]: ...
+    async def on_transport_close(
         self, exit_code: int, exception: Exception | None
     ) -> None: ...
+    def request(self, r: Request[P_contra, R]) -> CancellableRequest[R]:
+        """
+        Make a request to the language server.
+
+        You must call this method from the asyncio thread.
+
+        ```py
+        result = await session.request(Request(...))
+        if isinstance(result, Error):
+            print(result.code, result.message)
+        else:
+            print(result)
+        ```
+        """
     def send_request_async(
         self,
         request: Request[P_contra, R],
         on_result: Callable[[R], None],
         on_error: Callable[[ResponseError], None] | None = None,
     ) -> int:
-        """You must call this method from Sublime's worker thread. Callbacks will run in Sublime's worker thread."""
+        """You can call this method from any thread. Callbacks will run in the asyncio thread."""
     def send_request(
         self,
         request: Request[P_contra, R],
         on_result: Callable[[R], None],
         on_error: Callable[[ResponseError], None] | None = None,
     ) -> None:
-        """You can call this method from any thread. Callbacks will run in Sublime's worker thread."""
+        """You can call this method from any thread. Callbacks will run in the asyncio thread."""
     def send_request_task(
         self, request: Request[P_contra, R]
     ) -> Promise[R | Error]: ...
     def send_request_task_2(
         self, request: Request[P_contra, R]
     ) -> tuple[Promise[R | Error], int]: ...
-    def cancel_request_async(self, request_id: int) -> None: ...
-    def send_notification(self, notification: Notification[P_contra]) -> None: ...
-    def send_response(self, response: Response[R]) -> None: ...
-    def send_error_response(self, request_id: int | str, error: Error) -> None: ...
-    def exit(self) -> None: ...
-    def send_payload(self, payload: JSONRPCMessage) -> None: ...
-    def deduce_payload(
+    async def cancel_request(self, request_id: int) -> None: ...
+    async def notify(self, notification: Notification[P_contra]) -> None:
+        """Send a notification to the server."""
+    def send_notification_async(self, notification: Notification[P_contra]) -> None:
+        """Send a notification to the server. Not thread safe. Must be called from the asyncio thread."""
+    def send_notification(self, notification: Notification[P_contra]) -> None:
+        """Send a notification to the server. Thread safe. Can be called from any thread."""
+    async def send_response(self, response: Response[R]) -> None: ...
+    async def send_error_response(
+        self, request_id: int | str, error: Error
+    ) -> None: ...
+    async def exit(self) -> None: ...
+    async def send_payload(self, payload: JSONRPCMessage) -> None: ...
+    async def deduce_payload(
         self, payload: JSONRPCMessage
     ) -> tuple[Callable | None, Any, str | int | None, str | None, str | None]: ...
-    def on_payload(self, payload: JSONRPCMessage) -> None: ...
+    async def on_payload(self, payload: JSONRPCMessage) -> None: ...
     def response_handler(
         self, response_id: str | int, response: JSONRPCMessage
     ) -> tuple[Callable[[ResponseError], None], str | None, Any, bool]: ...

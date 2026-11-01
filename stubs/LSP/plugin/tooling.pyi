@@ -6,6 +6,10 @@ from .api import (
     PluginStartError as PluginStartError,
     get_plugin as get_plugin,
 )
+from .core.aio import (
+    run_coroutine as run_coroutine,
+    run_on_threadpool as run_on_threadpool,
+)
 from .core.css import css as css
 from .core.logging import debug as debug
 from .core.registry import windows as windows
@@ -42,26 +46,19 @@ class LspParseVscodePackageJson(sublime_plugin.ApplicationCommand):
 
 class LspTroubleshootServerCommand(sublime_plugin.WindowCommand):
     def run(self) -> None: ...
+    test_runner: ServerTestRunner | None
     def on_selected(
         self,
         selected_index: int,
         configs: list[ClientConfig],
         active_view: sublime.View,
     ) -> None: ...
-    test_runner: ServerTestRunner | None
-    def test_run_server_async(
-        self,
-        config: ClientConfig,
-        window: sublime.Window,
-        active_view: sublime.View,
-        output_sheet: sublime.HtmlSheet,
-    ) -> None: ...
     def update_sheet(
         self,
         config: ClientConfig,
         active_view: sublime.View | None,
         output_sheet: sublime.HtmlSheet,
-        resolved_command: list[str],
+        resolved_command: list[str] | None,
         cwd: str | None,
         server_output: str,
         exit_code: int,
@@ -70,7 +67,7 @@ class LspTroubleshootServerCommand(sublime_plugin.WindowCommand):
         self,
         config: ClientConfig,
         active_view: sublime.View | None,
-        resolved_command: list[str],
+        resolved_command: list[str] | None,
         cwd: str | None,
         server_output: str,
         exit_code: int,
@@ -103,12 +100,12 @@ class ServerTestRunner(TransportCallbacks):
         config: ClientConfig,
         window: sublime.Window,
         initiating_view: sublime.View,
-        on_close: Callable[[list[str], str | None, str, int], None],
+        on_close: Callable[[list[str] | None, str | None, str, int], None],
     ) -> None: ...
-    def force_close_transport(self) -> None: ...
-    def on_payload(self, payload: dict[str, Any]) -> None: ...
+    async def run(self) -> None: ...
+    async def on_payload(self, payload: dict[str, Any]) -> None: ...
     def on_stderr_message(self, message: str) -> None: ...
-    def on_transport_close(
+    async def on_transport_close(
         self, exit_code: int, exception: Exception | None
     ) -> None: ...
 

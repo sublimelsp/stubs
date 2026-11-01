@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 from ...protocol import Diagnostic as Diagnostic, Location, LocationLink
+from .aio import run_coroutine as run_coroutine
 from .sessions import AbstractViewListener as AbstractViewListener, Session as Session
 from .settings import userprefs as userprefs
 from .type_converters import position_to_offset as position_to_offset

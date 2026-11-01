@@ -1,12 +1,18 @@
 import sublime
 from ..protocol import CodeLens, Command as Command, Range
+from .core.aio import run_coroutine as run_coroutine
 from .core.constants import CODE_LENS_ENABLED_KEY as CODE_LENS_ENABLED_KEY
-from .core.protocol import Error as Error, ResolvedCodeLens as ResolvedCodeLens
+from .core.protocol import (
+    Error as Error,
+    Request as Request,
+    ResolvedCodeLens as ResolvedCodeLens,
+)
 from .core.registry import (
     LspTextCommand as LspTextCommand,
     LspWindowCommand as LspWindowCommand,
     windows as windows,
 )
+from .core.sessions import Session as Session
 from .core.type_converters import range_to_region as range_to_region
 from typing_extensions import TypeGuard
 from typing import Any
@@ -27,7 +33,7 @@ class CachedCodeLens:
     range: HashableRange
     cached_command: Any
     def __init__(self, data: CodeLens) -> None: ...
-    def on_resolve(self, response: CodeLens | Error) -> None: ...
+    async def resolve(self, session: Session, view: sublime.View) -> CachedCodeLens: ...
 
 class CodeLensCache:
     code_lenses: dict[HashableRange, list[CachedCodeLens]]

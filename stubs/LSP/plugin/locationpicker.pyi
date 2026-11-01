@@ -1,5 +1,6 @@
 import sublime
 from ..protocol import DocumentUri as DocumentUri, Location, LocationLink, Position
+from .core.aio import run_coroutine as run_coroutine
 from .core.constants import ST_PACKAGES_PATH as ST_PACKAGES_PATH
 from .core.logging import debug as debug
 from .core.sessions import Session as Session
@@ -10,7 +11,7 @@ from .core.views import (
 )
 from sublime_types import Kind
 
-def open_location_async(
+async def open_location(
     session: Session,
     location: Location | LocationLink,
     side_by_side: bool,

@@ -8,16 +8,20 @@ from ..protocol import (
     Range,
     TextEdit,
 )
+from .core.aio import run_coroutine as run_coroutine
 from .core.constants import (
     COMPLETION_KINDS as COMPLETION_KINDS,
     MarkdownLangMap as MarkdownLangMap,
 )
 from .core.edit import apply_text_edits as apply_text_edits
 from .core.logging import debug as debug
-from .core.promise import Promise as Promise
 from .core.protocol import Error as Error, Request as Request
 from .core.registry import LspTextCommand as LspTextCommand
-from .core.sessions import Session as Session
+from .core.sessions import (
+    CancellableRequest as CancellableRequest,
+    RequestController as RequestController,
+    Session as Session,
+)
 from .core.settings import userprefs as userprefs
 from .core.type_converters import range_to_region as range_to_region
 from .core.views import (
@@ -28,17 +32,18 @@ from .core.views import (
     show_lsp_popup as show_lsp_popup,
     text_document_position_params as text_document_position_params,
 )
-from typing import Any, Callable
+from typing import Any
 from typing_extensions import TypeAlias, TypeGuard
 from ..protocol import CompletionList
 from typing import List
 from typing import Tuple
 from typing import Union
-import weakref
 
 SessionName: TypeAlias = str
-CompletionResponse: TypeAlias = Union[List[CompletionItem], CompletionList, Error, None]
-ResolvedCompletions: TypeAlias = Tuple[CompletionResponse, "weakref.ref[Session]"]
+CompletionResponse: TypeAlias = Union[List[CompletionItem], CompletionList, None]
+ResolvedCompletions: TypeAlias = Tuple[
+    Union[CompletionResponse, BaseException], Session
+]
 CompletionsStore: TypeAlias = Tuple[List[CompletionItem], CompletionItemDefaults]
 
 def format_details(detail: str, cutoff_length: int = 80) -> str: ...
@@ -61,26 +66,13 @@ def completion_with_defaults(
     """Currently supports defaults for: ["editRange", "insertTextFormat", "data"]."""
 
 class QueryCompletionsTask:
-    """
-    Represents pending completion requests.
-
-    Can be canceled while in progress in which case the "on_done_async" callback will get immediately called with empty
-    list and the pending response from the server(s) will be canceled and results ignored.
-
-    All public methods must only be called on the async thread and the "on_done_async" callback will also be called
-    on the async thread.
-    """
+    """Represents pending completion requests."""
     def __init__(
-        self,
-        view: sublime.View,
-        location: int,
-        triggered_manually: bool,
-        on_done_async: Callable[
-            [list[sublime.CompletionItem], sublime.AutoCompleteFlags], None
-        ],
+        self, view: sublime.View, location: int, triggered_manually: bool
     ) -> None: ...
-    def query_completions_async(self, sessions: list[Session]) -> None: ...
-    def cancel_async(self) -> None: ...
+    async def query_completions(
+        self, sessions: list[Session]
+    ) -> tuple[list[sublime.CompletionItem], sublime.AutoCompleteFlags]: ...
 
 class LspResolveDocsCommand(LspTextCommand):
     def run(

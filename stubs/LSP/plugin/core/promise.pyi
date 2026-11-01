@@ -1,4 +1,7 @@
-from typing import Callable, Generic, Protocol, TypeVar
+import asyncio
+from .protocol import Error as Error
+from collections.abc import Coroutine
+from typing import Any, Callable, Generator, Generic, Protocol, TypeVar
 from typing import Tuple
 from typing import Union
 import threading
@@ -76,6 +79,12 @@ class Promise(Generic[T]):
     @staticmethod
     def packaged_task() -> PackagedTask[S]: ...
     @staticmethod
+    def wrap_task(task: asyncio.Task[T]) -> Promise[T | Error]:
+        """Wrap a task in a Promise. The Promise resolves when the task is done."""
+    @staticmethod
+    def wrap_coroutine(coro: Coroutine[None, None, T]) -> Promise[T | Error]:
+        """Wrap a coroutine object in a Promise. The Promise resolves when the coroutine is done."""
+    @staticmethod
     def all(promises: list[Promise[S]]) -> Promise[list[S]]:
         """
         Takes a list of promises and returns a Promise that gets resolved when all promises
@@ -110,3 +119,5 @@ class Promise(Generic[T]):
         Arguments:
             onfullfilled: The callback to call when this promise gets resolved.
         """
+    def __await__(self) -> Generator[Any, None, T]:
+        """You can `await` a Promise."""

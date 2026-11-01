@@ -10,6 +10,7 @@ from ...protocol import (
     TextDocumentSyncOptions,
     URI,
 )
+from .aio import TaskContainer as TaskContainer, run_coroutine as run_coroutine
 from .collections import DottedDict as DottedDict
 from .constants import (
     LANGUAGE_IDENTIFIERS as LANGUAGE_IDENTIFIERS,
@@ -31,6 +32,7 @@ from typing import Any, Callable, Final, Generator, Iterable, TypeVar, TypedDict
 from typing_extensions import NotRequired, TypeGuard
 from typing import List
 from typing_extensions import override
+import asyncio
 import os
 import time
 
@@ -68,19 +70,16 @@ def sublime_pattern_to_glob(
     """
 
 def debounced(
-    f: Callable[[], Any],
-    timeout_ms: int = 0,
-    condition: Callable[[], bool] = ...,
-    async_thread: bool = False,
+    f: Callable[[], Any], timeout_ms: int = 0, condition: Callable[[], bool] = ...
 ) -> None:
     """
-    Possibly run a function at a later point in time, either on the async thread or on the main thread.
+    Possibly run a function at a later point in time. Always on the asyncio thread.
+
+    Note: use asyncio.sleep(x) and simple condition checking if you're already running in an `async` function.
 
     :param      f:             The function to possibly run. Its return type is discarded.
     :param      timeout_ms:    The time in milliseconds after which to possibly to run the function
     :param      condition:     The condition that must evaluate to True in order to run the function
-    :param      async_thread:  If true, run the function on the async worker thread, otherwise run the function on the
-                               main thread
     """
 
 @dataclass
@@ -102,10 +101,9 @@ class DebouncerNonThreadSafe:
     When calling `debounce()` multiple times, if the time span between calls is shorter than the specified `timeout_ms`,
     the callback function will only be called once, after `timeout_ms` since the last call.
 
-    This implementation is not thread safe. You must ensure that `debounce()` is called from the same thread as
-    was chosen during initialization through the `async_thread` argument.
+    This implementation is not thread safe. You must ensure that `debounce()` is called from the asyncio thread.
     """
-    def __init__(self, async_thread: bool) -> None: ...
+    def __init__(self, task_container: TaskContainer) -> None: ...
     def debounce(
         self,
         f: Callable[[], None],
@@ -113,7 +111,7 @@ class DebouncerNonThreadSafe:
         condition: Callable[[], bool] = ...,
     ) -> None:
         """
-        Possibly run a function at a later point in time on the thread chosen during initialization.
+        Possibly run a function at a later point in time on the asyncio thread.
 
         :param      f:             The function to possibly run
         :param      timeout_ms:    The time in milliseconds after which to possibly to run the function
@@ -187,11 +185,6 @@ class SemanticToken:
     region: sublime.Region
     type: str
     modifiers: list[str]
-
-class ClientStates:
-    STARTING: int
-    READY: int
-    STOPPING: int
 
 def is_notebook_cell_text_document_filter(
     document_filter: DocumentFilter,

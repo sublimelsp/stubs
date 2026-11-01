@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 from ..protocol import Diagnostic, DocumentUri, LocationLink as LocationLink
+from .core.aio import run_coroutine as run_coroutine
 from .core.constants import DIAGNOSTIC_KINDS as DIAGNOSTIC_KINDS
 from .core.input_handlers import (
     PreselectedListInputHandler as PreselectedListInputHandler,
@@ -30,7 +31,7 @@ from .core.views import (
 )
 from .locationpicker import (
     LocationPicker as LocationPicker,
-    open_location_async as open_location_async,
+    open_location as open_location,
 )
 from typing import Any, TypedDict
 

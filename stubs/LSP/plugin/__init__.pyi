@@ -11,6 +11,13 @@ from .api import (
     unregister_plugin as unregister_plugin,
     uri_handler as uri_handler,
 )
+from .core.aio import (
+    PortableTimeoutError as PortableTimeoutError,
+    run_coroutine as run_coroutine,
+    run_on_asyncio_thread as run_on_asyncio_thread,
+    run_on_threadpool as run_on_threadpool,
+    run_on_worker_thread as run_on_worker_thread,
+)
 from .core.collections import DottedDict as DottedDict
 from .core.constants import (
     MarkdownLangMap as MarkdownLangMap,

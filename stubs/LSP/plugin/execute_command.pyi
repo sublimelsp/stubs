@@ -1,7 +1,9 @@
 import sublime
+from .core.aio import run_coroutine as run_coroutine
 from .core.logging import debug as debug
 from .core.protocol import Error as Error
 from .core.registry import LspTextCommand as LspTextCommand
+from .core.sessions import Session as Session
 from .core.views import (
     first_selection_region as first_selection_region,
     offset_to_point as offset_to_point,

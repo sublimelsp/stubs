@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 from ..protocol import AnnotatedTextEdit, SnippetTextEdit, TextEdit, WorkspaceEdit
+from .core.aio import run_coroutine as run_coroutine
 from .core.constants import ChangeEventAction as ChangeEventAction
 from .core.edit import (
     WorkspaceChanges as WorkspaceChanges,

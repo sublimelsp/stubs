@@ -2,6 +2,11 @@ import sublime
 import sublime_plugin
 import weakref
 from ..protocol import FileRename, WorkspaceEdit
+from .core.aio import (
+    run_coroutine as run_coroutine,
+    run_on_asyncio_thread as run_on_asyncio_thread,
+    run_on_main_thread as run_on_main_thread,
+)
 from .core.edit import show_summary_message as show_summary_message
 from .core.logging import debug as debug
 from .core.open import open_file_uri as open_file_uri
@@ -71,7 +76,7 @@ class LspRenamePathCommand(LspWindowCommand):
         label: str,
         accepted: bool,
     ) -> Promise[bool]: ...
-    def rename_path(self, old: str, new: str) -> Promise[bool]: ...
+    async def rename_path(self, old: str, new: str) -> bool: ...
     def restore_view(
         self,
         selection: list[sublime.Region],

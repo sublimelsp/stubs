@@ -1,3 +1,4 @@
+import asyncio
 import sublime
 from ..protocol import (
     CodeAction,
@@ -6,7 +7,7 @@ from ..protocol import (
     Command,
     Diagnostic as Diagnostic,
 )
-from .core.promise import Promise as Promise
+from .core.aio import run_coroutine as run_coroutine
 from .core.protocol import Error as Error, Request as Request
 from .core.registry import (
     LspTextCommand as LspTextCommand,
@@ -27,7 +28,7 @@ from .core.views import (
 )
 from .lsp_task import LspTask as LspTask
 from abc import ABC, abstractmethod
-from collections.abc import Generator
+from typing import AsyncGenerator
 from typing_extensions import TypeGuard
 
 ConfigName = str
@@ -41,7 +42,8 @@ def is_code_action_with_diagnostics(
 ) -> TypeGuard[CodeAction]: ...
 def is_quickfix(action: Command | CodeAction) -> bool: ...
 def filter_quickfix_actions(
-    only_with_diagnostics: bool, response: list[Command | CodeAction] | Error | None
+    only_with_diagnostics: bool,
+    response: list[Command | CodeAction] | BaseException | None,
 ) -> list[Command | CodeAction]: ...
 
 class CodeActionsManager:
@@ -51,7 +53,7 @@ class CodeActionsManager:
     refactor_actions_cache: list[tuple[str, CodeAction]]
     source_actions_cache: list[tuple[str, CodeAction]]
     def __init__(self) -> None: ...
-    def request_for_region_async(
+    def request_for_region(
         self,
         view: sublime.View,
         region: sublime.Region,
@@ -62,14 +64,14 @@ class CodeActionsManager:
         *,
         manual: bool = False,
         progress: bool = False,
-    ) -> Promise[list[CodeActionsByConfigName]]:
+    ) -> asyncio.Future[list[CodeActionsByConfigName]]:
         """
         Requests code actions with provided diagnostics and specified region. If there are
         no diagnostics for given session, the request will be made with empty diagnostics list.
         """
-    def request_on_save_or_format_async(
+    async def request_on_save_or_format(
         self, view: sublime.View, code_actions: dict[str, bool]
-    ) -> Generator[Promise[CodeActionsByConfigName]]: ...
+    ) -> AsyncGenerator[CodeActionsByConfigName]: ...
 
 actions_manager: CodeActionsManager
 
@@ -98,7 +100,7 @@ class CodeActionsTaskBase(LspTask):
     def format_on_save_enabled(cls, view: sublime.View) -> bool: ...
     @classmethod
     def get_code_action_kinds(cls, view: sublime.View) -> dict[str, bool]: ...
-    def run_async(self) -> None: ...
+    async def run(self) -> None: ...
 
 class CodeActionsOnSaveTask(CodeActionsTaskBase):
     """
@@ -158,7 +160,6 @@ class LspMenuActionCommand(LspWindowCommand, ABC):
     def description(self, index: int, event: dict | None = None) -> str | None: ...
     def want_event(self) -> bool: ...
     def run(self, index: int, event: dict | None = None) -> None: ...
-    def run_async(self, index: int, event: dict | None) -> None: ...
     @staticmethod
     def applies_to_context_menu(event: dict | None) -> bool: ...
 

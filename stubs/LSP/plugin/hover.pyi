@@ -7,6 +7,10 @@ from ..protocol import (
     Hover,
 )
 from .code_actions import filter_quickfix_actions as filter_quickfix_actions
+from .core.aio import (
+    run_coroutine as run_coroutine,
+    run_on_asyncio_thread as run_on_asyncio_thread,
+)
 from .core.constants import (
     HOVER_ENABLED_KEY as HOVER_ENABLED_KEY,
     MarkdownLangMap as MarkdownLangMap,
@@ -96,7 +100,7 @@ class LspHoverCommand(LspTextCommand):
     def show_hover(
         self, listener: AbstractViewListener, point: int, only_diagnostics: bool
     ) -> None: ...
-    def try_open_custom_uri_async(self, uri: str) -> None: ...
+    async def try_open_custom_uri(self, uri: str) -> None: ...
 
 class LspToggleHoverPopupsCommand(sublime_plugin.WindowCommand):
     def is_enabled(self) -> bool: ...

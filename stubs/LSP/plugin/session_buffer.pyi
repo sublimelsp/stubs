@@ -3,7 +3,6 @@ from ..protocol import (
     CodeAction as CodeAction,
     CodeActionKind as CodeActionKind,
     CodeActionTriggerKind,
-    CodeLens as CodeLens,
     ColorInformation as ColorInformation,
     Command as Command,
     Diagnostic as Diagnostic,
@@ -13,10 +12,13 @@ from ..protocol import (
     DocumentLink,
     DocumentUri,
     FullDocumentDiagnosticReport,
-    InlayHint as InlayHint,
     RelatedFullDocumentDiagnosticReport as RelatedFullDocumentDiagnosticReport,
+    SemanticTokens as SemanticTokens,
+    SemanticTokensDelta as SemanticTokensDelta,
+    SemanticTokensDeltaParams as SemanticTokensDeltaParams,
+    SemanticTokensParams as SemanticTokensParams,
+    SemanticTokensRangeParams as SemanticTokensRangeParams,
     TextDocumentSyncKind,
-    TextEdit as TextEdit,
     UnchangedDocumentDiagnosticReport,
 )
 from .api import AbstractPlugin as AbstractPlugin, LspPlugin as LspPlugin
@@ -24,6 +26,7 @@ from .code_lens import (
     CodeLensCache as CodeLensCache,
     LspToggleCodeLensesCommand as LspToggleCodeLensesCommand,
 )
+from .core.aio import TaskContainer as TaskContainer
 from .core.constants import (
     AUTO_CLOSE_BRACKETS as AUTO_CLOSE_BRACKETS,
     CODE_LENS_ANNOTATION_SCOPE as CODE_LENS_ANNOTATION_SCOPE,
@@ -37,14 +40,15 @@ from .core.constants import (
     SUPPORTED_DIAGNOSTIC_TAGS as SUPPORTED_DIAGNOSTIC_TAGS,
 )
 from .core.edit import apply_text_edits as apply_text_edits
+from .core.logging import debug as debug, exceptions_log as exceptions_log
 from .core.promise import Promise as Promise
 from .core.protocol import (
     Error as Error,
     Request as Request,
     ResolvedCodeLens as ResolvedCodeLens,
-    ResponseError as ResponseError,
 )
 from .core.sessions import (
+    RequestController as RequestController,
     Session as Session,
     SessionViewProtocol as SessionViewProtocol,
     is_diagnostic_server_cancellation_data as is_diagnostic_server_cancellation_data,
@@ -56,7 +60,6 @@ from .core.types import (
     DebouncerNonThreadSafe as DebouncerNonThreadSafe,
     FEATURES_TIMEOUT as FEATURES_TIMEOUT,
     SemanticToken as SemanticToken,
-    debounced as debounced,
 )
 from .core.url import normalize_uri as normalize_uri
 from .core.views import (
@@ -106,7 +109,7 @@ class PendingChanges:
 @dataclass
 class PendingDocumentDiagnosticRequest:
     version: int
-    request_id: int
+    request: RequestController
 
 class SemanticTokensData:
     data: list[int]
@@ -114,10 +117,11 @@ class SemanticTokensData:
     active_region_keys: set[int]
     tokens: list[SemanticToken]
     view_change_count: int
-    pending_response: int | None
+    pending_response: RequestController | None
     def __init__(self) -> None: ...
+    async def cancel(self) -> None: ...
 
-class SessionBuffer:
+class SessionBuffer(TaskContainer):
     """
     Holds state per session per buffer.
 
@@ -155,7 +159,7 @@ class SessionBuffer:
     def language_id(self) -> str:
         """Deprecated: use get_language_id."""
     def add_session_view(self, sv: SessionViewProtocol) -> None: ...
-    def remove_session_view(self, sv: SessionViewProtocol) -> None: ...
+    async def remove_session_view(self, sv: SessionViewProtocol) -> list[Exception]: ...
     def register_capability_async(
         self,
         registration_id: str,
@@ -174,20 +178,20 @@ class SessionBuffer:
     def should_notify_will_save(self) -> bool: ...
     def should_notify_did_save(self) -> tuple[bool, bool]: ...
     def should_notify_did_close(self) -> bool: ...
-    def on_text_changed_async(
+    def on_text_changed(
         self,
         view: sublime.View,
         change_count: int,
         changes: list[sublime.TextChange],
         action: ChangeEventAction,
     ) -> None: ...
-    def on_revert_async(self, view: sublime.View) -> None: ...
-    on_reload_async = on_revert_async
-    def purge_changes_async(
+    async def on_revert(self, view: sublime.View) -> None: ...
+    on_reload = on_revert
+    async def purge_changes(
         self, view: sublime.View, suppress_requests: bool = False
     ) -> None: ...
-    def on_pre_save_async(self, view: sublime.View) -> None: ...
-    def on_post_save_async(self, view: sublime.View, new_uri: DocumentUri) -> None: ...
+    async def on_pre_save(self, view: sublime.View) -> None: ...
+    async def on_post_save(self, view: sublime.View, new_uri: DocumentUri) -> None: ...
     def on_userprefs_changed_async(self) -> None: ...
     def on_color_scheme_changed(self, view: sublime.View) -> None: ...
     def some_view(self) -> sublime.View | None: ...
@@ -201,7 +205,7 @@ class SessionBuffer:
         self, view: sublime.View, point: int
     ) -> DocumentLink | None: ...
     def update_document_link(self, new_link: DocumentLink) -> None: ...
-    def do_document_diagnostic_async(
+    async def do_document_diagnostic(
         self, view: sublime.View, version: int, *, forced_update: bool = False
     ) -> None: ...
     def on_diagnostics_async(
@@ -211,12 +215,12 @@ class SessionBuffer:
         visible_session_views: set[SessionViewProtocol],
     ) -> None: ...
     def has_latest_diagnostics(self) -> bool: ...
-    def do_semantic_tokens_async(
+    async def do_semantic_tokens(
         self, view: sublime.View, only_viewport: bool = False
     ) -> None: ...
     def get_semantic_tokens(self) -> list[SemanticToken]: ...
     def clear_semantic_tokens_async(self) -> None: ...
-    def do_inlay_hints_async(self, view: sublime.View) -> None: ...
+    async def do_inlay_hints(self, view: sublime.View) -> None: ...
     def present_inlay_hints(self, phantoms: list[sublime.Phantom]) -> None: ...
     def remove_inlay_hint_phantom(self, phantom_uuid: str) -> None: ...
     def remove_all_inlay_hints(self) -> None: ...
@@ -230,5 +234,15 @@ class SessionBuffer:
         *,
         progress: bool = False,
     ) -> Promise[list[Command | CodeAction] | Error | None]: ...
-    def do_code_lenses_async(self, view: sublime.View) -> None: ...
-    def resolve_visible_code_lenses_async(self, view: sublime.View) -> None: ...
+    async def request_code_actions(
+        self,
+        view: sublime.View,
+        region: sublime.Region,
+        diagnostics: list[Diagnostic],
+        kinds: list[str | CodeActionKind] | None = None,
+        trigger_kind: CodeActionTriggerKind = ...,
+        *,
+        progress: bool = False,
+    ) -> list[Command | CodeAction] | Error | None: ...
+    async def do_code_lenses(self, view: sublime.View) -> None: ...
+    async def resolve_visible_code_lenses(self, view: sublime.View) -> None: ...

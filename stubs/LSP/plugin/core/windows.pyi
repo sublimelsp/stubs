@@ -6,7 +6,7 @@ from ...protocol import (
     FileDelete as FileDelete,
     FileRename as FileRename,
     LogMessageParams,
-    MessageActionItem as MessageActionItem,
+    MessageActionItem,
     ShowMessageParams,
     ShowMessageRequestParams,
 )
@@ -18,6 +18,12 @@ from ..api import (
     PluginStartError as PluginStartError,
     get_plugin as get_plugin,
 )
+from .aio import (
+    gather_and_flatten_exceptions as gather_and_flatten_exceptions,
+    run_coroutine as run_coroutine,
+    run_on_asyncio_thread as run_on_asyncio_thread,
+    run_on_threadpool as run_on_threadpool,
+)
 from .configurations import (
     RETRY_COUNT_TIMEDELTA as RETRY_COUNT_TIMEDELTA,
     RETRY_MAX_COUNT as RETRY_MAX_COUNT,
@@ -25,7 +31,11 @@ from .configurations import (
     WindowConfigManager as WindowConfigManager,
 )
 from .constants import MESSAGE_TYPE_LEVELS as MESSAGE_TYPE_LEVELS
-from .logging import debug as debug, exception_log as exception_log
+from .logging import (
+    debug as debug,
+    exception_log as exception_log,
+    exceptions_log as exceptions_log,
+)
 from .messages_panel import MessagesPanel as MessagesPanel
 from .panels import (
     LOG_LINES_LIMIT_SETTING_NAME as LOG_LINES_LIMIT_SETTING_NAME,
@@ -34,7 +44,6 @@ from .panels import (
     PanelManager as PanelManager,
     PanelName as PanelName,
 )
-from .promise import Promise as Promise
 from .protocol import Error as Error, Notification as Notification, Point as Point
 from .sessions import (
     AbstractViewListener as AbstractViewListener,
@@ -106,31 +115,28 @@ class WindowManager(Manager, WindowConfigChangeListener, ViewStatusHandler):
     def unregister_listener_async(self, listener: AbstractViewListener) -> None: ...
     def listeners(self) -> Generator[AbstractViewListener, None, None]: ...
     def listener_for_view(self, view: sublime.View) -> AbstractViewListener | None: ...
-    def recheck_is_applicable_async(
+    async def recheck_is_applicable(
         self, view: sublime.View, config_name: str
     ) -> None: ...
     def get_session(
         self, config_name: str, file_path: str | None = None
     ) -> Session | None: ...
-    def start_async(
-        self, config: ClientConfig, initiating_view: sublime.View
-    ) -> None: ...
-    def handle_message_request(
+    async def start(
+        self, config: ClientConfig, listener: AbstractViewListener
+    ) -> Session | None: ...
+    async def handle_message_request(
         self, config_name: str, params: ShowMessageRequestParams
-    ) -> Promise[MessageActionItem | None]: ...
-    def restart_sessions_async(self, config_names: list[str]) -> None: ...
+    ) -> MessageActionItem | None: ...
+    async def restart_sessions(self, config_names: list[str]) -> None: ...
     def get_project_path(self, file_path: str) -> str | None: ...
     def should_ignore_diagnostics(
         self, uri: DocumentUri, configuration: ClientConfig
     ) -> str | None: ...
-    def on_post_exit_async(
+    async def on_post_exit(
         self, session: Session, exit_code: int, exception: Exception | None
     ) -> None: ...
-    def destroy(self) -> None:
-        """
-        Called **from the main thread** when the plugin unloads. In that case we must destroy all sessions
-        from the main thread. That could lead to some dict/list being mutated while iterated over, so be careful.
-        """
+    async def destroy(self) -> None:
+        """Destroy everything related to this instance."""
     def handle_log_message(
         self, config_name: str, params: LogMessageParams
     ) -> None: ...
@@ -156,7 +162,7 @@ class WindowManager(Manager, WindowConfigChangeListener, ViewStatusHandler):
 class WindowRegistry(LspSettingsChangeListener):
     def __init__(self) -> None: ...
     def enable(self) -> None: ...
-    def disable(self) -> None: ...
+    async def disable(self) -> None: ...
     def lookup(self, window: sublime.Window | None) -> WindowManager | None: ...
     def listener_for_view(self, view: sublime.View) -> AbstractViewListener | None: ...
     def discard(self, window: sublime.Window) -> None: ...

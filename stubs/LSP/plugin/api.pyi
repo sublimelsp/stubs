@@ -1,12 +1,12 @@
 import sublime
 from ..protocol import ConfigurationItem, DocumentUri, ExecuteCommandParams, LSPAny
+from .core.aio import run_on_threadpool as run_on_threadpool
 from .core.collections import DottedDict as DottedDict
 from .core.constants import (
     MarkdownLangMap as MarkdownLangMap,
     ST_STORAGE_PATH as ST_STORAGE_PATH,
 )
 from .core.logging import exception_log as exception_log
-from .core.promise import Promise as Promise
 from .core.protocol import (
     ClientNotification as ClientNotification,
     ClientRequest as ClientRequest,
@@ -31,7 +31,7 @@ from .core.workspace import WorkspaceFolder as WorkspaceFolder
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Final, TypeVar
+from typing import Any, Awaitable, Callable, Final, TypeVar
 from weakref import ref
 
 HANDLER_MARKER: str
@@ -39,16 +39,16 @@ COMMAND_HANDLER_MARKER: str
 URI_HANDLER_MARKER: str
 P = TypeVar("P", bound=LSPAny)
 R = TypeVar("R", bound=LSPAny)
-CommandHandler = Callable[["list[P] | None"], "Promise[R]"]
-CommandHandlerForDecorator = Callable[[Any, "list[P] | None"], "Promise[R]"]
+CommandHandler = Callable[["list[P] | None"], "Awaitable[R]"]
+CommandHandlerForDecorator = Callable[[Any, "list[P] | None"], "Awaitable[R]"]
 UriHandler = Callable[
-    ["DocumentUri", sublime.NewFileFlags], "Promise[sublime.Sheet | None]"
+    ["DocumentUri", sublime.NewFileFlags], "Awaitable[sublime.Sheet | None]"
 ]
 UriHandlerForDecorator = Callable[
-    [Any, "DocumentUri", sublime.NewFileFlags], "Promise[sublime.Sheet | None]"
+    [Any, "DocumentUri", sublime.NewFileFlags], "Awaitable[sublime.Sheet | None]"
 ]
 PostResponseCallback = Callable[[], None]
-RequestHandlerResponse = Promise[R] | tuple[Promise[R], PostResponseCallback]
+RequestHandlerResponse = R | tuple[R, PostResponseCallback]
 g_plugins: dict[str, type[AbstractPlugin | LspPlugin]]
 
 class PluginStartError(Exception):
@@ -138,25 +138,29 @@ def notification_handler(
 def request_handler(
     method: str,
 ) -> Callable[
-    [Callable[[Any, P], RequestHandlerResponse]],
-    Callable[[Any, P, int], Promise[Response[R]]],
+    [Callable[[Any, P], Awaitable[RequestHandlerResponse]]],
+    Callable[[Any, P, int], Awaitable[Response[R]]],
 ]:
     """
-    Decorator to mark a method as a handler for a specific LSP request.
+    Decorator to mark a coroutine method as a handler for a specific LSP request.
 
     Usage:
         ```py
         @request_handler('eslint/openDoc')
-        def on_open_doc(self, params: TextDocumentIdentifier) -> Promise[bool]:
+        async def on_open_doc(self, params: TextDocumentIdentifier) -> bool:
             ...
         ```
 
-    The decorated method will be called with the request parameters whenever the specified
-    request is received from the language server. The method must return a Promise that resolves
-    to the response value. The framework will automatically send it back to the server.
+    The decorated coroutine method will be called with the request parameters whenever the specified
+    request is received from the language server. The coroutine method must return a response value.
+    The framework will automatically send it back to the server.
+
+    An older, but backwards-compatible way to define a request handler is by defining a function that returns a Promise.
+    While that works, the advice is to define a coroutine function. To send an error response, resolve the Promise
+    with an `Error`.
 
     :param      method:             The LSP request method name (e.g., 'eslint/openDoc').
-    :returns:   A decorator that registers the function as a request handler.
+    :returns:   A decorator that registers the coroutine function as a request handler.
     """
 
 def command_handler(
@@ -167,12 +171,12 @@ def command_handler(
 
     Intercepts a `workspace/executeCommand` request with the given command name when triggered by the client.
     The decorated method is called with the command's `arguments` list (or `None` if absent).
-    Decorated method is called on the async thread, regardless of which thread the command was executed from.
+    The decorated method is called on the asyncio thread, regardless of which thread the command was executed from.
 
     Usage:
         ```py
         @command_handler('typescript.rename')
-        def on_custom_rename(self, arguments: list[LSPAny] | None) -> Promise[LspAny]:
+        async def on_custom_rename(self, arguments: list[LSPAny] | None) -> LspAny:
             ...
         ```
 
@@ -189,14 +193,13 @@ def uri_handler(
     """
     Decorator to mark a method as a handler for URIs with a specific scheme.
 
-    The decorated method receives the full URI and a `sublime.NewFileFlags` bitflag and must return a `Promise`
-    resolved with the opened `sublime.Sheet`, or `None` if the URI could not be opened.
-    Decorated method is called on the async thread.
+    The decorated async method receives the full URI and a `sublime.NewFileFlags` bitflag and must return an opened
+    `sublime.Sheet`, or `None` if the URI could not be opened.
 
     Usage:
         ```py
         @uri_handler('foo')
-        def on_open_foo_uri(self, uri: DocumentUri, flags: sublime.NewFileFlags) -> Promise[sublime.Sheet | None]:
+        async def on_open_foo_uri(self, uri: DocumentUri, flags: sublime.NewFileFlags) -> sublime.Sheet | None:
             ...
         ```
 
@@ -303,15 +306,14 @@ class LspPlugin(APIHandler):
         :param      context:           The plugin context.
         """
     @classmethod
-    def on_pre_start_async(cls, context: OnPreStartContext) -> None:
+    def on_pre_start_async(cls, context: OnPreStartContext) -> None: ...
+    @classmethod
+    async def on_pre_start(cls, context: OnPreStartContext) -> None:
         """
         Called just before the language server process is started.
 
         Override to perform any preparation needed before startup - for example installing or updating server binaries,
         resolving the working directory, or injecting extra template variables into `context.variables`.
-
-        This method runs on a worker thread so perform any blocking I/O (e.g. downloading a binary, running
-        `npm install`) directly here without spawning additional threads.
 
         Mutations to `context.working_directory` and `context.variables` are picked up and used when launching the
         server process.
@@ -334,7 +336,8 @@ class LspPlugin(APIHandler):
                             reference cycle that prevents garbage collection.
         """
     def __init_subclass__(cls, **kwargs: Any) -> None: ...
-    def on_initialized_async(self) -> None:
+    def on_initialized_async(self) -> None: ...
+    async def on_initialized(self) -> None:
         """
         Called after the `initialized` notification has been sent to the language server.
 
@@ -343,6 +346,9 @@ class LspPlugin(APIHandler):
         """
     def on_pre_send_request_async(
         self, request: ClientRequest, view: sublime.View | None
+    ) -> None: ...
+    async def on_pre_send_request(
+        self, request: ClientRequest, view: sublime.View | None
     ) -> None:
         """
         Notifies about a request that is about to be sent to the language server.
@@ -350,7 +356,8 @@ class LspPlugin(APIHandler):
         :param    request:     The request object. The request['params'] can be modified by the plugin.
         :param    view:        The corresponding View if applicable.
         """
-    def on_pre_send_response_async(self, response: ClientResponse) -> None:
+    def on_pre_send_response_async(self, response: ClientResponse) -> None: ...
+    async def on_pre_send_response(self, response: ClientResponse) -> None:
         """
         Notifies about a response that is about to be sent to the language server.
 
@@ -359,13 +366,17 @@ class LspPlugin(APIHandler):
 
         :param    response:    The response object containing 'method', 'params', and 'result'.
         """
-    def on_pre_send_notification_async(self, notification: ClientNotification) -> None:
+    def on_pre_send_notification_async(
+        self, notification: ClientNotification
+    ) -> None: ...
+    async def on_pre_send_notification(self, notification: ClientNotification) -> None:
         """
         Notifies about a notification that is about to be sent to the language server.
 
         :param    notification:  The notification object. The notification['params'] can be modified by the plugin.
         """
-    def on_server_request_async(self, request: ServerRequest) -> None:
+    def on_server_request_async(self, request: ServerRequest) -> None: ...
+    async def on_server_request(self, request: ServerRequest) -> None:
         """
         Notifies about a request message that has been received from the language server.
 
@@ -374,7 +385,8 @@ class LspPlugin(APIHandler):
         :param    request:  The request object. The request['params'] field can be modified by the plugin, before it
                             gets further handled by the LSP package.
         """
-    def on_server_response_async(self, response: ServerResponse) -> None:
+    def on_server_response_async(self, response: ServerResponse) -> None: ...
+    async def on_server_response(self, response: ServerResponse) -> None:
         """
         Notifies about a response message that has been received from the language server.
 
@@ -383,17 +395,24 @@ class LspPlugin(APIHandler):
         :param    response:  The response object to the request. The response['result'] field can be modified by the
                              plugin, before it gets further handled by the LSP package.
         """
-    def on_server_notification_async(self, notification: ServerNotification) -> None:
+    def on_server_notification_async(
+        self, notification: ServerNotification
+    ) -> None: ...
+    async def on_server_notification(self, notification: ServerNotification) -> None:
         """
         Notifies about a notification message that has been received from the language server.
 
         :param    notification:  The notification object.
         """
-    def on_text_changed_async(self, session_buffer: SessionBufferProtocol) -> None:
+    def on_text_changed_async(self, session_buffer: SessionBufferProtocol) -> None: ...
+    async def on_text_changed(self, session_buffer: SessionBufferProtocol) -> None:
         """Called when the content of the session buffer has changed or a new buffer was opened (debounced)."""
     def on_selection_modified_async(self, session_view: SessionViewProtocol) -> None:
         """Called after the selection has been modified in a view (debounced)."""
     def on_session_end_async(
+        self, exit_code: int | None, exception: Exception | None
+    ) -> None: ...
+    async def on_session_end(
         self, exit_code: int | None, exception: Exception | None
     ) -> None:
         """
@@ -405,7 +424,7 @@ class LspPlugin(APIHandler):
         after this method returns. In this case exit_code and exception are None.
         If the session has crashed, the exit_code and an optional exception are provided.
 
-        This API is triggered on async thread.
+        This API is triggered on the asyncio thread.
         """
 
 class AbstractPlugin(APIHandler, ABC):
@@ -623,7 +642,7 @@ class AbstractPlugin(APIHandler, ABC):
     ) -> None:
         """
         Notifies about a request that is about to be sent to the language server.
-        This API is triggered on async thread.
+        This API is triggered on the asyncio thread.
 
         :param    request_id:  The request ID.
         :param    request:     The request object. The request params can be modified by the plugin.
@@ -631,7 +650,7 @@ class AbstractPlugin(APIHandler, ABC):
     def on_pre_send_notification_async(self, notification: Notification[Any]) -> None:
         """
         Notifies about a notification that is about to be sent to the language server.
-        This API is triggered on async thread.
+        This API is triggered on the asyncio thread.
 
         :param    notification:  The notification object. The notification params can be modified by the plugin.
         """
@@ -682,5 +701,5 @@ class AbstractPlugin(APIHandler, ABC):
         after this method returns. In this case exit_code and exception are None.
         If the session has crashed, the exit_code and an optional exception are provided.
 
-        This API is triggered on async thread.
+        This API is triggered on the asyncio thread.
         """

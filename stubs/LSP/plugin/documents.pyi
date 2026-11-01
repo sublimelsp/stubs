@@ -1,4 +1,5 @@
 import sublime
+import sublime_aio
 import sublime_plugin
 from ..protocol import (
     CodeAction as CodeAction,
@@ -12,6 +13,13 @@ from ..protocol import (
 from .code_actions import filter_quickfix_actions as filter_quickfix_actions
 from .code_lens import LspToggleCodeLensesCommand as LspToggleCodeLensesCommand
 from .completion import QueryCompletionsTask as QueryCompletionsTask
+from .core.aio import (
+    TaskContainer as TaskContainer,
+    gather_and_flatten_exceptions as gather_and_flatten_exceptions,
+    get_clipboard as get_clipboard,
+    run_coroutine as run_coroutine,
+    run_on_asyncio_thread as run_on_asyncio_thread,
+)
 from .core.constants import (
     CODE_ACTION_ANNOTATION_SCOPE as CODE_ACTION_ANNOTATION_SCOPE,
     COMMAND_TO_CHANGE_EVENT_ACTION as COMMAND_TO_CHANGE_EVENT_ACTION,
@@ -19,7 +27,6 @@ from .core.constants import (
     DOCUMENT_HIGHLIGHT_KIND_SCOPES as DOCUMENT_HIGHLIGHT_KIND_SCOPES,
     HOVER_ENABLED_KEY as HOVER_ENABLED_KEY,
     LIGHTBULB_SCOPE as LIGHTBULB_SCOPE,
-    MarkdownLangMap as MarkdownLangMap,
     RegionKey as RegionKey,
     RequestFlags as RequestFlags,
     SIGNATURE_HELP_ACTIVE_PARAMETER_SCOPE as SIGNATURE_HELP_ACTIVE_PARAMETER_SCOPE,
@@ -27,14 +34,18 @@ from .core.constants import (
     SIGNATURE_HELP_INACTIVE_PARAMETER_SCOPE as SIGNATURE_HELP_INACTIVE_PARAMETER_SCOPE,
     ST_VERSION as ST_VERSION,
 )
-from .core.logging import debug as debug
+from .core.logging import (
+    debug as debug,
+    exception_log as exception_log,
+    exceptions_log as exceptions_log,
+)
 from .core.open import (
     open_file_uri as open_file_uri,
     open_in_browser as open_in_browser,
 )
 from .core.panels import PanelName as PanelName
 from .core.promise import Promise as Promise
-from .core.protocol import Request as Request
+from .core.protocol import Error as Error, Request as Request
 from .core.registry import (
     best_session as best_session,
     get_position as get_position,
@@ -65,6 +76,7 @@ from .core.url import (
     view_to_uri as view_to_uri,
 )
 from .core.views import (
+    MissingUriError as MissingUriError,
     diagnostic_severity as diagnostic_severity,
     document_highlight_key as document_highlight_key,
     first_selection_region as first_selection_region,
@@ -77,19 +89,20 @@ from .core.views import (
 )
 from .core.windows import WindowManager as WindowManager
 from .folding_range import folding_range_to_range as folding_range_to_range
+from .formatting import format_selection as format_selection
 from .session_buffer import SessionBuffer as SessionBuffer
 from .session_view import SessionView as SessionView
-from typing import Any, Callable, Literal, TypeVar, overload
+from collections.abc import Coroutine as Coroutine
+from typing import Any, Callable, Literal, overload
 from typing_extensions import Concatenate, ParamSpec
 from weakref import WeakValueDictionary
 from weakref import WeakSet
 
 P = ParamSpec("P")
-R = TypeVar("R")
 
 def requires_session(
-    func: Callable[Concatenate[DocumentSyncListener, P], R],
-) -> Callable[Concatenate[DocumentSyncListener, P], R | None]:
+    func: Callable[Concatenate[DocumentSyncListener, P], Any],
+) -> Callable[Concatenate[DocumentSyncListener, P], Any]:
     """
     A decorator for the `DocumentSyncListener` event handlers, which immediately returns `None` if there are no
     `SessionView`s.
@@ -110,7 +123,9 @@ class TextChangeListener(sublime_plugin.TextChangeListener):
     def on_revert_async(self) -> None: ...
     def set_last_edit_action(self, action: ChangeEventAction) -> None: ...
 
-class DocumentSyncListener(sublime_plugin.ViewEventListener, AbstractViewListener):
+class DocumentSyncListener(
+    sublime_aio.ViewEventListener, AbstractViewListener, TaskContainer
+):
     ACTIVE_DIAGNOSTIC: str
     debounce_time = FEATURES_TIMEOUT
     @classmethod
@@ -122,7 +137,7 @@ class DocumentSyncListener(sublime_plugin.ViewEventListener, AbstractViewListene
     def on_post_move_window_async(self) -> None: ...
     def on_documentation_popup_toggle(self, *, opened: bool) -> None: ...
     def on_session_initialized_async(self, session: Session) -> None: ...
-    def on_session_shutdown_async(self, session: Session) -> None: ...
+    async def on_session_shutdown(self, session: Session) -> list[Exception]: ...
     def get_diagnostics_async(
         self, location: sublime.Region | int, max_diagnostic_severity_level: int = ...
     ) -> list[tuple[SessionBufferProtocol, list[Diagnostic]]]: ...
@@ -133,7 +148,7 @@ class DocumentSyncListener(sublime_plugin.ViewEventListener, AbstractViewListene
         self, capability: str | None = None
     ) -> list[SessionBuffer]: ...
     def session_views_async(self) -> list[SessionView]: ...
-    def on_text_changed_async(
+    def on_text_changed(
         self,
         change_count: int,
         changes: list[sublime.TextChange],
@@ -143,12 +158,12 @@ class DocumentSyncListener(sublime_plugin.ViewEventListener, AbstractViewListene
     def set_uri(self, new_uri: DocumentUri) -> None: ...
     def get_language_id(self) -> str: ...
     def get_request_flags(self, session: Session) -> RequestFlags: ...
-    def on_load_async(self) -> None: ...
-    def on_post_move_async(self) -> None: ...
-    def on_activated_async(self) -> None: ...
-    def on_selection_modified_async(self) -> None: ...
-    def on_post_save_async(self) -> None: ...
-    def on_close(self) -> None: ...
+    async def on_load(self) -> None: ...
+    async def on_post_move(self) -> None: ...
+    async def on_activated(self) -> None: ...
+    async def on_selection_modified(self) -> None: ...
+    async def on_post_save(self) -> list[BaseException | None]: ...
+    async def on_close(self) -> None: ...
     def on_query_context(
         self, key: str, operator: int, operand: Any, match_all: bool
     ) -> bool | None: ...
@@ -162,17 +177,17 @@ class DocumentSyncListener(sublime_plugin.ViewEventListener, AbstractViewListene
     def on_post_text_command(
         self, command_name: str, args: dict[str, Any] | None
     ) -> None: ...
-    def on_query_completions(
+    async def on_query_completions(
         self, prefix: str, locations: list[int]
-    ) -> sublime.CompletionList | None: ...
+    ) -> sublime.CompletionList: ...
     @overload
-    def do_signature_help_async(
+    async def do_signature_help(
         self,
         trigger_kind: Literal[SignatureHelpTriggerKind.TriggerCharacter],
         trigger_char: str,
     ) -> None: ...
     @overload
-    def do_signature_help_async(
+    async def do_signature_help(
         self,
         trigger_kind: Literal[
             SignatureHelpTriggerKind.Invoked, SignatureHelpTriggerKind.ContentChange
@@ -189,9 +204,10 @@ class DocumentSyncListener(sublime_plugin.ViewEventListener, AbstractViewListene
         self, session: Session, capability_path: str
     ) -> Any | None: ...
     def has_capability_async(self, session: Session, capability_path: str) -> bool: ...
+    async def purge_changes(self) -> list[BaseException | None]: ...
     def purge_changes_async(self) -> None: ...
-    def trigger_on_pre_save_async(self) -> None: ...
-    def revert_async(self) -> None: ...
-    def reload_async(self) -> None: ...
+    async def trigger_on_pre_save(self) -> list[BaseException | None]: ...
+    async def revert(self) -> list[BaseException | None]: ...
+    async def reload(self) -> list[BaseException | None]: ...
     def on_userprefs_changed_async(self) -> None: ...
     def set_change_event_action(self, action: ChangeEventAction) -> None: ...

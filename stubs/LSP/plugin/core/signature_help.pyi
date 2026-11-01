@@ -1,5 +1,6 @@
 import sublime
 from ...protocol import SignatureHelp
+from .aio import run_coroutine as run_coroutine
 from .constants import MarkdownLangMap as MarkdownLangMap
 from .logging import debug as debug
 from .registry import LspTextCommand as LspTextCommand

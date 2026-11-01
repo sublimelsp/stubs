@@ -1,9 +1,10 @@
 import sublime
 from ..protocol import InlayHint, InlayHintLabelPart, MarkupContent
+from .core.aio import run_coroutine as run_coroutine
 from .core.constants import RequestFlags as RequestFlags, ST_VERSION as ST_VERSION
 from .core.css import css as css
 from .core.edit import apply_text_edits as apply_text_edits
-from .core.protocol import Request as Request
+from .core.protocol import Error as Error, Request as Request
 from .core.registry import (
     LspTextCommand as LspTextCommand,
     LspWindowCommand as LspWindowCommand,
@@ -28,19 +29,6 @@ class LspInlayHintClickCommand(LspTextCommand):
         phantom_uuid: str,
         event: dict | None = None,
         label_part: InlayHintLabelPart | None = None,
-    ) -> None: ...
-    def handle(
-        self,
-        session_name: str,
-        inlay_hint: InlayHint,
-        phantom_uuid: str,
-        label_part: InlayHintLabelPart | None = None,
-    ) -> None: ...
-    def handle_inlay_hint_text_edits(
-        self, session_name: str, inlay_hint: InlayHint, phantom_uuid: str
-    ) -> None: ...
-    def handle_label_part_command(
-        self, session_name: str, label_part: InlayHintLabelPart | None = None
     ) -> None: ...
 
 def inlay_hint_to_phantom(
