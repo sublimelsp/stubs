@@ -204,8 +204,27 @@ class PanelLogger(Logger):
         self, method: str, params: Any, unhandled: bool
     ) -> None: ...
 
+class RemoteLogServer:
+    """
+    A websocket server, started on demand, that streams the communication with language servers to a log viewer.
+
+    The server only listens on the loopback interface, on a random free port, and only accepts clients that pass the
+    randomly generated token in the `token` query parameter of the connection URL. It stops automatically when there
+    are no connected clients for `IDLE_TIMEOUT` seconds.
+    """
+
+    IDLE_TIMEOUT: int
+    VIEWER_URL: str
+    @classmethod
+    def viewer_url(cls) -> str: ...
+    @classmethod
+    async def start(cls) -> None: ...
+    @classmethod
+    async def stop(cls) -> None: ...
+    @classmethod
+    def broadcast(cls, data: dict[str, Any]) -> None: ...
+
 class RemoteLogger(Logger):
-    PORT: int
     DIRECTION_OUTGOING: int
     DIRECTION_INCOMING: int
     def __init__(self, manager: WindowManager, server_name: str) -> None: ...

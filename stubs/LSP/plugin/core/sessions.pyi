@@ -691,7 +691,7 @@ class Session(APIHandler, TransportCallbacks, TaskContainer):
         *,
         label: str | None = None,
         is_refactoring: bool = False,
-    ) -> ApplyWorkspaceEditResult: ...
+    ) -> tuple[ApplyWorkspaceEditResult, WorkspaceEditSummary]: ...
     async def apply_workspace_edit(
         self,
         edit: WorkspaceEdit,

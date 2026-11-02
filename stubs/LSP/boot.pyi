@@ -84,6 +84,7 @@ from .plugin.panels import (
     LspClearLogPanelCommand as LspClearLogPanelCommand,
     LspClearMessagesPanelCommand as LspClearMessagesPanelCommand,
     LspClearPanelCommand as LspClearPanelCommand,
+    LspOpenRemoteLogViewerCommand as LspOpenRemoteLogViewerCommand,
     LspShowDiagnosticsPanelCommand as LspShowDiagnosticsPanelCommand,
     LspToggleLogPanelLinesLimitCommand as LspToggleLogPanelLinesLimitCommand,
     LspToggleMessagesPanelCommand as LspToggleMessagesPanelCommand,

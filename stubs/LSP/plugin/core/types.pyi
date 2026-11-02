@@ -144,7 +144,7 @@ class Settings:
     link_highlight_style: str
     log_debug: bool
     log_max_size: int
-    log_server: list[str]
+    log_server: bool
     lsp_code_actions_on_format: dict[str, bool]
     lsp_code_actions_on_save: dict[str, bool]
     lsp_format_on_paste: bool
