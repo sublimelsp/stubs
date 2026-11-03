@@ -698,7 +698,7 @@ class CodeLensResolveResponse(TypedDict):
 
 class ColorPresentationResponse(TypedDict):
     method: Literal["textDocument/colorPresentation"]
-    result: list[ColorPresentation] | None
+    result: list[ColorPresentation]
 
 class CompletionResponse(TypedDict):
     method: Literal["textDocument/completion"]
@@ -728,7 +728,7 @@ class DiagnosticRefreshResponse(TypedDict):
 
 class DocumentColorResponse(TypedDict):
     method: Literal["textDocument/documentColor"]
-    result: list[ColorInformation] | None
+    result: list[ColorInformation]
 
 class DocumentDiagnosticResponse(TypedDict):
     method: Literal["textDocument/diagnostic"]

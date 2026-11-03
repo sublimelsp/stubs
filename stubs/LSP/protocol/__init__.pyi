@@ -285,7 +285,7 @@ class CodeActionTag(IntEnum):
     """
     Code action tags are extra annotations that tweak the behavior of a code action.
 
-    @since 3.18.0 - proposed
+    @since 3.18.0
     """
 
     LLMGenerated: int
@@ -353,6 +353,7 @@ class LanguageKind(StrEnum):
     Perl: str
     Perl6: str
     PHP: str
+    Plaintext: str
     Powershell: str
     Pug: str
     Python: str
@@ -380,7 +381,6 @@ class InlineCompletionTriggerKind(IntEnum):
     Describes how an {@link InlineCompletionItemProvider inline completion provider} was triggered.
 
     @since 3.18.0
-    @proposed
     """
 
     Invoked: int
@@ -516,34 +516,37 @@ InlineValue: TypeAlias = Union[
 DocumentDiagnosticReport: TypeAlias = Union[
     "RelatedFullDocumentDiagnosticReport", "RelatedUnchangedDocumentDiagnosticReport"
 ]
+DocumentDiagnosticReportProgress: TypeAlias = Union[
+    DocumentDiagnosticReport, "DocumentDiagnosticReportPartialResult"
+]
 PrepareRenameResult: TypeAlias = Union[
     "Range", "PrepareRenamePlaceholder", "PrepareRenameDefaultBehavior"
 ]
-DocumentSelector: TypeAlias = List["DocumentFilter"]
 ProgressToken: TypeAlias = Union[int, str]
 ChangeAnnotationIdentifier: TypeAlias = str
 WorkspaceDocumentDiagnosticReport: TypeAlias = Union[
     "WorkspaceFullDocumentDiagnosticReport",
     "WorkspaceUnchangedDocumentDiagnosticReport",
 ]
+DocumentSelector: TypeAlias = List["DocumentFilter"]
 TextDocumentContentChangeEvent: TypeAlias = Union[
     "TextDocumentContentChangePartial", "TextDocumentContentChangeWholeDocument"
 ]
 MarkedString: TypeAlias = Union[str, "MarkedStringWithLanguage"]
+LSPObject: TypeAlias = Mapping[str, Any]
 DocumentFilter: TypeAlias = Union[
     "TextDocumentFilter", "NotebookCellTextDocumentFilter"
 ]
-LSPObject: TypeAlias = Mapping[str, Any]
 GlobPattern: TypeAlias = Union["Pattern", "RelativePattern"]
-TextDocumentFilter: TypeAlias = Union[
-    "TextDocumentFilterLanguage",
-    "TextDocumentFilterScheme",
-    "TextDocumentFilterPattern",
-]
 NotebookDocumentFilter: TypeAlias = Union[
     "NotebookDocumentFilterNotebookType",
     "NotebookDocumentFilterScheme",
     "NotebookDocumentFilterPattern",
+]
+TextDocumentFilter: TypeAlias = Union[
+    "TextDocumentFilterLanguage",
+    "TextDocumentFilterScheme",
+    "TextDocumentFilterPattern",
 ]
 Pattern: TypeAlias = str
 RegularExpressionEngineKind: TypeAlias = str
@@ -623,14 +626,6 @@ class ColorPresentation(TypedDict):
     label: str
     textEdit: NotRequired["TextEdit"]
     additionalTextEdits: NotRequired[list["TextEdit"]]
-
-class WorkDoneProgressOptions(TypedDict):
-    workDoneProgress: NotRequired[bool]
-
-class TextDocumentRegistrationOptions(TypedDict):
-    """General text document registration options."""
-
-    documentSelector: DocumentSelector | None
 
 class FoldingRangeParams(TypedDict):
     """Parameters for a {@link FoldingRangeRequest}."""
@@ -1010,6 +1005,7 @@ class InlineValueParams(TypedDict):
     range: Range
     context: InlineValueContext
     workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class InlineValueRegistrationOptions(TypedDict):
     """
@@ -1031,6 +1027,7 @@ class InlayHintParams(TypedDict):
     textDocument: TextDocumentIdentifier
     range: Range
     workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class InlayHint(TypedDict):
     """
@@ -1071,17 +1068,6 @@ class DocumentDiagnosticParams(TypedDict):
     previousResultId: NotRequired[str]
     workDoneToken: NotRequired["ProgressToken"]
     partialResultToken: NotRequired["ProgressToken"]
-
-class DocumentDiagnosticReportPartialResult(TypedDict):
-    """
-    A partial result for a document diagnostic report.
-
-    @since 3.17.0
-    """
-
-    relatedDocuments: dict[
-        DocumentUri, FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport
-    ]
 
 class DiagnosticServerCancellationData(TypedDict):
     """
@@ -1192,20 +1178,19 @@ class InlineCompletionParams(TypedDict):
     A parameter literal used in inline completion requests.
 
     @since 3.18.0
-    @proposed
     """
 
     context: InlineCompletionContext
     textDocument: TextDocumentIdentifier
     position: Position
     workDoneToken: NotRequired["ProgressToken"]
+    partialResultToken: NotRequired["ProgressToken"]
 
 class InlineCompletionList(TypedDict):
     """
     Represents a collection of {@link InlineCompletionItem inline completion items} to be presented in the editor.
 
     @since 3.18.0
-    @proposed
     """
 
     items: list["InlineCompletionItem"]
@@ -1215,7 +1200,6 @@ class InlineCompletionItem(TypedDict):
     An inline completion item represents a text snippet that is proposed inline to complete text that is being typed.
 
     @since 3.18.0
-    @proposed
     """
 
     insertText: str | StringValue
@@ -1228,7 +1212,6 @@ class InlineCompletionRegistrationOptions(TypedDict):
     Inline completion options used during static or dynamic registration.
 
     @since 3.18.0
-    @proposed
     """
 
     documentSelector: DocumentSelector | None
@@ -1239,7 +1222,6 @@ class TextDocumentContentParams(TypedDict):
     Parameters for the `workspace/textDocumentContent` request.
 
     @since 3.18.0
-    @proposed
     """
 
     uri: DocumentUri
@@ -1249,7 +1231,6 @@ class TextDocumentContentResult(TypedDict):
     Result of the `workspace/textDocumentContent` request.
 
     @since 3.18.0
-    @proposed
     """
 
     text: str
@@ -1259,7 +1240,6 @@ class TextDocumentContentRegistrationOptions(TypedDict):
     Text document content provider registration options.
 
     @since 3.18.0
-    @proposed
     """
 
     schemes: list[str]
@@ -1270,7 +1250,6 @@ class TextDocumentContentRefreshParams(TypedDict):
     Parameters for the `workspace/textDocumentContent/refresh` request.
 
     @since 3.18.0
-    @proposed
     """
 
     uri: DocumentUri
@@ -1340,6 +1319,11 @@ class DidOpenTextDocumentParams(TypedDict):
     """The parameters sent in an open text document notification"""
 
     textDocument: TextDocumentItem
+
+class TextDocumentRegistrationOptions(TypedDict):
+    """General text document registration options."""
+
+    documentSelector: DocumentSelector | None
 
 class DidChangeTextDocumentParams(TypedDict):
     """The change text document notification's parameters."""
@@ -1748,7 +1732,6 @@ class DocumentRangesFormattingParams(TypedDict):
     The parameters of a {@link DocumentRangesFormattingRequest}.
 
     @since 3.18.0
-    @proposed
     """
 
     textDocument: TextDocumentIdentifier
@@ -2012,7 +1995,7 @@ class FileCreate(TypedDict):
     @since 3.16.0
     """
 
-    uri: str
+    uri: DocumentUri
 
 class TextDocumentEdit(TypedDict):
     """
@@ -2079,8 +2062,8 @@ class FileRename(TypedDict):
     @since 3.16.0
     """
 
-    oldUri: str
-    newUri: str
+    oldUri: DocumentUri
+    newUri: DocumentUri
 
 class FileDelete(TypedDict):
     """
@@ -2089,7 +2072,7 @@ class FileDelete(TypedDict):
     @since 3.16.0
     """
 
-    uri: str
+    uri: DocumentUri
 
 class MonikerOptions(TypedDict):
     workDoneProgress: NotRequired[bool]
@@ -2111,7 +2094,7 @@ class InlineValueContext(TypedDict):
 
 class InlineValueText(TypedDict):
     """
-    Provide inline value as text.
+    Returns inline value information as the complete text to be shown.
 
     @since 3.17.0
     """
@@ -2121,9 +2104,13 @@ class InlineValueText(TypedDict):
 
 class InlineValueVariableLookup(TypedDict):
     """
-    Provide inline value through a variable lookup.
-    If only a range is specified, the variable name will be extracted from the underlying document.
-    An optional variable name can be used to override the extracted name.
+    To compute inline value through a variable lookup.
+
+    If only a range is specified, the variable name should
+    be extracted from the underlying document.
+
+    An optional variable name could be used to lookup instead
+    of the extracted name.
 
     @since 3.17.0
     """
@@ -2134,9 +2121,13 @@ class InlineValueVariableLookup(TypedDict):
 
 class InlineValueEvaluatableExpression(TypedDict):
     """
-    Provide an inline value through an expression evaluation.
-    If only a range is specified, the expression will be extracted from the underlying document.
-    An optional expression can be used to override the extracted expression.
+    To compute an inline value through an expression evaluation.
+
+    If only a range is specified, the expression should be
+    extracted from the underlying document.
+
+    An optional expression could be evaluated instead of
+    the extracted expression.
 
     @since 3.17.0
     """
@@ -2238,27 +2229,16 @@ class RelatedUnchangedDocumentDiagnosticReport(TypedDict):
     kind: Literal["unchanged"]
     resultId: str
 
-class FullDocumentDiagnosticReport(TypedDict):
+class DocumentDiagnosticReportPartialResult(TypedDict):
     """
-    A diagnostic report with a full set of problems.
+    A partial result for a document diagnostic report.
 
     @since 3.17.0
     """
 
-    kind: Literal["full"]
-    resultId: NotRequired[str]
-    items: list["Diagnostic"]
-
-class UnchangedDocumentDiagnosticReport(TypedDict):
-    """
-    A diagnostic report indicating that the last returned
-    report is still accurate.
-
-    @since 3.17.0
-    """
-
-    kind: Literal["unchanged"]
-    resultId: str
+    relatedDocuments: dict[
+        DocumentUri, FullDocumentDiagnosticReport | UnchangedDocumentDiagnosticReport
+    ]
 
 class DiagnosticOptions(TypedDict):
     """
@@ -2362,7 +2342,6 @@ class InlineCompletionContext(TypedDict):
     Provides information about the context in which an inline completion was requested.
 
     @since 3.18.0
-    @proposed
     """
 
     triggerKind: InlineCompletionTriggerKind
@@ -2379,7 +2358,6 @@ class StringValue(TypedDict):
     `${name:default value}`.
 
     @since 3.18.0
-    @proposed
     """
 
     kind: Literal["snippet"]
@@ -2390,7 +2368,6 @@ class InlineCompletionOptions(TypedDict):
     Inline completion options used during static registration.
 
     @since 3.18.0
-    @proposed
     """
 
     workDoneProgress: NotRequired[bool]
@@ -2400,7 +2377,6 @@ class TextDocumentContentOptions(TypedDict):
     Text document content provider options.
 
     @since 3.18.0
-    @proposed
     """
 
     schemes: list[str]
@@ -2804,10 +2780,12 @@ class WorkspaceEditMetadata(TypedDict):
     Additional data about a workspace edit.
 
     @since 3.18.0
-    @proposed
     """
 
     isRefactoring: NotRequired[bool]
+
+class WorkDoneProgressOptions(TypedDict):
+    workDoneProgress: NotRequired[bool]
 
 class SemanticTokensLegend(TypedDict):
     """@since 3.16.0"""
@@ -2846,7 +2824,6 @@ class SnippetTextEdit(TypedDict):
     An interactive text edit.
 
     @since 3.18.0
-    @proposed
     """
 
     range: Range
@@ -2888,6 +2865,28 @@ class FileOperationPattern(TypedDict):
     glob: str
     matches: NotRequired["FileOperationPatternKind"]
     options: NotRequired["FileOperationPatternOptions"]
+
+class FullDocumentDiagnosticReport(TypedDict):
+    """
+    A diagnostic report with a full set of problems.
+
+    @since 3.17.0
+    """
+
+    kind: Literal["full"]
+    resultId: NotRequired[str]
+    items: list["Diagnostic"]
+
+class UnchangedDocumentDiagnosticReport(TypedDict):
+    """
+    A diagnostic report indicating that the last returned
+    report is still accurate.
+
+    @since 3.17.0
+    """
+
+    kind: Literal["unchanged"]
+    resultId: str
 
 class WorkspaceFullDocumentDiagnosticReport(TypedDict):
     """
@@ -2958,7 +2957,6 @@ class SelectedCompletionInfo(TypedDict):
     Describes the currently selected completion item.
 
     @since 3.18.0
-    @proposed
     """
 
     range: Range
@@ -3074,22 +3072,10 @@ class CodeActionKindDocumentation(TypedDict):
     Documentation for a class of code actions.
 
     @since 3.18.0
-    @proposed
     """
 
     kind: str | CodeActionKind
     command: Command
-
-class NotebookCellTextDocumentFilter(TypedDict):
-    """
-    A notebook cell text document filter denotes a cell text
-    document by different properties.
-
-    @since 3.17.0
-    """
-
-    notebook: str | NotebookDocumentFilter
-    language: NotRequired[str]
 
 class FileOperationPatternOptions(TypedDict):
     """
@@ -3230,6 +3216,17 @@ class FileOperationOptions(TypedDict):
     didDelete: NotRequired["FileOperationRegistrationOptions"]
     willDelete: NotRequired["FileOperationRegistrationOptions"]
 
+class NotebookCellTextDocumentFilter(TypedDict):
+    """
+    A notebook cell text document filter denotes a cell text
+    document by different properties.
+
+    @since 3.17.0
+    """
+
+    notebook: str | NotebookDocumentFilter
+    language: NotRequired[str]
+
 class RelativePattern(TypedDict):
     """
     A relative pattern is a helper to construct glob patterns that are matched
@@ -3241,39 +3238,6 @@ class RelativePattern(TypedDict):
 
     baseUri: WorkspaceFolder | URI
     pattern: Pattern
-
-class TextDocumentFilterLanguage(TypedDict):
-    """
-    A document filter where `language` is required field.
-
-    @since 3.18.0
-    """
-
-    language: str
-    scheme: NotRequired[str]
-    pattern: NotRequired["GlobPattern"]
-
-class TextDocumentFilterScheme(TypedDict):
-    """
-    A document filter where `scheme` is required field.
-
-    @since 3.18.0
-    """
-
-    language: NotRequired[str]
-    scheme: str
-    pattern: NotRequired["GlobPattern"]
-
-class TextDocumentFilterPattern(TypedDict):
-    """
-    A document filter where `pattern` is required field.
-
-    @since 3.18.0
-    """
-
-    language: NotRequired[str]
-    scheme: NotRequired[str]
-    pattern: GlobPattern
 
 class NotebookDocumentFilterNotebookType(TypedDict):
     """
@@ -3409,7 +3373,6 @@ class FoldingRangeWorkspaceClientCapabilities(TypedDict):
     Client workspace capabilities specific to folding ranges
 
     @since 3.18.0
-    @proposed
     """
 
     refreshSupport: NotRequired[bool]
@@ -3419,7 +3382,6 @@ class TextDocumentContentClientCapabilities(TypedDict):
     Client capabilities for a text document content provider.
 
     @since 3.18.0
-    @proposed
     """
 
     dynamicRegistration: NotRequired[bool]
@@ -3635,10 +3597,10 @@ class DiagnosticClientCapabilities(TypedDict):
 
     dynamicRegistration: NotRequired[bool]
     relatedDocumentSupport: NotRequired[bool]
+    markupMessageSupport: NotRequired[bool]
     relatedInformation: NotRequired[bool]
     tagSupport: NotRequired["ClientDiagnosticsTagOptions"]
     codeDescriptionSupport: NotRequired[bool]
-    markupMessageSupport: NotRequired[bool]
     dataSupport: NotRequired[bool]
 
 class InlineCompletionClientCapabilities(TypedDict):
@@ -3646,7 +3608,6 @@ class InlineCompletionClientCapabilities(TypedDict):
     Client capabilities specific to inline completions.
 
     @since 3.18.0
-    @proposed
     """
 
     dynamicRegistration: NotRequired[bool]
@@ -3701,6 +3662,39 @@ class MarkdownClientCapabilities(TypedDict):
     parser: str
     version: NotRequired[str]
     allowedTags: NotRequired[list[str]]
+
+class TextDocumentFilterLanguage(TypedDict):
+    """
+    A document filter where `language` is required field.
+
+    @since 3.18.0
+    """
+
+    language: str
+    scheme: NotRequired[str]
+    pattern: NotRequired["GlobPattern"]
+
+class TextDocumentFilterScheme(TypedDict):
+    """
+    A document filter where `scheme` is required field.
+
+    @since 3.18.0
+    """
+
+    language: NotRequired[str]
+    scheme: str
+    pattern: NotRequired["GlobPattern"]
+
+class TextDocumentFilterPattern(TypedDict):
+    """
+    A document filter where `pattern` is required field.
+
+    @since 3.18.0
+    """
+
+    language: NotRequired[str]
+    scheme: NotRequired[str]
+    pattern: GlobPattern
 
 class ChangeAnnotationsSupportOptions(TypedDict):
     """@since 3.18.0"""
@@ -3771,7 +3765,7 @@ class ClientCodeActionResolveOptions(TypedDict):
     properties: list[str]
 
 class CodeActionTagOptions(TypedDict):
-    """@since 3.18.0 - proposed"""
+    """@since 3.18.0"""
 
     valueSet: list["CodeActionTag"]
 
