@@ -12,7 +12,9 @@ from sublime import (
 )
 from typing import Any
 
-view_event_listeners: dict[int, list[ViewEventListener]]
+def find_view_event_listener(
+    view: View, cls: type[_T_ViewEventListener]
+) -> _T_ViewEventListener | None: ...
 
 class CommandInputHandler:
     def name(self) -> str:
