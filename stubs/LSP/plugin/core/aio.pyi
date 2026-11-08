@@ -4,11 +4,12 @@ from .logging import debug as debug, exception_log as exception_log
 from .promise import Promise as Promise, ResolveFunc as ResolveFunc
 from .protocol import Error as Error, LSPErrorCodes as LSPErrorCodes
 from contextvars import Context
-from sublime_aio import T, Ts as Ts
-from typing import Any, Callable, Coroutine
-from typing_extensions import ParamSpec, Unpack
+from typing import Any, Callable, Coroutine, TypeVar
+from typing_extensions import ParamSpec, TypeVarTuple, Unpack
 
 P = ParamSpec("P")
+T = TypeVar("T")
+Ts = TypeVarTuple("Ts")
 PortableTimeoutError = TimeoutError
 
 def run_coroutine(

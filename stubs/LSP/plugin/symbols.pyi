@@ -14,7 +14,7 @@ from .core.input_handlers import (
     DynamicListInputHandler as DynamicListInputHandler,
     PreselectedListInputHandler as PreselectedListInputHandler,
 )
-from .core.promise import Promise as Promise
+from .core.logging import exception_log as exception_log
 from .core.protocol import (
     Error as Error,
     Point as Point,
@@ -144,6 +144,9 @@ class LspWorkspaceSymbolsCommand(LspWindowCommand):
     def input(self, args: dict[str, Any]) -> sublime_plugin.ListInputHandler | None: ...
 
 class WorkspaceSymbolsInputHandler(DynamicListInputHandler):
+    def __init__(
+        self, command: sublime_plugin.WindowCommand, args: dict[str, Any]
+    ) -> None: ...
     def name(self) -> str: ...
     def placeholder(self) -> str: ...
     def preview(

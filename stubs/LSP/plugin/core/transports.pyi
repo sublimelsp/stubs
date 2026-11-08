@@ -14,6 +14,7 @@ from typing import Callable
 import subprocess
 
 TCP_CONNECT_TIMEOUT: int
+TCP_CONNECT_RETRY_INTERVAL: float
 
 class StopLoopError(Exception): ...
 
