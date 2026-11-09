@@ -12,7 +12,7 @@ from ..protocol import (
 )
 from .code_actions import filter_quickfix_actions as filter_quickfix_actions
 from .code_lens import LspToggleCodeLensesCommand as LspToggleCodeLensesCommand
-from .completion import QueryCompletionsTask as QueryCompletionsTask
+from .completion import query_completions as query_completions
 from .core.aio import (
     TaskContainer as TaskContainer,
     gather_and_flatten_exceptions as gather_and_flatten_exceptions,

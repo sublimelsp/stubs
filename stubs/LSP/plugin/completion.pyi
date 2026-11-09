@@ -2,7 +2,6 @@ import sublime
 from ..protocol import (
     CompletionItem,
     CompletionItemDefaults,
-    CompletionParams as CompletionParams,
     EditRangeWithInsertReplace as EditRangeWithInsertReplace,
     InsertReplaceEdit,
     Range,
@@ -17,11 +16,7 @@ from .core.edit import apply_text_edits as apply_text_edits
 from .core.logging import debug as debug
 from .core.protocol import Error as Error, Request as Request
 from .core.registry import LspTextCommand as LspTextCommand
-from .core.sessions import (
-    CancellableRequest as CancellableRequest,
-    RequestController as RequestController,
-    Session as Session,
-)
+from .core.sessions import Session as Session
 from .core.settings import userprefs as userprefs
 from .core.type_converters import range_to_region as range_to_region
 from .core.views import (
@@ -65,14 +60,9 @@ def completion_with_defaults(
 ) -> CompletionItem:
     """Currently supports defaults for: ["editRange", "insertTextFormat", "data"]."""
 
-class QueryCompletionsTask:
-    """Represents pending completion requests."""
-    def __init__(
-        self, view: sublime.View, location: int, triggered_manually: bool
-    ) -> None: ...
-    async def query_completions(
-        self, sessions: list[Session]
-    ) -> tuple[list[sublime.CompletionItem], sublime.AutoCompleteFlags]: ...
+async def query_completions(
+    view: sublime.View, location: int, triggered_manually: bool, sessions: list[Session]
+) -> tuple[list[sublime.CompletionItem], sublime.AutoCompleteFlags]: ...
 
 class LspResolveDocsCommand(LspTextCommand):
     def run(
