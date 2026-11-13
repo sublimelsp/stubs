@@ -15,6 +15,7 @@ import subprocess
 
 TCP_CONNECT_TIMEOUT: int
 TCP_CONNECT_RETRY_INTERVAL: float
+PROCESS_SHUTDOWN_TIMEOUT: int
 
 class StopLoopError(Exception): ...
 
@@ -36,7 +37,7 @@ class TransportConfig(ABC):
         cwd: str | None,
         variables: dict[str, str],
         callbacks: TransportCallbacks,
-    ) -> TransportWrapper:
+    ) -> Transport:
         """Start a communication channel with the language server."""
 
 class StdioTransportConfig(TransportConfig):
@@ -52,7 +53,7 @@ class StdioTransportConfig(TransportConfig):
         cwd: str | None,
         variables: dict[str, str],
         callbacks: TransportCallbacks,
-    ) -> TransportWrapper: ...
+    ) -> Transport: ...
 
 class TcpClientTransportConfig(TransportConfig):
     """
@@ -70,7 +71,7 @@ class TcpClientTransportConfig(TransportConfig):
         cwd: str | None,
         variables: dict[str, str],
         callbacks: TransportCallbacks,
-    ) -> TransportWrapper: ...
+    ) -> Transport: ...
 
 class TcpServerTransportConfig(TransportConfig):
     """
@@ -81,7 +82,7 @@ class TcpServerTransportConfig(TransportConfig):
     """
     def __init__(self, port: int | None) -> None: ...
     cv: Incomplete
-    wrapper: Incomplete
+    transport: Incomplete
     process: Incomplete
     error_reader: Incomplete
     async def start(
@@ -91,7 +92,7 @@ class TcpServerTransportConfig(TransportConfig):
         cwd: str | None,
         variables: dict[str, str],
         callbacks: TransportCallbacks,
-    ) -> TransportWrapper: ...
+    ) -> Transport: ...
 
 class TransportCallbacks:
     async def on_transport_close(
@@ -100,61 +101,54 @@ class TransportCallbacks:
     async def on_payload(self, payload: JSONRPCMessage) -> None: ...
     def on_stderr_message(self, message: str) -> None: ...
 
-class Transport(ABC):
-    def __init__(
-        self,
-        encoder: Callable[[JSONRPCMessage], bytes],
-        decoder: Callable[[bytes], JSONRPCMessage],
-    ) -> None: ...
-    @abstractmethod
-    async def read(self) -> JSONRPCMessage: ...
-    @abstractmethod
-    async def write(self, payload: JSONRPCMessage) -> None: ...
-    @abstractmethod
-    async def write_bytes(self, payload: bytes) -> None: ...
-    @abstractmethod
-    async def close(self) -> None: ...
-
 async def parse_headers(reader: asyncio.StreamReader) -> dict[str, str]: ...
 async def parse_content_length(reader: asyncio.StreamReader) -> int | None: ...
 
-class StreamTransport(Transport):
+class Transport(TaskContainer):
+    """
+    Provides to a (subclass of) TransportCallbacks appropriately decoded messages. The Transport is also
+    responsible for keeping the spawned child process around (if any), and also keeps track of the ErrorReader. It can
+    be the case that there is no ErrorReader, for instance when talking to a remote TCP language server. So it can be
+    None.
+
+    Shutting down has a single owner: the task started by `start()`. Its tail releases all resources, whether the read
+    loop ended because `close()` was called or because the server went away by itself. `close()` only requests the
+    shutdown and waits for it, so cancelling `close()` never interrupts the teardown.
+    """
     def __init__(
         self,
         encoder: Callable[[JSONRPCMessage], bytes],
         decoder: Callable[[bytes], JSONRPCMessage],
         reader: asyncio.StreamReader,
         writer: asyncio.StreamWriter,
-    ) -> None: ...
-    async def read(self) -> JSONRPCMessage: ...
-    async def write(self, payload: JSONRPCMessage) -> None: ...
-    async def write_bytes(self, payload: bytes) -> None: ...
-    async def close(self) -> None: ...
-
-class TransportWrapper(TaskContainer):
-    """
-    Double dispatch-like class that takes a (subclass of) Transport, and provides to a (subclass of) TransportCallbacks
-    appropriately decoded messages. The TransportWrapper is also responsible for keeping the spawned child
-    process around (if any), and also keeps track of the ErrorReader. It can be the case that there is no ErrorReader,
-    for instance when talking to a remote TCP language server. So it can be None.
-    """
-    def __init__(
-        self,
         callback_object: TransportCallbacks,
-        transport: Transport,
         process: asyncio.subprocess.Process | None,
         process_args: list[str] | None,
         error_reader: ErrorReader | None,
     ) -> None: ...
+    def start(self) -> None:
+        """Start the message processing loop."""
     @property
     def process_args(self) -> list[str] | None:
         """
-        The arguments for the process launched by this wrapper, or None if there is no process launched (such as with
+        The arguments for the process launched by this transport, or None if there is no process launched (such as with
         a remote TCP/websocket connection).
         """
-    async def send(self, payload: JSONRPCMessage) -> None: ...
-    async def send_bytes(self, payload: bytes) -> None: ...
-    async def close(self) -> None: ...
+    async def send(self, payload: JSONRPCMessage) -> None:
+        """Write a JSON-RPC message. Messages sent after `close()` are dropped."""
+    async def send_bytes(self, payload: bytes) -> None:
+        """Write raw bytes. Bytes sent after `close()` are dropped."""
+    async def close(self) -> tuple[int | None, Exception | None]:
+        """
+        Stop the message loop and stop the process (if any).
+
+        The writer stream is closed first so that the server can exit by itself. A server that is still running after
+        `PROCESS_SHUTDOWN_TIMEOUT` seconds is killed. This returns once the streams, tasks and process are released,
+        which can be before `TransportCallbacks.on_transport_close` has run. It is safe to call this many times, also
+        concurrently. Cancelling it only cancels the wait: the resources are still released in the background.
+
+        :returns: tuple of (exit code, exception)
+        """
 
 class LaunchConfig:
     """Small object that can start a process."""

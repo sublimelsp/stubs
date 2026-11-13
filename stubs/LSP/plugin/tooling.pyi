@@ -14,8 +14,8 @@ from .core.css import css as css
 from .core.logging import debug as debug
 from .core.registry import windows as windows
 from .core.transports import (
+    Transport as Transport,
     TransportCallbacks as TransportCallbacks,
-    TransportWrapper as TransportWrapper,
 )
 from .core.types import Capabilities as Capabilities, ClientConfig as ClientConfig
 from .core.version import __version__ as __version__
@@ -93,8 +93,6 @@ class ServerTestRunner(TransportCallbacks):
 
     Server is automatically closed after defined timeout.
     """
-
-    CLOSE_TIMEOUT_SEC: int
     def __init__(
         self,
         config: ClientConfig,
@@ -102,7 +100,7 @@ class ServerTestRunner(TransportCallbacks):
         initiating_view: sublime.View,
         on_close: Callable[[list[str] | None, str | None, str, int], None],
     ) -> None: ...
-    async def run(self) -> None: ...
+    async def run(self, close_timeout_sec: float = 2.0) -> None: ...
     async def on_payload(self, payload: dict[str, Any]) -> None: ...
     def on_stderr_message(self, message: str) -> None: ...
     async def on_transport_close(

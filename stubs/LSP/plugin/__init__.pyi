@@ -55,7 +55,6 @@ from .core.sessions import (
     SessionBufferProtocol as SessionBufferProtocol,
     SessionViewProtocol as SessionViewProtocol,
 )
-from .core.transports import TransportWrapper as TransportWrapper
 from .core.type_converters import (
     point_to_offset as point_to_offset,
     position_to_offset as position_to_offset,

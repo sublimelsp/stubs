@@ -139,10 +139,7 @@ from .protocol import (
     TextPosition as TextPosition,
 )
 from .settings import globalprefs as globalprefs, userprefs as userprefs
-from .transports import (
-    TransportCallbacks as TransportCallbacks,
-    TransportWrapper as TransportWrapper,
-)
+from .transports import Transport as Transport, TransportCallbacks as TransportCallbacks
 from .types import (
     Capabilities as Capabilities,
     ClientConfig as ClientConfig,
@@ -536,7 +533,7 @@ class _RegistrationData:
     ) -> None: ...
 
 class Session(APIHandler, TransportCallbacks, TaskContainer):
-    transport: TransportWrapper | None
+    transport: Transport | None
     working_directory: str | None
     request_id: int
     config: ClientConfig
@@ -550,6 +547,7 @@ class Session(APIHandler, TransportCallbacks, TaskContainer):
         DiagnosticsIdentifier, RequestController | None
     ]
     exiting: bool
+    end_requested: bool
     def __init__(
         self,
         manager: Manager,
@@ -604,7 +602,7 @@ class Session(APIHandler, TransportCallbacks, TaskContainer):
         self,
         variables: dict[str, str],
         working_directory: str | None,
-        transport: TransportWrapper,
+        transport: Transport,
     ) -> InitializeResult | Error: ...
     def on_stderr_message(self, message: str) -> None: ...
     async def run_command(
