@@ -73,7 +73,7 @@ class TreeViewSheet(sublime.HtmlSheet):
     selected_node_id: str | None
     ordered_node_ids: list[str]
     root_nodes: list[str]
-    name: str
+    sheet_name: str
     data_provider: TreeDataProvider
     header: str
     def __init__(

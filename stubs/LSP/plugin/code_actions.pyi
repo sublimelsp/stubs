@@ -69,6 +69,16 @@ class CodeActionsManager:
         Requests code actions with provided diagnostics and specified region. If there are
         no diagnostics for given session, the request will be made with empty diagnostics list.
         """
+    def is_menu_actions_cache_valid(
+        self, view: sublime.View, region: sublime.Region
+    ) -> bool: ...
+    async def request_menu_actions(
+        self, view: sublime.View, region: sublime.Region
+    ) -> None:
+        """
+        Request the code actions for the Refactor and Source Action menus, unless the cached ones (or the ones being
+        requested) are already for the given location. Returns once the actions for the given location are available.
+        """
     async def request_on_save_or_format(
         self, view: sublime.View, code_actions: dict[str, bool]
     ) -> AsyncGenerator[CodeActionsByConfigName]: ...

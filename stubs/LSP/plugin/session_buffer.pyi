@@ -16,8 +16,6 @@ from ..protocol import (
     SemanticTokens as SemanticTokens,
     SemanticTokensDelta as SemanticTokensDelta,
     SemanticTokensDeltaParams as SemanticTokensDeltaParams,
-    SemanticTokensParams as SemanticTokensParams,
-    SemanticTokensRangeParams as SemanticTokensRangeParams,
     TextDocumentSyncKind,
     UnchangedDocumentDiagnosticReport,
 )
