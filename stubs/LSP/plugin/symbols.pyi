@@ -31,18 +31,18 @@ from .core.views import (
     offset_to_point as offset_to_point,
     text_document_identifier as text_document_identifier,
 )
-from typing import Any, TypedDict, overload
-from typing_extensions import NotRequired, TypeGuard
+from typing import Any, overload
+from typing_extensions import NotRequired, TypeGuard, TypedDict
 
 SUPPRESS_INPUT_SETTING_KEY: str
 SYMBOL_KIND_NAMES: dict[SymbolKind, str]
 
-class DocumentSymbolValue(TypedDict):
+class DocumentSymbolValue(TypedDict, closed=True):
     deprecated: bool
     kind: int
     range: Range
 
-class WorkspaceSymbolValue(TypedDict):
+class WorkspaceSymbolValue(TypedDict, closed=True):
     deprecated: bool
     kind: int
     location: NotRequired[Location]

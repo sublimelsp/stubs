@@ -10,9 +10,9 @@ from .views import (
     html_wrapper as html_wrapper,
     minihtml as minihtml,
 )
-from typing import TypedDict
+from typing_extensions import TypedDict
 
-class SignatureHelpStyle(TypedDict):
+class SignatureHelpStyle(TypedDict, closed=True):
     function_color: str
     active_parameter_color: str
     active_parameter_bold: bool

@@ -31,11 +31,12 @@ from .core.views import (
 )
 from _typeshed import Incomplete
 from abc import ABC, abstractmethod
-from typing import Any, Callable, TypedDict
+from typing import Any, Callable
+from typing_extensions import TypedDict
 
 HierarchyItem = CallHierarchyItem | TypeHierarchyItem
 
-class HierarchyItemWrapper(TypedDict):
+class HierarchyItemWrapper(TypedDict, closed=True):
     item: HierarchyItem
     selectionRange: Range
 

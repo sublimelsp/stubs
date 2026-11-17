@@ -14,15 +14,15 @@ from ...protocol import (
 from .logging import debug as debug, printf as printf
 from .promise import Promise as Promise
 from .protocol import UINT_MAX as UINT_MAX
-from typing import Sequence, TypedDict
-from typing_extensions import NotRequired, TypeGuard
+from typing import Sequence
+from typing_extensions import NotRequired, TypeGuard, TypedDict
 
 WorkspaceChanges = dict[
     str,
     tuple[list[TextEdit | AnnotatedTextEdit | SnippetTextEdit], str | None, int | None],
 ]
 
-class WorkspaceEditSummary(TypedDict):
+class WorkspaceEditSummary(TypedDict, closed=True):
     total_changes: int
     edited_files: int
     created_files: NotRequired[int]

@@ -33,7 +33,8 @@ from .locationpicker import (
     LocationPicker as LocationPicker,
     open_location as open_location,
 )
-from typing import Any, TypedDict
+from typing import Any
+from typing_extensions import TypedDict
 
 class LspGotoCommand(LspTextCommand):
     method: str
@@ -89,7 +90,7 @@ class LspSymbolImplementationCommand(LspGotoCommand):
     capability: Any
     placeholder_text: str
 
-class DiagnosticData(TypedDict):
+class DiagnosticData(TypedDict, closed=True):
     session_name: str
     diagnostic: Diagnostic
 

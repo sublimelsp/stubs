@@ -18,8 +18,8 @@ from .core.types import match_file_operation_filters as match_file_operation_fil
 from .core.url import filename_to_uri as filename_to_uri
 from .edit import prompt_for_workspace_edits as prompt_for_workspace_edits
 from collections.abc import Generator
-from typing import Any, TypedDict
-from typing_extensions import NotRequired
+from typing import Any
+from typing_extensions import NotRequired, TypedDict
 from pathlib import Path
 
 class RenamePathInputHandler(sublime_plugin.TextInputHandler):
@@ -31,7 +31,7 @@ class RenamePathInputHandler(sublime_plugin.TextInputHandler):
     def initial_selection(self) -> list[tuple[int, int]]: ...
     def validate(self, path: str) -> bool: ...
 
-class LspRenamePathInputArgs(TypedDict):
+class LspRenamePathInputArgs(TypedDict, closed=True):
     paths: NotRequired[list[str]]
     new_name: NotRequired[str]
     prompt_workspace_edits: NotRequired[bool]

@@ -28,8 +28,8 @@ from .url import filename_to_uri as filename_to_uri, parse_uri as parse_uri
 from .workspace import WorkspaceFolder as WorkspaceFolder
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Callable, Final, Generator, Iterable, TypeVar, TypedDict
-from typing_extensions import NotRequired, TypeGuard
+from typing import Any, Callable, Final, Generator, Iterable, TypeVar
+from typing_extensions import NotRequired, TypeGuard, TypedDict
 from typing import List
 from typing_extensions import override
 import asyncio
@@ -41,7 +41,7 @@ PANEL_FILE_REGEX: str
 PANEL_LINE_REGEX: str
 MarkdownLangMapJson = dict[str, list[list[str]]]
 
-class FileWatcherConfig(TypedDict):
+class FileWatcherConfig(TypedDict, closed=True):
     patterns: list[str]
     events: NotRequired[list[FileWatcherEventType]]
     ignores: NotRequired[list[str]]
