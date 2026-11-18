@@ -1,17 +1,13 @@
-import sublime
-from ..protocol import SelectionRange
-from .core.protocol import Request as Request
+from .core.protocol import Error as Error, Request as Request
 from .core.registry import (
     LspTextCommand as LspTextCommand,
     get_position as get_position,
 )
 from .core.type_converters import range_to_region as range_to_region
 from .core.views import selection_range_params as selection_range_params
-from typing import Any
 
 class LspExpandSelectionCommand(LspTextCommand):
     capability: str
-    def __init__(self, view: sublime.View) -> None: ...
     def is_enabled(
         self,
         event: dict | None = None,
@@ -24,8 +20,4 @@ class LspExpandSelectionCommand(LspTextCommand):
         point: int | None = None,
         fallback: bool = False,
     ) -> bool: ...
-    def run(
-        self, edit: sublime.Edit, event: dict | None = None, fallback: bool = False
-    ) -> None: ...
-    def on_result(self, params: list[SelectionRange] | None) -> None: ...
-    def on_error(self, params: Any) -> None: ...
+    async def run(self, event: dict | None = None, fallback: bool = False) -> None: ...

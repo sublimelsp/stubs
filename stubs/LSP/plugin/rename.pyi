@@ -1,7 +1,6 @@
 import sublime
 import sublime_plugin
 from ..protocol import PrepareRenameResult, Range as Range
-from .core.aio import run_coroutine as run_coroutine
 from .core.edit import show_summary_message as show_summary_message
 from .core.protocol import Error as Error, Request as Request
 from .core.registry import (
@@ -29,9 +28,8 @@ class LspSymbolRenameCommand(LspTextCommand):
         point: int | None = None,
     ) -> bool: ...
     def input(self, args: dict) -> sublime_plugin.TextInputHandler | None: ...
-    def run(
+    async def run(
         self,
-        edit: sublime.Edit,
         new_name: str = "",
         placeholder: str = "",
         session_name: str | None = None,

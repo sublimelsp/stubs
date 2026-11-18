@@ -65,12 +65,8 @@ async def query_completions(
 ) -> tuple[list[sublime.CompletionItem], sublime.AutoCompleteFlags]: ...
 
 class LspResolveDocsCommand(LspTextCommand):
-    def run(
-        self,
-        edit: sublime.Edit,
-        index: int,
-        session_name: str,
-        event: dict | None = None,
+    async def run(
+        self, index: int, session_name: str, event: dict | None = None
     ) -> None: ...
 
 class LspCommitCompletionWithOppositeInsertMode(LspTextCommand):

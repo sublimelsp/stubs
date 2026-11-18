@@ -1,8 +1,10 @@
+import asyncio
 import sublime
 from .types import (
     PANEL_FILE_REGEX as PANEL_FILE_REGEX,
     PANEL_LINE_REGEX as PANEL_LINE_REGEX,
 )
+from collections.abc import Callable
 from typing import Iterable
 from typing import Literal
 from typing import Optional
@@ -21,6 +23,28 @@ def buttons_html(buttons: Iterable[PanelButton]) -> str:
 
     Each button is given as a tuple of the link target, the label and an optional style, which is either `primary` for
     a highlighted button or `secondary` for a less prominent one.
+    """
+
+def show_quick_panel(
+    window: sublime.Window,
+    items: list[str] | list[list[str]] | list[sublime.QuickPanelItem],
+    flags: sublime.QuickPanelFlags = ...,
+    selected_index: int = -1,
+    on_highlight: Callable[[int], None] | None = None,
+    placeholder: str | None = None,
+) -> asyncio.Future[int]:
+    """
+    Show a quick panel to select an item in a list.
+
+    :param window: The window to use for the quick panel.
+    :param items: May be either a list of strings, or a list of lists of strings where the first item is the trigger and
+    all subsequent strings are details shown below.
+    :param flags: `QuickPanelFlags` controlling behavior. The `WANT_EVENT` bit is set to 0.
+    :param selected_index: The initially selected item. `-1` for no selection.
+    :param on_highlight: Called every time the highlighted item in the quick panel is changed. Note that this callback
+    runs on the main thread, not on the asyncio thread.
+    :param placeholder: Text displayed in the filter input field before any query is typed.
+    :raises RuntimeError: when this function is not called from the asyncio thread.
     """
 
 class PanelName:

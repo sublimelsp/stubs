@@ -1,6 +1,5 @@
 import sublime
 from ..protocol import InlayHint, InlayHintLabelPart, MarkupContent
-from .core.aio import run_coroutine as run_coroutine
 from .core.constants import RequestFlags as RequestFlags, ST_VERSION as ST_VERSION
 from .core.css import css as css
 from .core.edit import apply_text_edits as apply_text_edits
@@ -16,14 +15,13 @@ from .core.type_converters import position_to_offset as position_to_offset
 class LspToggleInlayHintsCommand(LspWindowCommand):
     capability: str
     def __init__(self, window: sublime.Window) -> None: ...
-    def run(self, enable: bool | None = None) -> None: ...
+    async def run(self, enable: bool | None = None) -> None: ...
     def is_checked(self) -> bool: ...
 
 class LspInlayHintClickCommand(LspTextCommand):
     capability: str
-    def run(
+    async def run(
         self,
-        _edit: sublime.Edit,
         session_name: str,
         inlay_hint: InlayHint,
         phantom_uuid: str,

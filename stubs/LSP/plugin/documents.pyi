@@ -5,7 +5,6 @@ from ..protocol import (
     CodeAction as CodeAction,
     Command as Command,
     Diagnostic as Diagnostic,
-    DocumentHighlight as DocumentHighlight,
     DocumentUri,
     FoldingRange as FoldingRange,
     SignatureHelpTriggerKind,
@@ -19,6 +18,7 @@ from .core.aio import (
     get_clipboard as get_clipboard,
     run_coroutine as run_coroutine,
     run_on_asyncio_thread as run_on_asyncio_thread,
+    run_on_main_thread as run_on_main_thread,
 )
 from .core.constants import (
     CODE_ACTION_ANNOTATION_SCOPE as CODE_ACTION_ANNOTATION_SCOPE,
@@ -66,7 +66,6 @@ from .core.types import (
     FEATURES_TIMEOUT as FEATURES_TIMEOUT,
     SettingsRegistration as SettingsRegistration,
     basescope2languageid as basescope2languageid,
-    debounced as debounced,
 )
 from .core.url import (
     CODE_ACTION_SCHEME as CODE_ACTION_SCHEME,

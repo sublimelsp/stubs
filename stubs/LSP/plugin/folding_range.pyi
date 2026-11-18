@@ -1,7 +1,9 @@
 import sublime
 from ..protocol import FoldingRange, Range
-from .core.protocol import Request as Request, UINT_MAX as UINT_MAX
+from .core.aio import run_coroutine as run_coroutine
+from .core.protocol import Error as Error, Request as Request, UINT_MAX as UINT_MAX
 from .core.registry import LspTextCommand as LspTextCommand
+from .core.sessions import Session as Session
 from .core.type_converters import range_to_region as range_to_region
 from .core.views import text_document_identifier as text_document_identifier
 
@@ -43,9 +45,8 @@ class LspFoldCommand(LspTextCommand):
         event: dict | None = None,
         point: int | None = None,
     ) -> str: ...
-    def run(
+    async def run(
         self,
-        edit: sublime.Edit,
         prefetch: bool = False,
         hidden: bool = False,
         strict: bool = True,
@@ -55,6 +56,4 @@ class LspFoldCommand(LspTextCommand):
 
 class LspFoldAllCommand(LspTextCommand):
     capability: str
-    def run(
-        self, edit: sublime.Edit, kind: str | None = None, event: dict | None = None
-    ) -> None: ...
+    async def run(self, kind: str | None = None, event: dict | None = None) -> None: ...

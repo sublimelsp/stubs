@@ -1,5 +1,3 @@
-import sublime
-from .core.aio import run_coroutine as run_coroutine
 from .core.logging import exception_log as exception_log
 from .core.open import (
     open_file_uri as open_file_uri,
@@ -21,6 +19,6 @@ class LspOpenLinkCommand(LspTextCommand):
     def is_enabled(
         self, event: dict | None = None, point: int | None = None
     ) -> bool: ...
-    def run(
-        self, edit: sublime.Edit, event: dict | None = None, point: int | None = None
+    async def run(
+        self, event: dict | None = None, point: int | None = None
     ) -> None: ...

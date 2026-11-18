@@ -1,7 +1,10 @@
-import sublime
 from ..protocol import Location as Location
 from .core.constants import RegionKey as RegionKey
-from .core.protocol import Request as Request, TextPosition as TextPosition
+from .core.protocol import (
+    Error as Error,
+    Request as Request,
+    TextPosition as TextPosition,
+)
 from .core.registry import (
     LspTextCommand as LspTextCommand,
     get_position as get_position,
@@ -46,9 +49,8 @@ class LspSymbolReferencesCommand(LspTextCommand):
         include_declaration: bool = False,
         output_mode: OutputMode | None = None,
     ) -> bool: ...
-    def run(
+    async def run(
         self,
-        _: sublime.Edit,
         event: dict | None = None,
         point: int | None = None,
         side_by_side: bool = False,

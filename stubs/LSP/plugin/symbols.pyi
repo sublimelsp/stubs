@@ -15,12 +15,7 @@ from .core.input_handlers import (
     PreselectedListInputHandler as PreselectedListInputHandler,
 )
 from .core.logging import exception_log as exception_log
-from .core.protocol import (
-    Error as Error,
-    Point as Point,
-    Request as Request,
-    ResponseError as ResponseError,
-)
+from .core.protocol import Error as Error, Point as Point, Request as Request
 from .core.registry import (
     LspTextCommand as LspTextCommand,
     LspWindowCommand as LspWindowCommand,
@@ -83,18 +78,13 @@ class LspDocumentSymbolsCommand(LspTextCommand):
     cached: bool
     has_matching_symbols: bool
     def __init__(self, view: sublime.View) -> None: ...
-    def run(
+    async def run(
         self,
-        edit: sublime.Edit,
         event: dict[str, Any] | None = None,
         kind: int = 0,
         index: int | None = None,
     ) -> None: ...
     def input(self, args: dict) -> sublime_plugin.CommandInputHandler | None: ...
-    def handle_response_async(
-        self, response: list[DocumentSymbol] | list[SymbolInformation] | None
-    ) -> None: ...
-    def handle_response_error(self, error: ResponseError) -> None: ...
     def process_document_symbol_recursive(
         self, item: DocumentSymbol, hierarchy: str = ""
     ) -> list[sublime.ListInputItem[DocumentSymbolValue]]: ...
@@ -140,7 +130,7 @@ class DocumentSymbolsInputHandler(sublime_plugin.ListInputHandler):
 
 class LspWorkspaceSymbolsCommand(LspWindowCommand):
     capability: str
-    def run(self, symbol: WorkspaceSymbolValue) -> None: ...
+    async def run(self, symbol: WorkspaceSymbolValue) -> None: ...
     def input(self, args: dict[str, Any]) -> sublime_plugin.ListInputHandler | None: ...
 
 class WorkspaceSymbolsInputHandler(DynamicListInputHandler):

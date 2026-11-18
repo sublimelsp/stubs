@@ -4,13 +4,11 @@ from ..protocol import (
     CodeAction as CodeAction,
     Command as Command,
     Diagnostic as Diagnostic,
-    Hover,
+    Hover as Hover,
+    TextDocumentPositionParams as TextDocumentPositionParams,
 )
 from .code_actions import filter_quickfix_actions as filter_quickfix_actions
-from .core.aio import (
-    run_coroutine as run_coroutine,
-    run_on_asyncio_thread as run_on_asyncio_thread,
-)
+from .core.aio import run_coroutine as run_coroutine
 from .core.constants import (
     HOVER_ENABLED_KEY as HOVER_ENABLED_KEY,
     MarkdownLangMap as MarkdownLangMap,
@@ -22,15 +20,16 @@ from .core.open import (
     open_file_uri as open_file_uri,
     open_in_browser as open_in_browser,
 )
-from .core.promise import Promise as Promise
 from .core.protocol import Error as Error, Request as Request
 from .core.registry import (
     LspTextCommand as LspTextCommand,
+    LspWindowCommand as LspWindowCommand,
     get_position as get_position,
     windows as windows,
 )
 from .core.sessions import (
     AbstractViewListener as AbstractViewListener,
+    Session as Session,
     SessionBufferProtocol as SessionBufferProtocol,
 )
 from .core.settings import userprefs as userprefs
@@ -59,7 +58,6 @@ from .core.views import (
 )
 
 SessionName = str
-ResolvedHover = Hover | Error
 
 class LinkKind:
     lsp_name: str
@@ -75,18 +73,20 @@ link_kinds: list[LinkKind]
 
 class LspHoverCommand(LspTextCommand):
     def __init__(self, view: sublime.View) -> None: ...
-    def run(
+    async def run(
         self,
-        edit: sublime.Edit,
         only_diagnostics: bool = False,
         point: int | None = None,
         event: dict | None = None,
     ) -> None: ...
-    def request_symbol_hover_async(
+    async def request_symbol_hover(
         self, listener: AbstractViewListener, point: int
     ) -> None: ...
-    def request_document_link_async(
+    async def request_document_link(
         self, listener: AbstractViewListener, point: int
+    ) -> None: ...
+    async def show_diagnostics_and_request_code_actions(
+        self, listener: AbstractViewListener, point: int, only_diagnostics: bool
     ) -> None: ...
     def provider_exists(
         self, listener: AbstractViewListener, link: LinkKind
@@ -102,10 +102,10 @@ class LspHoverCommand(LspTextCommand):
     ) -> None: ...
     async def try_open_custom_uri(self, uri: str) -> None: ...
 
-class LspToggleHoverPopupsCommand(sublime_plugin.WindowCommand):
+class LspToggleHoverPopupsCommand(LspWindowCommand):
     def is_enabled(self) -> bool: ...
     def is_checked(self) -> bool: ...
-    def run(self) -> None: ...
+    async def run(self) -> None: ...
 
 class LspCopyTextCommand(sublime_plugin.WindowCommand):
     def run(self, text: str) -> None: ...

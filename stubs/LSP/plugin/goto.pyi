@@ -1,6 +1,11 @@
 import sublime
 import sublime_plugin
-from ..protocol import Diagnostic, DocumentUri, LocationLink as LocationLink
+from ..protocol import (
+    Diagnostic,
+    DocumentUri,
+    LocationLink as LocationLink,
+    TextDocumentPositionParams as TextDocumentPositionParams,
+)
 from .core.aio import run_coroutine as run_coroutine
 from .core.constants import DIAGNOSTIC_KINDS as DIAGNOSTIC_KINDS
 from .core.input_handlers import (
@@ -58,9 +63,8 @@ class LspGotoCommand(LspTextCommand):
         fallback: bool = False,
         group: int = -1,
     ) -> bool: ...
-    def run(
+    async def run(
         self,
-        _: sublime.Edit,
         event: dict | None = None,
         point: int | None = None,
         side_by_side: bool = False,

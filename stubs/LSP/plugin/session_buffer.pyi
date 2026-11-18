@@ -3,7 +3,6 @@ from ..protocol import (
     CodeAction as CodeAction,
     CodeActionKind as CodeActionKind,
     CodeActionTriggerKind,
-    ColorInformation as ColorInformation,
     Command as Command,
     Diagnostic as Diagnostic,
     DiagnosticSeverity as DiagnosticSeverity,
@@ -85,10 +84,9 @@ from .diagnostics import (
 from .inlay_hint import inlay_hint_to_phantom as inlay_hint_to_phantom
 from dataclasses import dataclass
 from typing import Any
-from typing_extensions import ParamSpec, TypeGuard
+from typing_extensions import TypeGuard
 from weakref import WeakSet
 
-P = ParamSpec("P")
 HUGE_FILE_SIZE: int
 
 def is_full_document_diagnostic_report(

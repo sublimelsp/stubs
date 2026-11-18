@@ -93,8 +93,8 @@ class LspHierarchyCommand(LspTextCommand, ABC):
     def is_visible(
         self, event: dict | None = None, point: int | None = None
     ) -> bool: ...
-    def run(
-        self, edit: sublime.Edit, event: dict | None = None, point: int | None = None
+    async def run(
+        self, event: dict | None = None, point: int | None = None
     ) -> None: ...
 
 class LspHierarchyToggleCommand(LspWindowCommand):

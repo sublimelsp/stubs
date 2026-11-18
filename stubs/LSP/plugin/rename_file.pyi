@@ -1,23 +1,15 @@
 import sublime
 import sublime_plugin
-import weakref
-from ..protocol import FileRename, WorkspaceEdit
-from .core.aio import (
-    run_coroutine as run_coroutine,
-    run_on_asyncio_thread as run_on_asyncio_thread,
-    run_on_main_thread as run_on_main_thread,
-)
+from ..protocol import FileRename
+from .core.aio import run_on_main_thread as run_on_main_thread
 from .core.edit import show_summary_message as show_summary_message
 from .core.logging import debug as debug
 from .core.open import open_file_uri as open_file_uri
-from .core.promise import Promise as Promise
 from .core.protocol import Error as Error, Request as Request
 from .core.registry import LspWindowCommand as LspWindowCommand
-from .core.sessions import Session as Session
 from .core.types import match_file_operation_filters as match_file_operation_filters
 from .core.url import filename_to_uri as filename_to_uri
 from .edit import prompt_for_workspace_edits as prompt_for_workspace_edits
-from collections.abc import Generator
 from typing import Any
 from typing_extensions import NotRequired, TypedDict
 from pathlib import Path
@@ -45,37 +37,20 @@ class LspRenamePathCommand(LspWindowCommand):
     def input(
         self, args: LspRenamePathInputArgs
     ) -> sublime_plugin.TextInputHandler | None: ...
-    def run(
+    async def run(
         self,
         new_name: str,
         paths: list[str] | None = None,
         prompt_workspace_edits: bool = True,
     ) -> None: ...
-    def on_rename_path(self, success: bool, file_rename: FileRename) -> None: ...
-    def prompt_rename_async(
-        self, file_rename: FileRename, label: str, rename_command_args: dict[str, Any]
-    ) -> None: ...
-    def create_will_rename_requests_async(
-        self, file_rename: FileRename
-    ) -> Generator[
-        Promise[tuple[WorkspaceEdit | Error | None, weakref.ref[Session]]]
-    ]: ...
-    def return_response_with_session(
-        self, weak_session: weakref.ref[Session], response: WorkspaceEdit | Error | None
-    ) -> tuple[WorkspaceEdit | Error | None, weakref.ref[Session]]: ...
-    def handle_rename_async(
-        self,
-        responses: list[tuple[WorkspaceEdit | Error | None, weakref.ref[Session]]],
-        label: str,
-        rename_command_args: dict[str, Any],
-    ) -> None: ...
-    def on_prompt_for_workspace_edits_concluded(
-        self,
-        weak_session: weakref.ref[Session],
-        response: WorkspaceEdit,
-        label: str,
-        accepted: bool,
-    ) -> Promise[bool]: ...
+    async def apply_will_rename_edits(
+        self, file_rename: FileRename, label: str
+    ) -> bool:
+        """
+        Request and apply the WorkspaceEdit from the workspace/willRenameFiles request.
+
+        Returns whether the file rename should proceed.
+        """
     async def rename_path(self, old: str, new: str) -> bool: ...
     def restore_view(
         self,

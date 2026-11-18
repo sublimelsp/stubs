@@ -6,13 +6,11 @@ from .api import (
     PluginStartError as PluginStartError,
     get_plugin as get_plugin,
 )
-from .core.aio import (
-    run_coroutine as run_coroutine,
-    run_on_threadpool as run_on_threadpool,
-)
+from .core.aio import run_on_threadpool as run_on_threadpool
 from .core.css import css as css
 from .core.logging import debug as debug
-from .core.registry import windows as windows
+from .core.panels import show_quick_panel as show_quick_panel
+from .core.registry import LspWindowCommand as LspWindowCommand, windows as windows
 from .core.transports import (
     Transport as Transport,
     TransportCallbacks as TransportCallbacks,
@@ -44,15 +42,9 @@ class LspParseVscodePackageJson(sublime_plugin.ApplicationCommand):
     ) -> sublime_plugin.CommandInputHandler | None: ...
     def run(self, base_package_name: str) -> None: ...
 
-class LspTroubleshootServerCommand(sublime_plugin.WindowCommand):
-    def run(self) -> None: ...
-    test_runner: ServerTestRunner | None
-    def on_selected(
-        self,
-        selected_index: int,
-        configs: list[ClientConfig],
-        active_view: sublime.View,
-    ) -> None: ...
+class LspTroubleshootServerCommand(LspWindowCommand):
+    async def run(self) -> None: ...
+    def is_enabled(self) -> bool: ...
     def update_sheet(
         self,
         config: ClientConfig,

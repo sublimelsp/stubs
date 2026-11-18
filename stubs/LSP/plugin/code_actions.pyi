@@ -8,6 +8,7 @@ from ..protocol import (
     Diagnostic as Diagnostic,
 )
 from .core.aio import run_coroutine as run_coroutine
+from .core.panels import show_quick_panel as show_quick_panel
 from .core.protocol import Error as Error, Request as Request
 from .core.registry import (
     LspTextCommand as LspTextCommand,
@@ -148,9 +149,8 @@ class LspCodeActionsCommand(LspTextCommand):
         point: int | None = None,
         only_kinds: list[str | CodeActionKind] | None = None,
     ) -> bool: ...
-    def run(
+    async def run(
         self,
-        edit: sublime.Edit,
         event: dict | None = None,
         only_kinds: list[str | CodeActionKind] | None = None,
         code_actions_by_config: list[CodeActionsByConfigName] | None = None,
@@ -169,7 +169,7 @@ class LspMenuActionCommand(LspWindowCommand, ABC):
     def is_visible(self, index: int, event: dict | None = None) -> bool: ...
     def description(self, index: int, event: dict | None = None) -> str | None: ...
     def want_event(self) -> bool: ...
-    def run(self, index: int, event: dict | None = None) -> None: ...
+    async def run(self, index: int, event: dict | None = None) -> None: ...
     @staticmethod
     def applies_to_context_menu(event: dict | None) -> bool: ...
 
