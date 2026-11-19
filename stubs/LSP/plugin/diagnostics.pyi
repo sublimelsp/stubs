@@ -36,7 +36,13 @@ class DiagnosticsStorage:
         registration_id: str | None,
         options: DiagnosticOptions | DiagnosticRegistrationOptions,
     ) -> None: ...
-    def unregister_provider(self, registration_id: str) -> None: ...
+    def unregister_provider(self, registration_id: str) -> str | None:
+        """
+        Unregister a diagnostics provider and remove the stored diagnostics of its stream, unless another registered
+        provider uses the same identifier.
+
+        Returns the identifier of the removed diagnostics stream, or `None` if no stream was removed.
+        """
     def has_provider(self) -> bool: ...
     def set_diagnostics(
         self,

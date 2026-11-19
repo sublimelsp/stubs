@@ -533,7 +533,6 @@ class _RegistrationData:
     ) -> None: ...
 
 class Session(APIHandler, TransportCallbacks, TaskContainer):
-    transport: Transport | None
     working_directory: str | None
     request_id: int
     config: ClientConfig
@@ -546,8 +545,6 @@ class Session(APIHandler, TransportCallbacks, TaskContainer):
     workspace_diagnostics_pending_responses: dict[
         DiagnosticsIdentifier, RequestController | None
     ]
-    exiting: bool
-    end_requested: bool
     def __init__(
         self,
         manager: Manager,
@@ -559,6 +556,11 @@ class Session(APIHandler, TransportCallbacks, TaskContainer):
     def get_workspace_folders(self) -> list[WorkspaceFolder]: ...
     @property
     def plugin(self) -> AbstractPlugin | LspPlugin | None: ...
+    @property
+    def exiting(self) -> bool: ...
+    @property
+    def end_requested(self) -> bool:
+        """Whether `end()` was called, so the server stopping afterwards is not a crash."""
     def register_session_view_async(self, sv: SessionViewProtocol) -> None: ...
     async def unregister_session_view(self, sv: SessionViewProtocol) -> None: ...
     def session_views_async(self) -> Generator[SessionViewProtocol, None, None]:

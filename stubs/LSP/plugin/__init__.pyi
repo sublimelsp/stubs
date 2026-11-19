@@ -41,6 +41,7 @@ from .core.protocol import (
     Notification as Notification,
     Request as Request,
     Response as Response,
+    ResponseError as ResponseError,
     ServerNotification as ServerNotification,
     ServerRequest as ServerRequest,
     ServerResponse as ServerResponse,
