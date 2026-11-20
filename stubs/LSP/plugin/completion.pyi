@@ -27,7 +27,7 @@ from .core.views import (
     show_lsp_popup as show_lsp_popup,
     text_document_position_params as text_document_position_params,
 )
-from typing import Any
+from typing import Any, ClassVar, NamedTuple
 from typing_extensions import TypeAlias, TypeGuard
 from ..protocol import CompletionList
 from typing import List
@@ -42,6 +42,21 @@ ResolvedCompletions: TypeAlias = Tuple[
 CompletionsStore: TypeAlias = Tuple[List[CompletionItem], CompletionItemDefaults]
 
 def format_details(detail: str, cutoff_length: int = 80) -> str: ...
+
+class CompletionTriggerInfo(NamedTuple):
+    trigger: str
+    details_label: str
+    label_detail_matched: bool
+
+def completion_trigger_info(
+    label: str, label_detail: str, filter_text: str
+) -> CompletionTriggerInfo:
+    """
+    Decide how the `label`, `labelDetails.detail` and `filterText` of an LSP completion item are presented in ST.
+
+    Missing values should be passed as empty strings.
+    """
+
 def format_completion(
     item: CompletionItem,
     index: int,
@@ -74,6 +89,6 @@ class LspCommitCompletionWithOppositeInsertMode(LspTextCommand):
     def run(self, edit: sublime.Edit, event: dict | None = None) -> None: ...
 
 class LspSelectCompletionCommand(LspTextCommand):
-    completions: dict[SessionName, CompletionsStore]
+    completions: ClassVar[dict[SessionName, CompletionsStore]]
     def run(self, edit: sublime.Edit, index: int, session_name: str) -> None: ...
     def want_event(self) -> bool: ...
