@@ -675,6 +675,13 @@ class Session(APIHandler, TransportCallbacks, TaskContainer):
         flags: sublime.NewFileFlags = ...,
         group: int = -1,
     ) -> Promise[sublime.View | None]: ...
+    async def open_externally(self, uri: DocumentUri | str) -> bool:
+        """
+        Open a URI or a file path with the default application of the OS.
+
+        Returns whether the URI was opened successfully. Note that this currently blocks the event loop until the OS
+        command that opens the URI returns.
+        """
     def open_location_async(
         self,
         location: Location | LocationLink,
