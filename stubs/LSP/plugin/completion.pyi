@@ -57,6 +57,9 @@ def completion_trigger_info(
     Missing values should be passed as empty strings.
     """
 
+def completion_item_trigger(item: CompletionItem) -> str:
+    """Return the trigger that `format_completion` creates the ST completion item with."""
+
 def format_completion(
     item: CompletionItem,
     index: int,
@@ -90,5 +93,18 @@ class LspCommitCompletionWithOppositeInsertMode(LspTextCommand):
 
 class LspSelectCompletionCommand(LspTextCommand):
     completions: ClassVar[dict[SessionName, CompletionsStore]]
-    def run(self, edit: sublime.Edit, index: int, session_name: str) -> None: ...
     def want_event(self) -> bool: ...
+    def run(self, edit: sublime.Edit, index: int, session_name: str) -> None: ...
+
+class LspApplyCompletionCommand(LspTextCommand):
+    def run(
+        self,
+        edit: sublime.Edit,
+        session_name: str,
+        item: CompletionItem,
+        trigger: str,
+        reverse_insert_mode: bool,
+        edit_region: list[int] | None = None,
+        change_count: int | None = None,
+        change_id: list[int] | None = None,
+    ) -> None: ...

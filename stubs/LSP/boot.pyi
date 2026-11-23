@@ -11,6 +11,7 @@ from .plugin.code_lens import (
 )
 from .plugin.color import LspColorPresentationCommand as LspColorPresentationCommand
 from .plugin.completion import (
+    LspApplyCompletionCommand as LspApplyCompletionCommand,
     LspCommitCompletionWithOppositeInsertMode as LspCommitCompletionWithOppositeInsertMode,
     LspResolveDocsCommand as LspResolveDocsCommand,
     LspSelectCompletionCommand as LspSelectCompletionCommand,

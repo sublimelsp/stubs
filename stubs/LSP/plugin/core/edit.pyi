@@ -49,6 +49,9 @@ def parse_workspace_edit(
     workspace_edit: WorkspaceEdit, label: str | None = None
 ) -> WorkspaceChanges: ...
 def parse_lsp_position(position: Position) -> tuple[int, int]: ...
+def utf16_to_code_points(s: str, col: int) -> int:
+    """Convert a position from UTF-16 code units to Unicode code points, usable for string slicing."""
+
 def apply_text_edits(
     view: sublime.View,
     edits: Sequence[TextEdit | AnnotatedTextEdit | SnippetTextEdit],

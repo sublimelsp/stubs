@@ -7,6 +7,7 @@ from .core.edit import (
     is_snippet_text_edit as is_snippet_text_edit,
     parse_lsp_position as parse_lsp_position,
     parse_workspace_edit as parse_workspace_edit,
+    utf16_to_code_points as utf16_to_code_points,
 )
 from .core.logging import debug as debug
 from .core.panels import PanelName as PanelName, buttons_html as buttons_html
@@ -64,8 +65,6 @@ class LspApplyDocumentEditCommand(sublime_plugin.TextCommand):
 def prompt_for_workspace_edits(
     session: Session, response: WorkspaceEdit, label: str
 ) -> Promise[bool]: ...
-def utf16_to_code_points(s: str, col: int) -> int:
-    """Convert a position from UTF-16 code units to Unicode code points, usable for string slicing."""
 
 class LspConcludeWorkspaceEditPanelCommand(sublime_plugin.WindowCommand):
     def run(self, window_id: int, accept: bool) -> None: ...

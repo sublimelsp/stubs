@@ -1,6 +1,7 @@
 import sublime
 from ...protocol import SignatureHelp
 from .constants import MarkdownLangMap as MarkdownLangMap
+from .edit import utf16_to_code_points as utf16_to_code_points
 from .logging import debug as debug
 from .registry import LspTextCommand as LspTextCommand
 from .views import (
